@@ -1,0 +1,89 @@
+{
+  "detector": {
+    "ignoreRules": [],
+    "ignoreFiles": [],
+    "ignoreValues": [
+      {
+        "rule": "repeating-stripes-gradient",
+        "value": "*",
+        "files": [
+          "hub.css"
+        ],
+        "createdAt": "2026-09-08T19:25:08.137Z",
+        "reason": "Impeccable: hard-stop 1px repeating rules render the bottle-green baize weave and the empty slot's die-cut hatch, both named materials in the committed Compendium Box direction contract."
+      },
+      {
+        "rule": "repeating-stripes-gradient",
+        "value": "*",
+        "files": [
+          "games/tic-tac-toe/style.css"
+        ],
+        "createdAt": "2026-09-08T19:25:08.189Z",
+        "reason": "Impeccable: hard-stop 1px repeating rules render the bottle-green baize weave and the empty slot's die-cut hatch, both named materials in the committed Compendium Box direction contract."
+      },
+      {
+        "rule": "repeating-stripes-gradient",
+        "value": "*",
+        "files": [
+          "games/2048/style.css"
+        ],
+        "createdAt": "2026-09-08T19:25:08.246Z",
+        "reason": "Impeccable: hard-stop 1px repeating rules render the bottle-green baize weave and the empty slot's die-cut hatch, both named materials in the committed Compendium Box direction contract."
+      },
+      {
+        "rule": "repeating-stripes-gradient",
+        "value": "*",
+        "files": [
+          "games/tetris/style.css"
+        ],
+        "createdAt": "2026-09-08T19:25:08.295Z",
+        "reason": "Impeccable: hard-stop 1px repeating rules render the bottle-green baize weave and the empty slot's die-cut hatch, both named materials in the committed Compendium Box direction contract."
+      },
+      {
+        "rule": "repeating-stripes-gradient",
+        "value": "*",
+        "files": [
+          "games/math-puzzles/style.css"
+        ],
+        "createdAt": "2026-09-08T19:25:08.344Z",
+        "reason": "Impeccable: hard-stop 1px repeating rules render the bottle-green baize weave and the empty slot's die-cut hatch, both named materials in the committed Compendium Box direction contract."
+      },
+      {
+        "rule": "repeating-stripes-gradient",
+        "value": "*",
+        "files": [
+          "games/dc-romp/style.css"
+        ],
+        "createdAt": "2026-09-08T19:25:08.393Z",
+        "reason": "Impeccable: hard-stop 1px repeating rules render the bottle-green baize weave and the empty slot's die-cut hatch, both named materials in the committed Compendium Box direction contract."
+      },
+      {
+        "rule": "side-tab",
+        "value": "*",
+        "files": [
+          "games/tic-tac-toe/style.css"
+        ],
+        "createdAt": "2026-09-08T19:25:25.679Z",
+        "reason": "Impeccable: the flagged border-right is the tic-tac-toe board's printed 3x3 grid rule drawn with cell borders. The rule IS the game board, not a card side-tab."
+      },
+      {
+        "rule": "all-caps-body",
+        "value": "*",
+        "files": [
+          "index.html"
+        ],
+        "createdAt": "2026-09-08T19:25:25.726Z",
+        "reason": "Impeccable: the board spec strips (1 PLAYER - ENDLESS - KEYBOARD) are the printed spec line a boxed game carries under its title; caps at 11px with tracking is the form, not styled body copy."
+      },
+      {
+        "rule": "cramped-padding",
+        "value": "*",
+        "files": [
+          "index.html"
+        ],
+        "createdAt": "2026-09-08T19:25:25.773Z",
+        "reason": "Impeccable: measured false positive on .lid__plate - the render shows 25-46px clearance on all four sides; the rule reads the decorative inset gold ring (an inset box-shadow) as the container boundary. Confirmed by the finish reviewer."
+      }
+    ]
+  }
+}

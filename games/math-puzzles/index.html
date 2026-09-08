@@ -1,0 +1,121 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Math Puzzles — Game Hub</title>
+<link rel="stylesheet" href="type.css">
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+<a href="../../index.html" class="hub-link">
+  <svg class="hub-link__arrow" viewBox="0 0 16 16" aria-hidden="true" focusable="false"><path d="M10 2 4 8l6 6" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="square"/></svg>
+  Back to the box
+</a>
+
+<main class="wrap">
+  <header class="head">
+    <p class="head__no">No.&nbsp;04</p>
+    <h1>Math&nbsp;Puzzles</h1>
+  </header>
+
+  <div class="hud" id="hud" hidden>
+    <span id="hudType"></span>
+    <span id="hudDifficulty" class="badge"></span>
+    <span id="hudTimer" class="badge" hidden></span>
+    <span id="hudStats"></span>
+  </div>
+
+  <section id="screen-menu" class="screen">
+    <p class="tagline">Three puzzles in one board. None of them goes past 7th-grade arithmetic &mdash; the difficulty is the puzzle, not the maths.</p>
+    <div class="type-grid">
+      <button class="type-card" data-type="make24">
+        <svg class="type-icon" viewBox="0 0 132 62" aria-hidden="true" focusable="false">
+          <g class="ti-plate"><rect x="4" y="6" width="28" height="28"/><rect x="36" y="6" width="28" height="28"/><rect x="68" y="6" width="28" height="28"/><rect x="100" y="6" width="28" height="28"/></g>
+          <g class="ti-num"><text x="18" y="27">8</text><text x="50" y="27">3</text><text x="82" y="27">8</text><text x="114" y="27">3</text></g>
+          <text class="ti-eq" x="66" y="54">= 24</text>
+        </svg>
+        <h2>Make 24</h2>
+        <p>Combine four numbers with +, &minus;, &times; and &divide; until you land on exactly 24.</p>
+      </button>
+      <button class="type-card" data-type="calcudoku">
+        <svg class="type-icon" viewBox="0 0 80 80" aria-hidden="true" focusable="false">
+          <rect x="6" y="6" width="68" height="68" class="ti-field"/>
+          <g class="ti-grid"><path d="M23 6v68M40 6v68M57 6v68M6 23h68M6 40h68M6 57h68"/></g>
+          <g class="ti-cage"><path d="M9 9h31v14H26v14H9z"/><path d="M43 9h28v31H43z"/></g>
+          <rect x="6" y="6" width="68" height="68" class="ti-frame"/>
+          <g class="ti-clue"><text x="12" y="19">12×</text><text x="46" y="19">3−</text></g>
+        </svg>
+        <h2>Calcudoku</h2>
+        <p>Fill the grid with 1 to N so no row or column repeats and every cage hits its target.</p>
+      </button>
+      <button class="type-card" data-type="pyramid">
+        <svg class="type-icon" viewBox="0 0 80 76" aria-hidden="true" focusable="false">
+          <g class="ti-plate">
+            <rect x="28" y="10" width="24" height="16"/>
+            <rect x="15" y="30" width="24" height="16"/><rect x="41" y="30" width="24" height="16"/>
+            <rect x="2" y="50" width="24" height="16"/><rect x="28" y="50" width="24" height="16"/><rect x="54" y="50" width="24" height="16"/>
+          </g>
+          <g class="ti-num sm"><text x="40" y="23">34</text><text x="27" y="43">15</text><text x="53" y="43">19</text><text x="14" y="63">7</text><text x="40" y="63">8</text><text x="66" y="63">11</text></g>
+        </svg>
+        <h2>Number Pyramid</h2>
+        <p>Work out the missing blocks. Each one is the sum of the two sitting under it.</p>
+      </button>
+    </div>
+  </section>
+
+  <section id="screen-settings" class="screen" hidden>
+    <h2 id="settingsTitle">Settings</h2>
+    <div class="settings-group">
+      <p class="settings-label">Difficulty</p>
+      <div class="toggle-row" id="difficultyToggle">
+        <button class="toggle-btn" data-value="easy">Easy</button>
+        <button class="toggle-btn" data-value="medium">Medium</button>
+        <button class="toggle-btn" data-value="hard">Hard</button>
+      </div>
+    </div>
+    <div class="settings-group">
+      <p class="settings-label">Clock</p>
+      <div class="toggle-row" id="timedToggle">
+        <button class="toggle-btn" data-value="untimed">No clock</button>
+        <button class="toggle-btn" data-value="timed">Timed</button>
+      </div>
+    </div>
+    <div class="settings-stats" id="settingsStats"></div>
+    <div class="btn-row">
+      <button class="btn btn-ghost" id="settingsBackBtn">Back</button>
+      <button class="btn btn-primary" id="settingsStartBtn">Deal a puzzle</button>
+    </div>
+  </section>
+
+  <section id="screen-play" class="screen" hidden>
+    <div class="play-controls">
+      <button class="btn btn-ghost" id="playBackBtn">Back to the puzzles</button>
+      <button class="btn btn-ghost" id="playHintBtn">Hint</button>
+      <button class="btn btn-ghost" id="playCheckBtn">Check</button>
+      <button class="btn btn-primary" id="playNewBtn">Deal another</button>
+    </div>
+    <p id="playMessage" class="play-message" hidden></p>
+    <div id="puzzleContainer"></div>
+  </section>
+
+  <section id="screen-solved" class="screen" hidden>
+    <div class="solved-card">
+      <h2>Solved</h2>
+      <p id="solvedDetail"></p>
+      <div class="btn-row">
+        <button class="btn btn-ghost" id="solvedMenuBtn">Back to the puzzles</button>
+        <button class="btn btn-primary" id="solvedNextBtn">Deal another</button>
+      </div>
+    </div>
+  </section>
+</main>
+
+<script src="rational.js"></script>
+<script src="storage.js"></script>
+<script src="make24.js"></script>
+<script src="calcudoku.js"></script>
+<script src="pyramid.js"></script>
+<script src="app.js"></script>
+</body>
+</html>

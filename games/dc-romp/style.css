@@ -1,0 +1,167 @@
+/* ==========================================================================
+   D.C. Romp — No. 05 in the Game Hub compendium.
+
+   Only the frame around the canvas lives here: the table, the tab back to the
+   box, and the printed edge of the board the game is played on. Everything
+   inside the canvas is drawn by js/ui.js (menus, HUD) and the entity files
+   (the level itself, which keeps its own cartoon look).
+   ========================================================================== */
+
+:root {
+  --table:      #123b2c;
+  --table-deep: #0d2b20;
+  --table-weft: #16452f;
+
+  --ink:        #171410;
+  --paper:      #e6dcc4;
+  --red:        #b32d17;
+  --red-lit:    #e8542f;
+
+  --edge:       6px;
+}
+
+* { box-sizing: border-box; }
+
+html, body {
+  margin: 0;
+  padding: 0;
+  height: 100%;
+  overflow: hidden;
+}
+
+body {
+  background: var(--table);
+  background-image:
+    repeating-linear-gradient(90deg, var(--table-weft) 0 1px, transparent 1px 4px),
+    repeating-linear-gradient(0deg,  var(--table-weft) 0 1px, transparent 1px 4px);
+  color: var(--paper);
+  font: 400 16px/1.5 Slab, Georgia, serif;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  -webkit-text-size-adjust: 100%;
+}
+
+::selection { background: var(--red); color: var(--paper); }
+:focus-visible { outline: 3px solid var(--red-lit); outline-offset: 3px; }
+
+/* ── the tab back to the box ──────────────────────────────────────────── */
+
+.hub-link {
+  position: fixed;
+  top: 0;
+  left: clamp(14px, 4vw, 40px);
+  z-index: 10;
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  background: var(--paper);
+  color: var(--ink);
+  border: 3px solid var(--ink);
+  border-top: 0;
+  padding: 9px 16px 10px;
+  font-size: 11.5px;
+  font-weight: 700;
+  letter-spacing: .16em;
+  text-transform: uppercase;
+  text-decoration: none;
+  box-shadow: 4px 4px 0 0 var(--ink);
+  transition: transform .14s cubic-bezier(.2, .9, .3, 1);
+}
+.hub-link:hover, .hub-link:focus-visible { transform: translateY(3px); color: var(--red); }
+.hub-link__arrow { width: 13px; height: 13px; }
+
+/* ── the board itself ─────────────────────────────────────────────────── */
+
+#game {
+  display: block;
+  background: #7ec8e3;
+  border: 3px solid var(--ink);
+  box-shadow: var(--edge) var(--edge) 0 0 var(--ink);
+  image-rendering: -webkit-optimize-contrast;
+  max-width: calc(100vw - 34px);
+  max-height: calc(100vh - 34px);
+}
+
+noscript {
+  display: block;
+  max-width: 40ch;
+  padding: 18px 20px;
+  background: var(--paper);
+  color: var(--ink);
+  border: 3px solid var(--ink);
+  box-shadow: var(--edge) var(--edge) 0 0 var(--ink);
+  font-size: 15px;
+}
+
+/* ── too narrow to play ───────────────────────────────────────────────── */
+
+/* Below the width where the level is legible, the canvas would render as a
+   thumbnail with 5px labels. This game is keyboard-only anyway, so the honest
+   answer is to say so on a printed slip rather than ship an unreadable board. */
+.too-narrow { display: none; }
+
+@media (max-width: 700px) {
+  html, body { overflow: auto; }
+  body { display: block; padding: 0 18px 48px; }
+  #game { display: none; }
+
+  .too-narrow {
+    position: relative;
+    display: block;
+    max-width: 34rem;
+    margin: clamp(84px, 22vw, 130px) auto 0;
+    padding: 26px 22px 24px;
+    background: #4aa3d8;
+    color: var(--ink);
+    border: 3px solid var(--ink);
+    box-shadow: var(--edge) var(--edge) 0 0 var(--ink);
+  }
+
+  .too-narrow__no {
+    position: absolute;
+    top: 0;
+    right: 0;
+    margin: 0;
+    background: var(--ink);
+    color: var(--paper);
+    padding: 5px 10px 4px;
+    font-size: 11px;
+    font-weight: 700;
+    letter-spacing: .16em;
+    text-transform: uppercase;
+  }
+
+  .too-narrow h1 {
+    margin: 0 0 14px;
+    font: 400 clamp(32px, 11vw, 46px)/0.95 Lid, Georgia, serif;
+    text-transform: uppercase;
+    letter-spacing: .012em;
+    color: var(--ink);
+  }
+
+  .too-narrow p { margin: 0 0 12px; font-size: 15.5px; line-height: 1.5; }
+
+  .too-narrow__do { font-weight: 700; }
+
+  .too-narrow a {
+    display: inline-block;
+    margin-top: 6px;
+    background: var(--red);
+    color: var(--paper);
+    border: 3px solid var(--ink);
+    padding: 12px 18px;
+    font-size: 11.5px;
+    font-weight: 700;
+    letter-spacing: .15em;
+    text-transform: uppercase;
+    text-decoration: none;
+    box-shadow: 5px 5px 0 0 var(--ink);
+  }
+
+  .hub-link { display: none; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .hub-link { transition: none; }
+}

@@ -1,0 +1,67 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>2048 — Game Hub</title>
+<link rel="stylesheet" href="type.css">
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+<a href="../../index.html" class="hub-link">
+  <svg class="hub-link__arrow" viewBox="0 0 16 16" aria-hidden="true" focusable="false"><path d="M10 2 4 8l6 6" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="square"/></svg>
+  Back to the box
+</a>
+
+<main class="wrap">
+  <header class="head">
+    <div class="head__title">
+      <p class="head__no">No.&nbsp;02</p>
+      <h1>2048</h1>
+      <p class="head__rule">Slide the tray. Equal tiles join and double.</p>
+    </div>
+    <div class="scores">
+      <div class="score-box">
+        <span class="score-label">Score</span>
+        <span class="score-value" id="score">0</span>
+        <span class="score-add" id="scoreAdd"></span>
+      </div>
+      <div class="score-box">
+        <span class="score-label">Best</span>
+        <span class="score-value" id="best">0</span>
+      </div>
+    </div>
+  </header>
+
+  <div class="controls">
+    <button class="btn btn-primary" id="newGameBtn">Empty the tray</button>
+    <button class="btn btn-ghost" id="undoBtn">Take the move back</button>
+  </div>
+
+  <div class="board" id="board">
+    <div class="cells" id="cells"></div>
+    <div class="tiles" id="tiles"></div>
+    <div class="overlay" id="overlay" hidden>
+      <h2 id="overlayTitle"></h2>
+      <p id="overlayText"></p>
+      <div class="overlay-actions">
+        <button class="btn btn-primary" id="overlayPrimary"></button>
+        <button class="btn btn-ghost" id="overlayUndo">Take the move back</button>
+      </div>
+    </div>
+  </div>
+
+  <div class="legend">
+    <p class="legend__head">How it is played</p>
+    <dl class="legend__list">
+      <div><dt>Arrow keys<span>/</span>WASD</dt><dd>Slide every tile that way</dd></div>
+      <div><dt>Swipe</dt><dd>Same thing, on a touch screen</dd></div>
+      <div><dt>U</dt><dd>Take the move back &mdash; 25 deep, and it survives a reload</dd></div>
+    </dl>
+  </div>
+</main>
+
+<script src="board.js"></script>
+<script src="game.js"></script>
+</body>
+</html>

@@ -1,0 +1,619 @@
+/* ==========================================================================
+   Math Puzzles — No. 04 in the Game Hub compendium.
+
+   Three puzzle boards printed on one plum sheet, with a pad of pieces for
+   each. All three puzzle types render into #puzzleContainer, so their classes
+   (m24-, ck-, pyr-) all live here alongside the shared shell.
+   ========================================================================== */
+
+:root {
+  --table:      #123b2c;
+  --table-deep: #0d2b20;
+  --table-weft: #16452f;
+
+  --ink:        #171410;
+  --ink-70:     rgba(23, 20, 16, .70);
+  --ink-45:     rgba(23, 20, 16, .45);
+  --ink-30:     rgba(23, 20, 16, .30);
+  --ink-15:     rgba(23, 20, 16, .15);
+  --paper:      #e6dcc4;
+  --paper-dim:  #c3b696;
+
+  --red:        #b32d17;
+  --red-lit:    #e8542f;
+  --good:       #12503a;   /* the box's own green, not a stock success colour */
+
+  --field:      #6a2e5c;   /* this game's printed colour */
+  --gold:       #e8c25a;
+
+  --edge:       6px;
+}
+
+* { box-sizing: border-box; }
+
+html {
+  background: var(--table);
+  background-image:
+    repeating-linear-gradient(90deg, var(--table-weft) 0 1px, transparent 1px 4px),
+    repeating-linear-gradient(0deg,  var(--table-weft) 0 1px, transparent 1px 4px);
+  color: var(--paper);
+  -webkit-text-size-adjust: 100%;
+}
+
+body {
+  margin: 0;
+  font: 400 16px/1.55 Slab, Georgia, serif;
+  min-height: 100vh;
+  padding: 0 20px 72px;
+}
+
+::selection { background: var(--red); color: var(--paper); }
+:focus-visible { outline: 3px solid var(--red-lit); outline-offset: 3px; }
+html { scrollbar-color: #6d5a41 var(--table-deep); }
+::-webkit-scrollbar { width: 13px; height: 13px; }
+::-webkit-scrollbar-track { background: var(--table-deep); }
+::-webkit-scrollbar-thumb { background: #6d5a41; border: 3px solid var(--table-deep); }
+
+/* ── the tab back to the box ──────────────────────────────────────────── */
+
+.hub-link {
+  position: fixed;
+  top: 0;
+  left: clamp(14px, 4vw, 40px);
+  z-index: 30;
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  background: var(--paper);
+  color: var(--ink);
+  border: 3px solid var(--ink);
+  border-top: 0;
+  padding: 9px 16px 10px;
+  font-size: 11.5px;
+  font-weight: 700;
+  letter-spacing: .16em;
+  text-transform: uppercase;
+  text-decoration: none;
+  box-shadow: 4px 4px 0 0 var(--ink);
+  transition: transform .14s cubic-bezier(.2, .9, .3, 1);
+}
+.hub-link:hover, .hub-link:focus-visible { transform: translateY(3px); color: var(--red); }
+.hub-link__arrow { width: 13px; height: 13px; }
+
+/* ── page ─────────────────────────────────────────────────────────────── */
+
+.wrap {
+  max-width: 760px;
+  margin: 0 auto;
+  padding-top: clamp(74px, 12vw, 104px);
+}
+
+/* This game's own printed field, on its own page. */
+.head {
+  position: relative;
+  width: fit-content;
+  max-width: 100%;
+  background: var(--field);
+  color: var(--paper);
+  border: 3px solid var(--ink);
+  box-shadow: var(--edge) var(--edge) 0 0 var(--ink);
+  margin: 0 var(--edge) calc(20px + var(--edge)) 0;
+  padding: 22px 104px 24px 24px;
+}
+
+.head__no {
+  position: absolute;
+  top: 0;
+  right: 0;
+  background: var(--ink);
+  color: var(--paper);
+  padding: 5px 10px 4px;
+  margin: 0;
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: .16em;
+  text-transform: uppercase;
+}
+
+h1 {
+  margin: 0;
+  font: 400 clamp(36px, 8.5vw, 58px)/0.95 Lid, Georgia, serif;
+  text-transform: uppercase;
+  letter-spacing: .012em;
+  color: var(--paper);
+}
+
+.tagline {
+  margin: 0 0 26px;
+  max-width: 60ch;
+  font-size: 15.5px;
+  color: rgba(230, 220, 196, .82);
+}
+
+/* ── the running head, once a puzzle is out ───────────────────────────── */
+
+.hud {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 9px 12px;
+  margin-bottom: 20px;
+  padding-bottom: 14px;
+  border-bottom: 2px solid rgba(230, 220, 196, .2);
+  font-size: 11.5px;
+  font-weight: 700;
+  letter-spacing: .14em;
+  text-transform: uppercase;
+  color: var(--paper);
+}
+.hud[hidden] { display: none; }
+
+#hudStats {
+  margin-left: auto;
+  font-weight: 400;
+  letter-spacing: .08em;
+  text-transform: none;
+  font-size: 13px;
+  color: rgba(230, 220, 196, .7);
+}
+
+.badge {
+  background: var(--gold);
+  color: var(--ink);
+  border: 2px solid var(--ink);
+  padding: 3px 8px 2px;
+  font-variant-numeric: tabular-nums;
+}
+.badge[hidden] { display: none; }
+
+/* ── screens ──────────────────────────────────────────────────────────── */
+
+.screen[hidden] { display: none; }
+
+/* ── picking a puzzle ─────────────────────────────────────────────────── */
+
+/* Three boards of three different shapes, on the same twelve-column plan the
+   hub uses — not three equal cards. Each icon keeps its own aspect, so the
+   boards come out at different heights as well as different widths. */
+.type-grid {
+  display: grid;
+  grid-template-columns: repeat(12, 1fr);
+  align-items: start;
+  gap: 18px;
+  padding: 0 var(--edge) var(--edge) 0;
+}
+
+.type-card:nth-of-type(1) { grid-column: span 5; }
+.type-card:nth-of-type(2) { grid-column: span 4; }
+.type-card:nth-of-type(3) { grid-column: span 3; }
+
+.type-card {
+  appearance: none;
+  -webkit-appearance: none;
+  text-align: left;
+  cursor: pointer;
+  background: var(--paper);
+  color: var(--ink);
+  border: 3px solid var(--ink);
+  padding: 0 0 16px;
+  box-shadow: var(--edge) var(--edge) 0 0 var(--ink);
+  transition: transform .14s cubic-bezier(.2, .9, .3, 1), box-shadow .14s cubic-bezier(.2, .9, .3, 1);
+  font: inherit;
+  display: flex;
+  flex-direction: column;
+}
+.type-card:hover, .type-card:focus-visible {
+  transform: translate(-3px, -3px);
+  box-shadow: calc(var(--edge) + 3px) calc(var(--edge) + 3px) 0 0 var(--ink);
+}
+.type-card:active { transform: translate(2px, 2px); box-shadow: 3px 3px 0 0 var(--ink); }
+
+.type-icon {
+  display: block;
+  width: 100%;
+  height: auto;
+  background: var(--field);
+  border-bottom: 3px solid var(--ink);
+  padding: 16px;
+  color: var(--paper);
+}
+
+.ti-plate rect { fill: var(--paper); stroke: var(--ink); stroke-width: 2.5; }
+.ti-num text { font: 700 18px/1 Slab, Georgia, serif; fill: var(--ink); text-anchor: middle; font-variant-numeric: tabular-nums; }
+.ti-num.sm text { font-size: 13px; }
+.ti-field { fill: rgba(23, 20, 16, .16); }
+.ti-grid  { stroke: currentColor; opacity: .34; fill: none; stroke-width: 1.4; }
+.ti-cage  { fill: none; stroke: var(--gold); stroke-width: 2.5; stroke-dasharray: 4 3; }
+.ti-frame { fill: none; stroke: currentColor; stroke-width: 2.5; }
+.ti-clue text { font: 700 9px/1 Slab, Georgia, serif; fill: currentColor; }
+.ti-eq { font: 700 13px/1 Slab, Georgia, serif; fill: currentColor; text-anchor: middle; letter-spacing: .14em; }
+
+.type-card h2 {
+  margin: 15px 16px 0;
+  font: 400 22px/1 Lid, Georgia, serif;
+  text-transform: uppercase;
+}
+.type-card:hover h2, .type-card:focus-visible h2 { color: var(--red); }
+
+.type-card p {
+  margin: 9px 16px 0;
+  font-size: 14px;
+  line-height: 1.5;
+  color: var(--ink-70);
+}
+
+/* ── settings ─────────────────────────────────────────────────────────── */
+
+#settingsTitle {
+  margin: 0 0 22px;
+  font: 400 clamp(26px, 5vw, 34px)/1 Lid, Georgia, serif;
+  text-transform: uppercase;
+  color: var(--paper);
+}
+
+.settings-group { margin-bottom: 22px; }
+
+.settings-label {
+  margin: 0 0 9px;
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: .18em;
+  text-transform: uppercase;
+  color: #d9b46a;
+}
+
+.toggle-row { display: flex; flex-wrap: wrap; gap: 0; }
+
+.toggle-btn {
+  appearance: none;
+  -webkit-appearance: none;
+  cursor: pointer;
+  font: 700 12px/1 Slab, Georgia, serif;
+  letter-spacing: .13em;
+  text-transform: uppercase;
+  padding: 12px 18px;
+  background: var(--paper);
+  color: var(--ink);
+  border: 3px solid var(--ink);
+  margin-left: -3px;
+  transition: background-color .12s linear, color .12s linear;
+}
+.toggle-btn:first-child { margin-left: 0; }
+.toggle-btn:hover { background: var(--paper-dim); }
+.toggle-btn.active { background: var(--field); color: var(--paper); position: relative; z-index: 1; }
+
+/* the record card for this puzzle type: a small printed slip, not a callout */
+.settings-stats {
+  margin: 0 0 24px;
+  padding: 13px 16px 14px;
+  background: var(--paper);
+  color: var(--ink);
+  border: 3px solid var(--ink);
+  box-shadow: 4px 4px 0 0 var(--ink);
+  max-width: 460px;
+  font-size: 14px;
+  line-height: 1.6;
+  font-variant-numeric: tabular-nums;
+}
+.settings-stats:empty { display: none; }
+
+.btn-row { display: flex; flex-wrap: wrap; gap: 10px; }
+
+/* ── buttons ──────────────────────────────────────────────────────────── */
+
+.btn {
+  appearance: none;
+  -webkit-appearance: none;
+  font: 700 12px/1 Slab, Georgia, serif;
+  letter-spacing: .15em;
+  text-transform: uppercase;
+  padding: 12px 18px;
+  border: 3px solid var(--ink);
+  cursor: pointer;
+  box-shadow: 5px 5px 0 0 var(--ink);
+  transition: transform .12s cubic-bezier(.2, .9, .3, 1), box-shadow .12s cubic-bezier(.2, .9, .3, 1);
+}
+.btn:hover:not(:disabled), .btn:focus-visible { transform: translate(-2px, -2px); box-shadow: 7px 7px 0 0 var(--ink); }
+.btn:active:not(:disabled) { transform: translate(2px, 2px); box-shadow: 2px 2px 0 0 var(--ink); }
+.btn:disabled {
+  cursor: not-allowed;
+  background: var(--paper-dim);
+  color: var(--ink-45);
+  border-color: var(--ink-45);
+  box-shadow: 5px 5px 0 0 var(--ink-45);
+}
+
+.btn-primary { background: var(--red); color: var(--paper); }
+.btn-ghost   { background: var(--paper); color: var(--ink); }
+
+/* ── playing ──────────────────────────────────────────────────────────── */
+
+.play-controls {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+  margin-bottom: 20px;
+}
+
+.play-message {
+  margin: 0 0 18px;
+  padding: 12px 14px;
+  background: var(--gold);
+  color: var(--ink);
+  border: 3px solid var(--ink);
+  font-size: 14px;
+  font-weight: 700;
+  box-shadow: 4px 4px 0 0 var(--ink);
+}
+.play-message[hidden] { display: none; }
+
+.puzzle-instructions {
+  margin: 0 0 18px;
+  max-width: 62ch;
+  font-size: 14.5px;
+  line-height: 1.55;
+  color: rgba(230, 220, 196, .78);
+}
+
+/* every puzzle board is a printed plum sheet on the table */
+.m24-wrap, .ck-wrap, .pyr-wrap {
+  background: var(--field);
+  border: 3px solid var(--ink);
+  padding: clamp(16px, 4vw, 28px);
+  box-shadow: var(--edge) var(--edge) 0 0 var(--ink);
+}
+
+/* ── Make 24 ──────────────────────────────────────────────────────────── */
+
+.m24-tiles {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 12px;
+  margin-bottom: 20px;
+}
+
+.m24-tile {
+  appearance: none;
+  -webkit-appearance: none;
+  cursor: pointer;
+  min-width: 72px;
+  padding: 18px 14px;
+  background: var(--paper);
+  color: var(--ink);
+  border: 3px solid var(--ink);
+  font: 700 24px/1 Slab, Georgia, serif;
+  font-variant-numeric: tabular-nums;
+  box-shadow: 5px 5px 0 0 var(--ink);
+  transition: transform .12s cubic-bezier(.2, .9, .3, 1), box-shadow .12s cubic-bezier(.2, .9, .3, 1), background-color .12s linear;
+}
+.m24-tile:hover { transform: translate(-2px, -2px); box-shadow: 7px 7px 0 0 var(--ink); }
+/* Picked up. Gold is status in this system and never a control, so a chosen
+   piece reverses its plate instead of changing colour — ink ground, paper
+   numeral, pressed into the board. */
+.m24-tile.selected {
+  background: var(--ink);
+  color: var(--paper);
+  transform: translate(2px, 2px);
+  box-shadow: 2px 2px 0 0 var(--ink), inset 0 0 0 3px var(--paper);
+}
+
+.m24-ops {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+  margin-bottom: 18px;
+}
+
+.m24-op {
+  appearance: none;
+  -webkit-appearance: none;
+  cursor: pointer;
+  width: 52px;
+  height: 52px;
+  background: var(--paper);
+  color: var(--ink);
+  border: 3px solid var(--ink);
+  font: 700 22px/1 Slab, Georgia, serif;
+  box-shadow: 4px 4px 0 0 var(--ink);
+  transition: transform .12s cubic-bezier(.2, .9, .3, 1), box-shadow .12s cubic-bezier(.2, .9, .3, 1), background-color .12s linear;
+}
+.m24-op:hover:not(:disabled) { transform: translate(-2px, -2px); box-shadow: 6px 6px 0 0 var(--ink); }
+.m24-op.selected {
+  background: var(--ink);
+  color: var(--paper);
+  transform: translate(2px, 2px);
+  box-shadow: 2px 2px 0 0 var(--ink), inset 0 0 0 3px var(--paper);
+}
+/* Waiting for a tile, not gone: the operators stay legible so it is obvious
+   what will become available once a tile is picked. */
+.m24-op:disabled {
+  cursor: not-allowed;
+  background: var(--paper-dim);
+  color: var(--ink-45);
+  border-color: var(--ink-45);
+  box-shadow: 4px 4px 0 0 var(--ink-45);
+}
+
+.m24-undo { margin-bottom: 4px; }
+
+.m24-message, .ck-message, .pyr-message {
+  margin: 16px 0 0;
+  font-size: 14px;
+  font-weight: 700;
+  letter-spacing: .05em;
+  color: var(--paper);
+  min-height: 1.4em;
+}
+.m24-message.success, .ck-message.success, .pyr-message.success { color: #9fe0b4; }
+.m24-message.error, .pyr-message.error { color: #ffb59f; }
+
+/* ── Calcudoku ────────────────────────────────────────────────────────── */
+
+.ck-grid {
+  display: grid;
+  gap: 0;
+  width: fit-content;
+  max-width: 100%;
+  margin: 0 auto;
+  background: var(--ink);
+  border: 3px solid var(--ink);
+}
+
+.ck-cell {
+  position: relative;
+  width: clamp(46px, 12vw, 62px);
+  height: clamp(46px, 12vw, 62px);
+  background: var(--paper);
+  box-shadow: inset 0 0 0 1px var(--ink-15);
+}
+
+/* cage walls: heavy ink where a cage ends, hairline where it continues */
+.ck-edge-top    { box-shadow: inset 0  3px 0 0 var(--ink), inset 0 0 0 1px var(--ink-15); }
+.ck-edge-right  { box-shadow: inset -3px 0 0 0 var(--ink), inset 0 0 0 1px var(--ink-15); }
+.ck-edge-bottom { box-shadow: inset 0 -3px 0 0 var(--ink), inset 0 0 0 1px var(--ink-15); }
+.ck-edge-left   { box-shadow: inset  3px 0 0 0 var(--ink), inset 0 0 0 1px var(--ink-15); }
+.ck-edge-top.ck-edge-left     { box-shadow: inset 0 3px 0 0 var(--ink), inset 3px 0 0 0 var(--ink), inset 0 0 0 1px var(--ink-15); }
+.ck-edge-top.ck-edge-right    { box-shadow: inset 0 3px 0 0 var(--ink), inset -3px 0 0 0 var(--ink), inset 0 0 0 1px var(--ink-15); }
+.ck-edge-bottom.ck-edge-left  { box-shadow: inset 0 -3px 0 0 var(--ink), inset 3px 0 0 0 var(--ink), inset 0 0 0 1px var(--ink-15); }
+.ck-edge-bottom.ck-edge-right { box-shadow: inset 0 -3px 0 0 var(--ink), inset -3px 0 0 0 var(--ink), inset 0 0 0 1px var(--ink-15); }
+.ck-edge-top.ck-edge-left.ck-edge-right     { box-shadow: inset 0 3px 0 0 var(--ink), inset 3px 0 0 0 var(--ink), inset -3px 0 0 0 var(--ink), inset 0 0 0 1px var(--ink-15); }
+.ck-edge-bottom.ck-edge-left.ck-edge-right  { box-shadow: inset 0 -3px 0 0 var(--ink), inset 3px 0 0 0 var(--ink), inset -3px 0 0 0 var(--ink), inset 0 0 0 1px var(--ink-15); }
+.ck-edge-top.ck-edge-bottom.ck-edge-left    { box-shadow: inset 0 3px 0 0 var(--ink), inset 0 -3px 0 0 var(--ink), inset 3px 0 0 0 var(--ink), inset 0 0 0 1px var(--ink-15); }
+.ck-edge-top.ck-edge-bottom.ck-edge-right   { box-shadow: inset 0 3px 0 0 var(--ink), inset 0 -3px 0 0 var(--ink), inset -3px 0 0 0 var(--ink), inset 0 0 0 1px var(--ink-15); }
+.ck-edge-top.ck-edge-bottom.ck-edge-left.ck-edge-right { box-shadow: inset 0 0 0 3px var(--ink); }
+
+.ck-clue {
+  position: absolute;
+  top: 4px;
+  left: 5px;
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: .02em;
+  color: var(--ink);
+  pointer-events: none;
+  font-variant-numeric: tabular-nums;
+}
+
+.ck-input {
+  width: 100%;
+  height: 100%;
+  border: 0;
+  background: transparent;
+  text-align: center;
+  font: 700 clamp(20px, 5vw, 26px)/1 Slab, Georgia, serif;
+  color: var(--field);
+  font-variant-numeric: tabular-nums;
+  padding: 8px 0 0;
+  -moz-appearance: textfield;
+}
+.ck-input::-webkit-outer-spin-button,
+.ck-input::-webkit-inner-spin-button { -webkit-appearance: none; margin: 0; }
+.ck-input:focus { outline: none; background: rgba(232, 194, 90, .38); }
+.ck-input.conflict { color: var(--red); background: rgba(179, 45, 23, .16); }
+
+.ck-numpad {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  justify-content: center;
+  margin-top: 20px;
+}
+
+.ck-pad-btn {
+  appearance: none;
+  -webkit-appearance: none;
+  cursor: pointer;
+  min-width: 46px;
+  padding: 12px 10px;
+  background: var(--paper);
+  color: var(--ink);
+  border: 3px solid var(--ink);
+  font: 700 17px/1 Slab, Georgia, serif;
+  font-variant-numeric: tabular-nums;
+  box-shadow: 4px 4px 0 0 var(--ink);
+  transition: transform .1s cubic-bezier(.2, .9, .3, 1), box-shadow .1s cubic-bezier(.2, .9, .3, 1);
+}
+.ck-pad-btn:hover { transform: translate(-2px, -2px); box-shadow: 6px 6px 0 0 var(--ink); }
+.ck-pad-btn:active { transform: translate(2px, 2px); box-shadow: 2px 2px 0 0 var(--ink); }
+.ck-pad-clear { background: var(--paper-dim); font-size: 11px; letter-spacing: .1em; text-transform: uppercase; }
+
+/* ── Number Pyramid ───────────────────────────────────────────────────── */
+
+.pyr-pyramid { display: flex; flex-direction: column; align-items: center; gap: 7px; }
+.pyr-row { display: flex; gap: 7px; }
+
+.pyr-cell {
+  width: clamp(52px, 13vw, 68px);
+  height: clamp(40px, 10vw, 50px);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: rgba(230, 220, 196, .14);
+  border: 3px solid var(--ink);
+  font: 700 clamp(16px, 4vw, 20px)/1 Slab, Georgia, serif;
+  color: var(--paper);
+  font-variant-numeric: tabular-nums;
+}
+.pyr-given { background: var(--paper); color: var(--ink); }
+.pyr-cell.mismatch { background: rgba(179, 45, 23, .3); border-color: var(--red-lit); color: #ffd9cd; }
+
+.pyr-input-el {
+  width: 100%;
+  height: 100%;
+  border: 0;
+  background: transparent;
+  text-align: center;
+  font: 700 clamp(16px, 4vw, 20px)/1 Slab, Georgia, serif;
+  color: var(--gold);
+  font-variant-numeric: tabular-nums;
+  -moz-appearance: textfield;
+}
+.pyr-input-el::-webkit-outer-spin-button,
+.pyr-input-el::-webkit-inner-spin-button { -webkit-appearance: none; margin: 0; }
+.pyr-input-el:focus { outline: none; background: rgba(232, 194, 90, .22); }
+
+/* ── solved ───────────────────────────────────────────────────────────── */
+
+.solved-card {
+  background: var(--paper);
+  color: var(--ink);
+  border: 3px solid var(--ink);
+  padding: clamp(22px, 5vw, 34px);
+  box-shadow: var(--edge) var(--edge) 0 0 var(--ink);
+  max-width: 480px;
+}
+
+.solved-card h2 {
+  margin: 0;
+  font: 400 clamp(34px, 8vw, 48px)/1 Lid, Georgia, serif;
+  text-transform: uppercase;
+  color: var(--good);
+}
+
+.solved-card p {
+  margin: 12px 0 22px;
+  font-size: 15px;
+  line-height: 1.6;
+  color: var(--ink-70);
+  font-variant-numeric: tabular-nums;
+}
+
+@media (max-width: 720px) {
+  .type-card:nth-of-type(1) { grid-column: span 7; }
+  .type-card:nth-of-type(2) { grid-column: span 5; }
+  .type-card:nth-of-type(3) { grid-column: 1 / -1; }
+}
+
+@media (max-width: 520px) {
+  :root { --edge: 5px; }
+  .type-card:nth-of-type(1),
+  .type-card:nth-of-type(2),
+  .type-card:nth-of-type(3) { grid-column: 1 / -1; }
+  .hud { font-size: 11px; }
+  #hudStats { margin-left: 0; flex-basis: 100%; }
+  .m24-tile { min-width: 60px; padding: 14px 10px; font-size: 20px; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .btn, .hub-link, .type-card, .m24-tile, .m24-op, .ck-pad-btn, .toggle-btn { transition: none; }
+}

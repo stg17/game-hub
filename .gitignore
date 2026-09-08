@@ -1,0 +1,28 @@
+# Screenshots captured for design review. Regenerable, and they churn on every
+# visual change — the built pages are the source of truth, not the captures.
+.impeccable/review/
+
+# Machine-local Impeccable overrides (the committed config.json is shared)
+.impeccable/config.local.json
+
+# Throwaway capture/driver harnesses
+__*.html
+
+# OneDrive / Windows / macOS cruft
+desktop.ini
+Thumbs.db
+ehthumbs.db
+.DS_Store
+
+# Editor
+.vscode/
+.idea/
+*.swp
+
+# Not used today, but cheap insurance if a tool ever gets added
+node_modules/
+
+# Impeccable transient state (the surface briefs, config.json and design.json
+# ARE project files and stay tracked)
+**/.impeccable/hook.cache.json
+.impeccable/questions/

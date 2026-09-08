@@ -1,0 +1,283 @@
+{
+  "schemaVersion": 2,
+  "generatedAt": "2026-09-08T00:00:00.000Z",
+  "title": "Design System: Game Hub",
+  "extensions": {
+    "colorMeta": {
+      "table": {
+        "role": "secondary",
+        "displayName": "Bottle Green Table",
+        "canonical": "#123b2c",
+        "tonalRamp": ["#071710", "#0d2b20", "#123b2c", "#1a5540", "#237055", "#3d9a78", "#78c3a8", "#c8e7db"]
+      },
+      "table-deep": {
+        "role": "secondary",
+        "displayName": "Table Deep",
+        "canonical": "#0d2b20",
+        "tonalRamp": ["#050f0b", "#0a2018", "#0d2b20", "#134030", "#1a5540", "#2e8163", "#65b795", "#bfe3d4"]
+      },
+      "table-weft": {
+        "role": "secondary",
+        "displayName": "Table Weft",
+        "canonical": "#16452f",
+        "tonalRamp": ["#081a11", "#0f2f20", "#16452f", "#1e5d3f", "#277650", "#3fa470", "#7ecaa2", "#cbe9d9"]
+      },
+      "tray": {
+        "role": "secondary",
+        "displayName": "Chipboard Tray",
+        "canonical": "#6d5a41",
+        "tonalRamp": ["#221c14", "#372d20", "#4a3d2c", "#5c4c37", "#6d5a41", "#8e7757", "#b9a382", "#e2d7c3"]
+      },
+      "tray-cut": {
+        "role": "secondary",
+        "displayName": "Tray Cut Face",
+        "canonical": "#4a3d2c",
+        "tonalRamp": ["#171310", "#2c2419", "#3b3123", "#4a3d2c", "#5f4f39", "#826d4f", "#b09879", "#ded3bf"]
+      },
+      "ink": {
+        "role": "neutral",
+        "displayName": "Printed Black",
+        "canonical": "#171410",
+        "tonalRamp": ["#0a0908", "#171410", "#2b261e", "#443c30", "#615647", "#8a7d6a", "#b8ad9a", "#e4dcd0"]
+      },
+      "ink-70": { "role": "neutral", "displayName": "Ink 70%", "canonical": "rgba(23, 20, 16, .70)" },
+      "ink-45": { "role": "neutral", "displayName": "Ink 45%", "canonical": "rgba(23, 20, 16, .45)" },
+      "ink-30": { "role": "neutral", "displayName": "Ink 30%", "canonical": "rgba(23, 20, 16, .30)" },
+      "ink-15": { "role": "neutral", "displayName": "Ink 15%", "canonical": "rgba(23, 20, 16, .15)" },
+      "ink-08": { "role": "neutral", "displayName": "Ink 8%", "canonical": "rgba(23, 20, 16, .08)" },
+      "paper": {
+        "role": "neutral",
+        "displayName": "Pulpboard",
+        "canonical": "#e6dcc4",
+        "tonalRamp": ["#2b2519", "#463d29", "#63573c", "#867257", "#a89b7c", "#c3b696", "#e6dcc4", "#f7f2e6"]
+      },
+      "paper-dim": {
+        "role": "neutral",
+        "displayName": "Dimmed Pulpboard",
+        "canonical": "#c3b696",
+        "tonalRamp": ["#241f15", "#3d3524", "#584c34", "#756547", "#93815d", "#b0a07c", "#c3b696", "#e9e2d0"]
+      },
+      "red": {
+        "role": "primary",
+        "displayName": "Chrome Red",
+        "canonical": "#b32d17",
+        "tonalRamp": ["#2c0b05", "#4d130a", "#701c0e", "#941f12", "#b32d17", "#d64a2c", "#ea8368", "#f7c9bc"]
+      },
+      "red-lit": {
+        "role": "primary",
+        "displayName": "Lit Chrome",
+        "canonical": "#e8542f",
+        "tonalRamp": ["#37130a", "#5c1e0f", "#822a15", "#ab381c", "#cf4525", "#e8542f", "#f28e70", "#fbd0c3"]
+      },
+      "gold": {
+        "role": "tertiary",
+        "displayName": "Stamp Gold",
+        "canonical": "#e8c25a",
+        "tonalRamp": ["#3a2c0a", "#5c4712", "#7f631a", "#a48124", "#c8a133", "#e8c25a", "#f2d894", "#faeece"]
+      },
+      "gold-dim": {
+        "role": "tertiary",
+        "displayName": "Dimmed Stamp Gold",
+        "canonical": "#d9b46a",
+        "tonalRamp": ["#332508", "#523c11", "#73561a", "#977325", "#bb9132", "#d9b46a", "#ecd39f", "#f8eed6"]
+      },
+      "field-tetris": {
+        "role": "tertiary",
+        "displayName": "Cobalt (Tetris, No. 01)",
+        "canonical": "#1f4f9c",
+        "tonalRamp": ["#08152c", "#0e264c", "#14376e", "#1a4386", "#1f4f9c", "#3170ca", "#79a3e0", "#cbdcf5"]
+      },
+      "field-2048": {
+        "role": "tertiary",
+        "displayName": "Ochre (2048, No. 02)",
+        "canonical": "#d8912a",
+        "tonalRamp": ["#332006", "#54360c", "#764c13", "#9c661a", "#bd7c21", "#d8912a", "#eab967", "#f7e3bd"]
+      },
+      "field-ttt": {
+        "role": "tertiary",
+        "displayName": "Teal (Tic Tac Toe, No. 03)",
+        "canonical": "#155e58",
+        "tonalRamp": ["#051d1b", "#0a332f", "#0f4642", "#155e58", "#1b7a72", "#28a89d", "#63cdc3", "#c3ebe7"]
+      },
+      "field-math": {
+        "role": "tertiary",
+        "displayName": "Plum (Math Puzzles, No. 04)",
+        "canonical": "#6a2e5c",
+        "tonalRamp": ["#1e0c1a", "#33152c", "#4a1e40", "#6a2e5c", "#883b76", "#ab539a", "#c98cbc", "#eccde3"]
+      },
+      "field-romp": {
+        "role": "tertiary",
+        "displayName": "Sky (D.C. Romp, No. 05)",
+        "canonical": "#4aa3d8",
+        "tonalRamp": ["#0b2231", "#123a53", "#1a5478", "#25719e", "#3389c1", "#4aa3d8", "#8ac5e8", "#d2e9f7"]
+      }
+    },
+    "typographyMeta": {
+      "lid": { "displayName": "Lid", "purpose": "The wordmark on the propped box lid. Bevan 400, uppercase. One per set." },
+      "page-title": { "displayName": "Page Title", "purpose": "The h1 inside each game's full-strength head plate." },
+      "board-title": { "displayName": "Board Title", "purpose": "The game name on a hub board's glued-on label strip; also canvas menu titles." },
+      "body": { "displayName": "Body", "purpose": "Zilla Slab 400 page default on all six surfaces." },
+      "rule": { "displayName": "Rule Line", "purpose": "The one-sentence explanation of a game, capped at 46ch." },
+      "numeral": { "displayName": "Numeral", "purpose": "Every score, best, timer and tile value. Always Slab 700, always tabular-nums." },
+      "spec": { "displayName": "Spec Strip", "purpose": "The printed spec line under a board title, and small panel labels. 11px tracked caps." },
+      "stamp": { "displayName": "Set Stamp", "purpose": "The ink-ground set number in the corner of every plate, and the back tab." },
+      "control": { "displayName": "Control Face", "purpose": "Button and toggle labels. Slab 700 12px tracked caps." }
+    },
+    "shadows": [
+      { "name": "board-edge", "value": "var(--edge) var(--edge) 0 0 var(--ink)", "purpose": "The board's own die-cut thickness (6px desktop, 5px narrow, 7px on D.C. Romp's canvas frame). Major plates: hub board fields and label strips, head plates, score plates, panels, the 2048 tray, the Tetris stage. Always paired with margin-right: var(--edge)." },
+      { "name": "chip-edge", "value": "5px 5px 0 0 var(--ink)", "purpose": "Buttons and Make 24 tiles." },
+      { "name": "slip-edge", "value": "4px 4px 0 0 var(--ink)", "purpose": "The back tab, small record slips, numpad keys." },
+      { "name": "lifted", "value": "7px 7px 0 0 var(--ink)", "purpose": "Hover / focus-visible on a chip, paired with transform: translate(-2px, -2px). Board plates use calc(var(--edge) + 3px) with translate(-3px, -3px)." },
+      { "name": "pressed", "value": "2px 2px 0 0 var(--ink)", "purpose": ":active, paired with transform: translate(2px, 2px). The plate is pushed into the table." },
+      { "name": "punched-well", "value": "inset 2px 2px 0 0 rgba(23, 20, 16, .18)", "purpose": "A recess cut into a plate — the 2048 background cells." },
+      { "name": "printed-ring", "value": "inset 0 0 0 3px #e8c25a", "purpose": "A gold ring printed inside a milestone tile (2048 and above). Status marking, never a control." },
+      { "name": "lid-inset", "value": "inset 0 0 0 3px var(--table-deep), inset 0 0 0 6px #b98f3e", "purpose": "The decorative gold ring inset into the lid plate. The only place gold rules the box itself." }
+    ],
+    "motion": [
+      { "name": "announce", "value": "cubic-bezier(.2, .9, .3, 1)", "purpose": "The only easing in the system. Transitions are announced, not faded. .16s on board plates, .12s–.14s on chips and the back tab." },
+      { "name": "swap", "value": "linear", "purpose": ".12s linear on background-color and color swaps (toggles, selected states). Colour changes hard." },
+      { "name": "reduced-motion", "value": "@media (prefers-reduced-motion: reduce) { transition: none }", "purpose": "Every animated surface drops its transition. Honoured in hub.css, tetris, 2048 and math-puzzles." }
+    ],
+    "breakpoints": [
+      { "name": "two-up", "value": "1080px" },
+      { "name": "narrow", "value": "700px" }
+    ],
+    "distribution": {
+      "rule": "Duplicate, never link.",
+      "body": "hub.css and each games/<name>/style.css re-declare the same :root token block locally, and type.css is byte-identical in all six folders with both faces embedded as base64 data URIs. Per-folder independence is a product constraint (no game may break another), and Chrome will not fetch @font-face files over file://. Extracting a shared stylesheet or an external font file breaks the build.",
+      "canvasParity": "Surfaces without CSS carry the same system by hand: Game.UI's INK/PAPER/PAPER_DIM/TABLE/TABLE_WEFT/RED/RED_LIT/GOLD/FIELD constants and its plate(), sheet(), regMark(), setStamp(), button(), tracked() helpers; and Render.block()'s flat darker cut lip in Tetris."
+    },
+    "scopeBoundary": {
+      "rule": "D.C. Romp's in-level world art is outside this system.",
+      "body": "Characters, platforms, collectibles and parallax backgrounds keep their original cartoon look (Game.Draw's cartoonBox/roundRectPath/groundShadow/highlight). Only D.C. Romp's canvas menus, HUD, pause screens and page frame are in the box. Do not unify the level art."
+    }
+  },
+  "components": [
+    {
+      "name": "Primary Button",
+      "kind": "button",
+      "refersTo": "button-primary",
+      "description": "The one red control on a surface — start, new game, the thing you press.",
+      "html": "<button class=\"ds-btn ds-btn-primary\">NEW GAME</button>",
+      "css": ".ds-btn { appearance: none; font: 700 12px/1 Slab, Georgia, serif; letter-spacing: .15em; text-transform: uppercase; padding: 12px 18px; border: 3px solid #171410; border-radius: 0; cursor: pointer; box-shadow: 5px 5px 0 0 #171410; transition: transform .12s cubic-bezier(.2,.9,.3,1), box-shadow .12s cubic-bezier(.2,.9,.3,1); } .ds-btn-primary { background: #b32d17; color: #e6dcc4; } .ds-btn:hover, .ds-btn:focus-visible { transform: translate(-2px,-2px); box-shadow: 7px 7px 0 0 #171410; } .ds-btn:focus-visible { outline: 3px solid #e8542f; outline-offset: 3px; } .ds-btn:active { transform: translate(2px,2px); box-shadow: 2px 2px 0 0 #171410; }"
+    },
+    {
+      "name": "Ghost Button",
+      "kind": "button",
+      "refersTo": "button-ghost",
+      "description": "A pulpboard chip for every secondary action. Same die-cut body, no red.",
+      "html": "<button class=\"ds-btn-ghost\">UNDO</button>",
+      "css": ".ds-btn-ghost { appearance: none; font: 700 12px/1 Slab, Georgia, serif; letter-spacing: .15em; text-transform: uppercase; padding: 12px 18px; background: #e6dcc4; color: #171410; border: 3px solid #171410; border-radius: 0; cursor: pointer; box-shadow: 5px 5px 0 0 #171410; transition: transform .12s cubic-bezier(.2,.9,.3,1), box-shadow .12s cubic-bezier(.2,.9,.3,1), background-color .12s linear; } .ds-btn-ghost:hover, .ds-btn-ghost:focus-visible { background: #c3b696; transform: translate(-2px,-2px); box-shadow: 7px 7px 0 0 #171410; } .ds-btn-ghost:focus-visible { outline: 3px solid #e8542f; outline-offset: 3px; } .ds-btn-ghost:active { transform: translate(2px,2px); box-shadow: 2px 2px 0 0 #171410; } .ds-btn-ghost:disabled { cursor: not-allowed; background: #c3b696; color: rgba(23,20,16,.45); border-color: rgba(23,20,16,.45); box-shadow: 5px 5px 0 0 rgba(23,20,16,.45); transform: none; }"
+    },
+    {
+      "name": "Game Board",
+      "kind": "card",
+      "refersTo": "board-field",
+      "description": "The hub's signature component: a printed field plate carrying the drawn components and a corner set stamp, with a pulpboard label strip glued underneath. Both plates lift together.",
+      "html": "<a class=\"ds-board\" href=\"#\"><span class=\"ds-board-field\"><svg class=\"ds-board-art\" viewBox=\"0 0 240 150\" aria-hidden=\"true\"><rect x=\"70\" y=\"14\" width=\"100\" height=\"122\" fill=\"rgba(23,20,16,.08)\"/><rect x=\"70\" y=\"14\" width=\"100\" height=\"122\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"2.5\"/><g fill=\"none\" stroke=\"currentColor\" stroke-width=\"1\" opacity=\".28\"><path d=\"M95 14v122M120 14v122M145 14v122M70 45h100M70 76h100M70 107h100\"/></g><rect x=\"95\" y=\"76\" width=\"25\" height=\"25\" fill=\"#d8912a\" stroke=\"#171410\" stroke-width=\"2\"/><rect x=\"120\" y=\"76\" width=\"25\" height=\"25\" fill=\"#d8912a\" stroke=\"#171410\" stroke-width=\"2\"/></svg><span class=\"ds-board-no\">No.&nbsp;01</span></span><span class=\"ds-board-foot\"><span class=\"ds-board-title\">Tetris</span><span class=\"ds-board-rule\">Turn and drop the falling shapes. Fill a row and it clears.</span><span class=\"ds-board-spec\">1 player · endless · keyboard</span><span class=\"ds-board-record\">Best 12,400</span></span></a>",
+      "css": ".ds-board { --edge: 6px; --field: #1f4f9c; --on-field: #e6dcc4; display: flex; flex-direction: column; width: 340px; max-width: 100%; text-decoration: none; color: #171410; } .ds-board-field { position: relative; display: block; background: var(--field); color: var(--on-field); border: 3px solid #171410; border-radius: 0; padding: 18px; margin-right: var(--edge); box-shadow: var(--edge) var(--edge) 0 0 #171410; transition: transform .16s cubic-bezier(.2,.9,.3,1), box-shadow .16s cubic-bezier(.2,.9,.3,1); } .ds-board-art { display: block; width: 100%; height: auto; max-height: 300px; color: var(--on-field); } .ds-board-no { position: absolute; top: 0; right: 0; background: #171410; color: #e6dcc4; font: 700 11px/1 Slab, Georgia, serif; letter-spacing: .14em; text-transform: uppercase; padding: 5px 10px 4px; } .ds-board-foot { display: block; background: #e6dcc4; color: #171410; border: 3px solid #171410; border-top: 0; border-radius: 0; margin-right: var(--edge); padding: 14px 16px 15px; box-shadow: var(--edge) var(--edge) 0 0 #171410; transition: transform .16s cubic-bezier(.2,.9,.3,1), box-shadow .16s cubic-bezier(.2,.9,.3,1); } .ds-board-title { display: block; font: 400 27px/1 Lid, Georgia, serif; text-transform: uppercase; letter-spacing: .01em; } .ds-board-rule { display: block; margin-top: 8px; font: 400 14.5px/1.45 Slab, Georgia, serif; max-width: 46ch; color: rgba(23,20,16,.70); } .ds-board-spec { display: block; margin-top: 11px; font: 700 11px/1.35 Slab, Georgia, serif; letter-spacing: .15em; text-transform: uppercase; } .ds-board-record { display: block; margin-top: 12px; padding-top: 9px; border-top: 2px solid rgba(23,20,16,.15); font: 700 12px/1.35 Slab, Georgia, serif; letter-spacing: .09em; text-transform: uppercase; font-variant-numeric: tabular-nums; } .ds-board:hover .ds-board-field, .ds-board:hover .ds-board-foot, .ds-board:focus-visible .ds-board-field, .ds-board:focus-visible .ds-board-foot { transform: translate(-3px,-3px); box-shadow: calc(var(--edge) + 3px) calc(var(--edge) + 3px) 0 0 #171410; } .ds-board:hover .ds-board-title { color: #b32d17; } .ds-board:active .ds-board-field, .ds-board:active .ds-board-foot { transform: translate(1px,1px); } .ds-board:focus-visible { outline: none; } .ds-board:focus-visible .ds-board-field { outline: 3px solid #e8542f; outline-offset: 4px; }"
+    },
+    {
+      "name": "Head Plate",
+      "kind": "custom",
+      "refersTo": "head-plate",
+      "description": "Each game page opens with its own printed field at full strength, the page title in Lid, a 46ch rule line, and the set stamp in the reserved right inset.",
+      "html": "<header class=\"ds-head\"><p class=\"ds-head-no\">No.&nbsp;01</p><h1 class=\"ds-head-title\">Tetris</h1><p class=\"ds-head-rule\">Turn and drop the falling shapes. Fill a row and it clears.</p></header>",
+      "css": ".ds-head { --edge: 6px; position: relative; width: fit-content; max-width: 100%; background: #1f4f9c; color: #e6dcc4; border: 3px solid #171410; border-radius: 0; box-shadow: var(--edge) var(--edge) 0 0 #171410; margin: 0 var(--edge) calc(24px + var(--edge)) 0; padding: 22px 104px 24px 24px; } .ds-head-no { position: absolute; top: 0; right: 0; margin: 0; background: #171410; color: #e6dcc4; padding: 5px 10px 4px; font: 700 11px/1 Slab, Georgia, serif; letter-spacing: .16em; text-transform: uppercase; } .ds-head-title { margin: 0; font: 400 60px/0.95 Lid, Georgia, serif; text-transform: uppercase; letter-spacing: .012em; color: #e6dcc4; } .ds-head-rule { margin: 12px 0 0; max-width: 46ch; font: 400 15px/1.5 Slab, Georgia, serif; color: rgba(230,220,196,.88); }"
+    },
+    {
+      "name": "Back Tab",
+      "kind": "nav",
+      "refersTo": "hub-link",
+      "description": "The only navigation between surfaces. A plate hung from the top edge of the viewport that pushes down when you reach for it.",
+      "html": "<a class=\"ds-hub-link\" href=\"#\"><svg class=\"ds-hub-link-arrow\" viewBox=\"0 0 16 16\" aria-hidden=\"true\" focusable=\"false\"><path d=\"M10 2 4 8l6 6\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"2.4\" stroke-linecap=\"square\"/></svg>Back to the box</a>",
+      "css": ".ds-hub-link { display: inline-flex; align-items: center; gap: 8px; background: #e6dcc4; color: #171410; border: 3px solid #171410; border-top: 0; border-radius: 0; padding: 9px 16px 10px; font: 700 11.5px/1 Slab, Georgia, serif; letter-spacing: .16em; text-transform: uppercase; text-decoration: none; box-shadow: 4px 4px 0 0 #171410; transition: transform .14s cubic-bezier(.2,.9,.3,1), color .14s linear; } .ds-hub-link-arrow { width: 13px; height: 13px; } .ds-hub-link:hover, .ds-hub-link:focus-visible { transform: translateY(3px); color: #b32d17; } .ds-hub-link:focus-visible { outline: 3px solid #e8542f; outline-offset: 3px; }"
+    },
+    {
+      "name": "Score Slip",
+      "kind": "card",
+      "refersTo": "slip",
+      "description": "A small printed slip carrying a tracked-caps label over a tabular numeral. Every score, best, level and timer readout in the box is one of these.",
+      "html": "<div class=\"ds-slip\"><span class=\"ds-slip-label\">Best</span><span class=\"ds-slip-value\">12,400</span></div>",
+      "css": ".ds-slip { --edge: 6px; display: inline-block; background: #e6dcc4; color: #171410; border: 3px solid #171410; border-radius: 0; padding: 9px 12px 10px; margin-right: var(--edge); box-shadow: var(--edge) var(--edge) 0 0 #171410; min-width: 128px; } .ds-slip-label { display: block; font: 700 11px/1.35 Slab, Georgia, serif; letter-spacing: .18em; text-transform: uppercase; color: rgba(23,20,16,.70); } .ds-slip-value { display: block; font: 700 27px/1.1 Slab, Georgia, serif; font-variant-numeric: tabular-nums; }"
+    },
+    {
+      "name": "Status Badge",
+      "kind": "chip",
+      "refersTo": "badge-status",
+      "description": "Gold marks state and nothing else — a streak count, a message plate, a milestone. It never fills a control.",
+      "html": "<span class=\"ds-badge\">STREAK 4</span>",
+      "css": ".ds-badge { display: inline-block; background: #e8c25a; color: #171410; border: 2px solid #171410; border-radius: 0; padding: 3px 8px 2px; font: 700 11px/1.35 Slab, Georgia, serif; letter-spacing: .15em; text-transform: uppercase; font-variant-numeric: tabular-nums; }"
+    },
+    {
+      "name": "Grid Input",
+      "kind": "input",
+      "refersTo": null,
+      "description": "A puzzle cell: a flat well in the plate, tabular numerals, no chrome. Focus washes the cell gold; a conflict washes it red.",
+      "html": "<input class=\"ds-cell-input\" type=\"text\" inputmode=\"numeric\" value=\"4\" aria-label=\"Cell\">",
+      "css": ".ds-cell-input { width: 56px; height: 56px; text-align: center; background: rgba(230,220,196,.14); color: #e6dcc4; border: 3px solid #171410; border-radius: 0; font: 700 22px/1 Slab, Georgia, serif; font-variant-numeric: tabular-nums; } .ds-cell-input:focus { outline: none; background: rgba(232,194,90,.38); color: #171410; } .ds-cell-input.conflict { color: #b32d17; background: rgba(179,45,23,.16); }"
+    },
+    {
+      "name": "Empty Slot",
+      "kind": "custom",
+      "refersTo": "empty-slot",
+      "description": "The open space in the tray, printed with the next set number. The invitation, not a disabled card — it sizes itself from the board count and always closes the last row.",
+      "html": "<div class=\"ds-slot\"><span class=\"ds-slot-no\">No.&nbsp;06</span><p class=\"ds-slot-line\">Room for<br>the next game</p><svg class=\"ds-slot-cut\" viewBox=\"0 0 40 40\" aria-hidden=\"true\" focusable=\"false\"><path d=\"M20 8v24M8 20h24\" stroke=\"currentColor\" stroke-width=\"2.5\" stroke-linecap=\"square\"/></svg></div>",
+      "css": ".ds-slot { display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 10px; min-height: 246px; padding: 26px 18px; color: #c3b696; border: 3px dashed rgba(230,220,196,.34); border-radius: 0; background: repeating-linear-gradient(135deg, rgba(230,220,196,.05) 0 9px, transparent 9px 18px); } .ds-slot-no { font: 700 11px/1 Slab, Georgia, serif; letter-spacing: .16em; text-transform: uppercase; } .ds-slot-line { margin: 0; text-align: center; font: 400 15px/1.35 Slab, Georgia, serif; } .ds-slot-cut { width: 34px; height: 34px; color: rgba(230,220,196,.4); }"
+    },
+    {
+      "name": "Box Lid",
+      "kind": "custom",
+      "refersTo": null,
+      "description": "The propped lid at the top of the hub: a recessed plate with a gold inset ring, rotated 1.1 degrees off square, carrying the wordmark and the derived set line beside a printer's rosette.",
+      "html": "<header class=\"ds-lid\"><div class=\"ds-lid-plate\"><h1 class=\"ds-lid-word\">Game&nbsp;Hub</h1><p class=\"ds-lid-set\">five games in one box</p></div><div class=\"ds-lid-stamp\"><svg class=\"ds-rosette\" viewBox=\"0 0 48 48\" aria-hidden=\"true\" focusable=\"false\"><circle cx=\"24\" cy=\"24\" r=\"22.5\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"1.5\"/><circle cx=\"24\" cy=\"24\" r=\"17\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"3\"/><path d=\"M24 3v42M3 24h42\" stroke=\"currentColor\" stroke-width=\"1.5\"/></svg><p class=\"ds-lid-printed\">Printed<br>2026</p></div></header>",
+      "css": ".ds-lid { display: flex; align-items: flex-end; gap: 36px; } .ds-lid-plate { position: relative; background: #0d2b20; border: 3px solid #171410; border-radius: 0; box-shadow: inset 0 0 0 3px #0d2b20, inset 0 0 0 6px #b98f3e; padding: 32px 46px 26px; transform: rotate(-1.1deg); } .ds-lid-word { margin: 0; font: 400 88px/1 Lid, Georgia, serif; letter-spacing: .012em; color: #e6dcc4; text-transform: uppercase; } .ds-lid-set { margin: .5em 0 0; font: 700 15px/1.35 Slab, Georgia, serif; letter-spacing: .22em; text-transform: uppercase; color: #d9b46a; } .ds-lid-stamp { display: flex; align-items: center; gap: 12px; padding-bottom: 10px; color: #c3b696; } .ds-rosette { width: 44px; height: 44px; flex: none; } .ds-lid-printed { margin: 0; font: 700 11px/1.35 Slab, Georgia, serif; letter-spacing: .18em; text-transform: uppercase; }"
+    }
+  ],
+  "narrative": {
+    "northStar": "The Compendium Box",
+    "overview": "The page is the inside of a boxed set of games. A bottle-green baize table fills the frame; the lid is propped at the top edge carrying the wordmark; the games are laid out on the table as separately printed boards, each with its own die-cut components, its own printed field colour, and its set number stamped into the corner. Nothing here is a card in a card grid — every surface is a piece of board stock with a real cut edge.\n\nThe material rules are absolute and they are what make the world hold together across six independently-built folders. Depth is never light: no gradient, no blur, no glass, no soft shadow, no tonal lift anywhere in the shipped build. One flat plate overlaps another, the way die-cut board actually stacks, and the plate's thickness is drawn as a hard black offset with no falloff. Colour is unmixed and printed at full strength. Every keyline is 3px of warm printed black. Where the box needs texture — the baize weave, the empty slot's hatch — it is hard-stop 1px repeating rules, never soft noise or blended fill.\n\nDensity is composed rather than uniform. The hub's tray is a drawn twelve-column plan whose board widths cycle 5-4-3 by position, so a dense Tetris well is answered by a small quiet Tic Tac Toe plate on the same row, and adding a sixth game requires no CSS at all. Inside each game the same vocabulary reappears: a full-strength head plate in that game's own colour, paper slips for numbers, ink-stamped set numbers, and one reserved red for the thing you press.",
+    "keyCharacteristics": [
+      "Flat unmixed printed colour; no gradient, blur, glass, or soft shadow anywhere",
+      "Depth by overlap only — a hard offset plate of ink under every printed surface",
+      "Square corners throughout (0 radius, no exceptions in the build)",
+      "3px warm-black keyline on every plate, chip, tile and input",
+      "One reserved action colour (chrome red); gold is status, never a control",
+      "Every surface carries its set number, so any single screenshot names its piece",
+      "The system is duplicated into each game folder, never linked"
+    ],
+    "rules": [
+      { "name": "The One Red Rule", "body": "Chrome red is the only action colour in the box. If an element is not the thing you press or the thing that is live right now, it is ink, paper or a field colour.", "section": "colors" },
+      { "name": "The Gold Is Not A Button Rule", "body": "Gold marks state — a badge, a message plate, a scored tile's ring, a printed set line. It never fills a control. A control is red (primary) or paper (ghost).", "section": "colors" },
+      { "name": "The Full Strength Rule", "body": "A field colour is used as mixed by the press. There is no 12%-tint background, no lightened hover fill, no colour-mixed variant. If a surface needs to read quieter, it changes stock (paper vs field), not opacity of a hue.", "section": "colors" },
+      { "name": "The Two Faces Rule", "body": "Lid is for lids, board titles and page titles. Everything else — including every numeral — is Slab. Adding a third family breaks the box.", "section": "typography" },
+      { "name": "The 11px Floor Rule", "body": "No functional text is set below 11px. The tracked-caps spec strip at 11px/0.15em is the smallest legible unit in the system and it is a printed form, not shrunken body copy.", "section": "typography" },
+      { "name": "The Tracked Caps Rule", "body": "Uppercase is reserved for printed apparatus — spec strips, set numbers, labels, control faces. Sentences stay sentence case. Canvas has no letter-spacing, so Game.UI.tracked() spaces caps glyph by glyph to match.", "section": "typography" },
+      { "name": "The Composed Plan Rule", "body": "Boards on the table are deliberately different sizes on one plan. A dense board is answered by quiet table. Never render the collection as a uniform grid of equal plates.", "section": "layout" },
+      { "name": "The Open Slot Rule", "body": "The set is open-ended, and the next space is printed with its number rather than hidden. The slot is an invitation — a dashed die-cut outline with a hatch — not a disabled card.", "section": "layout" },
+      { "name": "The No Blur Rule", "body": "Every box-shadow in this system has a blur radius of exactly 0. A blurred shadow, a gradient, a glass panel or a backdrop filter is out of world, full stop.", "section": "elevation" },
+      { "name": "The Reserved Thickness Rule", "body": "A plate that casts a 6px cut edge also carries margin-right: var(--edge) (and where needed a matching bottom allowance). The board reserves its own thickness; it never overhangs its container.", "section": "elevation" }
+    ],
+    "dos": [
+      "Do build depth as one flat plate over another: a 0-blur ink offset (var(--edge), 6px desktop / 5px narrow) plus a matching margin-right: var(--edge) so the plate reserves its own thickness.",
+      "Do give a new game exactly one printed field colour, used at full strength on its hub board and again as its page head plate.",
+      "Do add a game as one <a class=\"board\"> in the tray and let the 5-4-3 cycle, the matching --art-cap, the :has() slot and hub.js's numbering handle width, height ceiling, layout and set number.",
+      "Do duplicate type.css and the :root token block into each new game folder. Per-folder independence is a product constraint, and Chrome cannot fetch @font-face files over file://, so the fonts must stay base64 data URIs.",
+      "Do keep every numeral in Slab 700 with font-variant-numeric: tabular-nums.",
+      "Do draw texture with hard-stop repeating rules — the 1px baize weave, the 9px die-cut hatch — and nothing softer.",
+      "Do mirror the CSS vocabulary on canvas through Game.UI.plate/sheet/regMark/setStamp/button/tracked and Render.block's flat cut lip.",
+      "Do treat an empty or unplayed state as printed content: the numbered open slot, the \"No score set yet\" strip."
+    ],
+    "donts": [
+      "Don't introduce a gradient, blur radius, backdrop-filter, glass panel, gloss highlight, or any tonal lift. Every shadow in this system is 0 0 blur/spread.",
+      "Don't put a border-radius on anything. The build has none.",
+      "Don't spend chrome red on anything but the primary affordance and live state, and don't put gold on a control.",
+      "Don't tint, lighten or colour-mix a field colour to make a variant. Change stock (paper vs field), not the hue's strength.",
+      "Don't extract the duplicated stylesheets or type.css into one shared file. The duplication is the distribution rule, not drift.",
+      "Don't add a third type family, an icon font, an emoji, or a raster image asset. Icons are inline SVG built from the box's own marks.",
+      "Don't set functional text below 11px, and don't use tracked caps for sentences — caps are for printed apparatus only.",
+      "Don't lay the collection out as a uniform grid of equal cards, and don't render the next-game space as a disabled card.",
+      "Don't restyle D.C. Romp's in-level world art. Characters, platforms, collectibles and parallax backgrounds are deliberately outside this system and keep their original cartoon look; only its menus, HUD, pause screens and page frame are in the box."
+    ]
+  }
+}

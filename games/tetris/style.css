@@ -1,0 +1,349 @@
+/* ==========================================================================
+   Tetris — No. 01 in the Game Hub compendium.
+
+   The well is a printed cobalt board; the pieces are printed tokens drawn on
+   the canvas by render.js. Everything around it is board stock and ink.
+   ========================================================================== */
+
+:root {
+  --table:      #123b2c;
+  --table-deep: #0d2b20;
+  --table-weft: #16452f;
+
+  --ink:        #171410;
+  --ink-70:     rgba(23, 20, 16, .70);
+  --ink-30:     rgba(23, 20, 16, .30);
+  --paper:      #e6dcc4;
+  --paper-dim:  #c3b696;
+
+  --red:        #b32d17;
+  --red-lit:    #e8542f;
+
+  --field:      #1f4f9c;   /* this game's printed colour */
+  --well:       #2b60b0;   /* the printed well the tokens fall into */
+
+  --edge:       6px;
+}
+
+* { box-sizing: border-box; }
+
+html {
+  background: var(--table);
+  background-image:
+    repeating-linear-gradient(90deg, var(--table-weft) 0 1px, transparent 1px 4px),
+    repeating-linear-gradient(0deg,  var(--table-weft) 0 1px, transparent 1px 4px);
+  color: var(--paper);
+  -webkit-text-size-adjust: 100%;
+}
+
+body {
+  margin: 0;
+  font: 400 16px/1.55 Slab, Georgia, serif;
+  min-height: 100vh;
+  padding: 0 20px 72px;
+}
+
+::selection { background: var(--red); color: var(--paper); }
+:focus-visible { outline: 3px solid var(--red-lit); outline-offset: 3px; }
+html { scrollbar-color: #6d5a41 var(--table-deep); }
+::-webkit-scrollbar { width: 13px; height: 13px; }
+::-webkit-scrollbar-track { background: var(--table-deep); }
+::-webkit-scrollbar-thumb { background: #6d5a41; border: 3px solid var(--table-deep); }
+
+/* ── the tab back to the box ──────────────────────────────────────────── */
+
+.hub-link {
+  position: fixed;
+  top: 0;
+  left: clamp(14px, 4vw, 40px);
+  z-index: 30;
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  background: var(--paper);
+  color: var(--ink);
+  border: 3px solid var(--ink);
+  border-top: 0;
+  padding: 9px 16px 10px;
+  font-size: 11.5px;
+  font-weight: 700;
+  letter-spacing: .16em;
+  text-transform: uppercase;
+  text-decoration: none;
+  box-shadow: 4px 4px 0 0 var(--ink);
+  transition: transform .14s cubic-bezier(.2, .9, .3, 1);
+}
+.hub-link:hover, .hub-link:focus-visible { transform: translateY(3px); color: var(--red); }
+.hub-link__arrow { width: 13px; height: 13px; }
+
+/* ── page ─────────────────────────────────────────────────────────────── */
+
+.wrap {
+  max-width: 720px;
+  margin: 0 auto;
+  padding-top: clamp(74px, 12vw, 104px);
+}
+
+/* This game's own printed field, on its own page — the same cobalt plate the
+   hub prints No. 01 on, at full strength rather than a tinted-up title. */
+.head {
+  position: relative;
+  width: fit-content;
+  max-width: 100%;
+  background: var(--field);
+  color: var(--paper);
+  border: 3px solid var(--ink);
+  box-shadow: var(--edge) var(--edge) 0 0 var(--ink);
+  margin: 0 var(--edge) calc(24px + var(--edge)) 0;
+  padding: 22px 104px 24px 24px;
+}
+
+.head__no {
+  position: absolute;
+  top: 0;
+  right: 0;
+  background: var(--ink);
+  color: var(--paper);
+  padding: 5px 10px 4px;
+  margin: 0;
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: .16em;
+  text-transform: uppercase;
+}
+
+h1 {
+  margin: 0;
+  font: 400 clamp(38px, 9vw, 60px)/0.95 Lid, Georgia, serif;
+  text-transform: uppercase;
+  letter-spacing: .012em;
+  color: var(--paper);
+}
+
+.head__rule {
+  margin: 12px 0 0;
+  max-width: 46ch;
+  font-size: 15px;
+  color: rgba(230, 220, 196, .88);
+}
+
+/* ── the well, flanked by its component trays ─────────────────────────── */
+
+.layout {
+  display: flex;
+  align-items: flex-start;
+  justify-content: center;
+  gap: clamp(12px, 2.5vw, 22px);
+}
+
+.panel {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  width: 128px;
+  flex: none;
+}
+
+.box, .stat {
+  background: var(--paper);
+  color: var(--ink);
+  border: 3px solid var(--ink);
+  box-shadow: var(--edge) var(--edge) 0 0 var(--ink);
+  padding: 9px 10px 10px;
+}
+
+.box-label, .stat-label {
+  display: block;
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: .18em;
+  text-transform: uppercase;
+  color: var(--ink-70);
+}
+
+.box canvas {
+  display: block;
+  width: 100%;
+  height: auto;
+  margin-top: 7px;
+  background: rgba(23, 20, 16, .07);
+  box-shadow: inset 0 0 0 2px rgba(23, 20, 16, .22);
+}
+
+.stat-value {
+  display: block;
+  font-size: 25px;
+  font-weight: 700;
+  line-height: 1.15;
+  font-variant-numeric: tabular-nums;
+}
+
+.stage {
+  position: relative;
+  flex: none;
+  border: 3px solid var(--ink);
+  box-shadow: var(--edge) var(--edge) 0 0 var(--ink);
+}
+
+#board {
+  display: block;
+  background: var(--well);
+  max-width: 100%;
+  height: auto;
+}
+
+/* ── the sheet laid over the well ─────────────────────────────────────── */
+
+.overlay {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  text-align: center;
+  padding: 22px;
+  background: var(--paper);
+  color: var(--ink);
+}
+.overlay[hidden] { display: none; }
+
+.overlay h2 {
+  margin: 0;
+  font: 400 clamp(26px, 6vw, 40px)/1 Lid, Georgia, serif;
+  text-transform: uppercase;
+  color: var(--field);
+}
+
+.overlay p {
+  margin: 6px 0 0;
+  font-size: 15px;
+  max-width: 24ch;
+  color: var(--ink-70);
+}
+
+/* ── controls ─────────────────────────────────────────────────────────── */
+
+.controls {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+  margin-top: 26px;
+  justify-content: center;
+}
+
+.btn {
+  appearance: none;
+  -webkit-appearance: none;
+  font: 700 12px/1 Slab, Georgia, serif;
+  letter-spacing: .15em;
+  text-transform: uppercase;
+  padding: 12px 18px;
+  border: 3px solid var(--ink);
+  cursor: pointer;
+  box-shadow: 5px 5px 0 0 var(--ink);
+  transition: transform .12s cubic-bezier(.2, .9, .3, 1), box-shadow .12s cubic-bezier(.2, .9, .3, 1);
+}
+.btn:hover, .btn:focus-visible { transform: translate(-2px, -2px); box-shadow: 7px 7px 0 0 var(--ink); }
+.btn:active { transform: translate(2px, 2px); box-shadow: 2px 2px 0 0 var(--ink); }
+
+.btn-primary { background: var(--red); color: var(--paper); }
+.btn-ghost   { background: var(--paper); color: var(--ink); }
+
+/* ── the folded instruction sheet ─────────────────────────────────────── */
+
+.help {
+  margin-top: 30px;
+  border-top: 2px solid rgba(230, 220, 196, .22);
+  padding-top: 14px;
+}
+
+.help summary {
+  cursor: pointer;
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: .18em;
+  text-transform: uppercase;
+  color: #d9b46a;
+  list-style: none;
+  display: flex;
+  align-items: center;
+  gap: 9px;
+}
+.help summary::-webkit-details-marker { display: none; }
+.help summary::before {
+  content: "";
+  width: 9px;
+  height: 9px;
+  flex: none;
+  border: 2px solid currentColor;
+  border-left: 0;
+  border-bottom: 0;
+  transform: rotate(45deg);
+  transition: transform .15s ease-out;
+}
+.help[open] summary::before { transform: rotate(135deg); }
+.help summary:hover { color: var(--paper); }
+
+.help dl { margin: 18px 0 0; display: grid; gap: 8px; }
+.help dl > div { display: flex; gap: 14px; align-items: baseline; }
+
+.help dt {
+  flex: none;
+  width: 104px;
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: .1em;
+  text-transform: uppercase;
+  color: var(--paper);
+}
+
+.help dd {
+  margin: 0;
+  font-size: 14px;
+  color: rgba(230, 220, 196, .78);
+}
+
+.help-note {
+  margin: 18px 0 0;
+  max-width: 68ch;
+  font-size: 13.5px;
+  line-height: 1.6;
+  color: rgba(230, 220, 196, .68);
+  border-top: 2px solid rgba(230, 220, 196, .16);
+  padding-top: 14px;
+}
+
+/* ── narrow: the trays fold under the well ────────────────────────────── */
+
+/* Narrow: the well shrinks so the numbers that drive the game — score, next
+   piece, level — stay on screen with it. The HUD is the task on this surface;
+   it does not get pushed below the fold. */
+@media (max-width: 700px) {
+  :root { --edge: 5px; }
+  /* Both component trays go above the well, so score, hold, next, lines and
+     level are all on screen with the playfield instead of under it. */
+  .layout { flex-wrap: wrap; gap: 10px; }
+  .panel-left  { order: -2; }
+  .panel-right { order: -1; }
+  .stage       { order: 0; margin: 10px auto 0; }
+  .panel { flex-direction: row; width: auto; flex: 1 1 100%; gap: 10px; }
+  .panel .box { flex: 1 1 auto; display: flex; align-items: center; gap: 10px; }
+  .panel .box canvas { margin-top: 0; max-height: 46px; width: auto; flex: 1 1 auto; }
+  .panel .stat { flex: 1 1 0; padding: 7px 9px 8px; }
+  .panel .stat-value { font-size: 21px; }
+  #board { height: min(46vh, 400px); width: auto; }
+  /* the head plate gives up its height on a phone; the playfield needs it */
+  .head { padding: 16px 18px 18px; margin-bottom: calc(14px + var(--edge)); }
+  h1 { font-size: clamp(30px, 8vw, 40px); }
+  .head__rule { margin-top: 8px; font-size: 14px; }
+  /* three controls, so the odd one out fills its row rather than orphaning */
+  .controls .btn { flex: 1 1 auto; }
+  .help dl > div { flex-direction: column; gap: 2px; }
+  .help dt { width: auto; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .btn, .hub-link, .help summary::before { transition: none; }
+}

@@ -1,0 +1,449 @@
+/* ==========================================================================
+   Game Hub — the compendium table.
+
+   The page is the inside of a boxed set: bottle-green baize, the lid propped
+   at the top edge, and the games laid out on it as separately printed boards.
+   Depth in here is never light: it is one flat plate overlapping another, the
+   way die-cut board actually stacks. No gradients, no glass, no blur.
+   ========================================================================== */
+
+:root {
+  /* the table and the box */
+  --table:      #123b2c;
+  --table-deep: #0d2b20;
+  --table-weft: #16452f;
+  --tray:       #6d5a41;
+  --tray-cut:   #4a3d2c;
+
+  /* ink and stock */
+  --ink:        #171410;
+  --ink-70:     rgba(23, 20, 16, .70);
+  --ink-30:     rgba(23, 20, 16, .30);
+  --ink-15:     rgba(23, 20, 16, .15);
+  --ink-08:     rgba(23, 20, 16, .08);
+  --paper:      #e6dcc4;
+  --paper-dim:  #c3b696;
+
+  /* the one reserved colour: the action */
+  --red:        #b32d17;
+  --red-lit:    #e8542f;
+
+  /* printed fields, one per game */
+  --f-tetris:   #1f4f9c;
+  --f-2048:     #d8912a;
+  --f-ttt:      #155e58;
+  --f-math:     #6a2e5c;
+  --f-romp:     #4aa3d8;
+
+  --edge:       6px;   /* the thickness of a board */
+  --gap:        26px;
+}
+
+* { box-sizing: border-box; }
+
+html {
+  background: var(--table);
+  /* woven baize: hard-stop lines only, no soft blending */
+  background-image:
+    repeating-linear-gradient(90deg, var(--table-weft) 0 1px, transparent 1px 4px),
+    repeating-linear-gradient(0deg,  var(--table-weft) 0 1px, transparent 1px 4px);
+  color: var(--paper);
+  -webkit-text-size-adjust: 100%;
+}
+
+body {
+  margin: 0;
+  font: 400 16px/1.55 Slab, Georgia, serif;
+  min-height: 100%;
+  padding: 0 clamp(16px, 4vw, 56px) 72px;
+}
+
+/* browser surfaces get the palette too ------------------------------------ */
+::selection { background: var(--red); color: var(--paper); }
+:focus-visible {
+  outline: 3px solid var(--red-lit);
+  outline-offset: 3px;
+}
+html { scrollbar-color: var(--tray) var(--table-deep); }
+::-webkit-scrollbar { width: 13px; height: 13px; }
+::-webkit-scrollbar-track { background: var(--table-deep); }
+::-webkit-scrollbar-thumb { background: var(--tray); border: 3px solid var(--table-deep); }
+::-webkit-scrollbar-thumb:hover { background: #85704f; }
+
+/* ── the lid, propped at the top edge ─────────────────────────────────── */
+
+.lid {
+  display: flex;
+  align-items: flex-end;
+  gap: clamp(16px, 3vw, 36px);
+  max-width: 1320px;
+  margin: 0 auto;
+  padding: clamp(28px, 5vw, 54px) 0 clamp(26px, 4vw, 44px);
+}
+
+.lid__plate {
+  position: relative;
+  background: var(--table-deep);
+  border: 3px solid var(--ink);
+  box-shadow: inset 0 0 0 3px var(--table-deep), inset 0 0 0 6px #b98f3e;
+  padding: clamp(20px, 3.4vw, 32px) clamp(24px, 4.4vw, 46px) clamp(18px, 2.8vw, 26px);
+  transform: rotate(-1.1deg);
+}
+
+.lid__word {
+  font: 400 clamp(40px, 8.5vw, 88px)/1 Lid, Georgia, serif;
+  letter-spacing: .012em;
+  margin: 0;
+  color: var(--paper);
+  text-transform: uppercase;
+}
+
+.lid__set {
+  margin: .5em 0 0;
+  font-size: clamp(12px, 1.5vw, 15px);
+  font-weight: 700;
+  letter-spacing: .22em;
+  text-transform: uppercase;
+  color: #d9b46a;
+}
+
+.lid__stamp {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding-bottom: 10px;
+  color: var(--paper-dim);
+}
+
+.rosette { width: 44px; height: 44px; flex: none; }
+
+.lid__printed {
+  margin: 0;
+  font-size: 11px;
+  font-weight: 700;
+  line-height: 1.35;
+  letter-spacing: .18em;
+  text-transform: uppercase;
+}
+
+/* ── the tray: boards laid out on the table ───────────────────────────── */
+
+/* A drawn plan, not an auto-fitting card soup: twelve columns, with widths
+   cycling 5-4-3 by position rather than by a class on each board.
+
+   Adding a game is one <a class="board"> element and no CSS edit: the cycle
+   assigns its width, and the empty slot always ends on the last column line
+   (grid-column-end: -1), so it stretches to close whatever the last row of
+   boards left open. Five games, six, seven or twelve all come out flush. */
+.tray {
+  display: grid;
+  grid-template-columns: repeat(12, 1fr);
+  align-items: start;
+  gap: var(--gap);
+  max-width: 1320px;
+  margin: 0 auto;
+  /* the cut edges sit inside the page, never past it */
+  padding: 0 var(--edge) var(--edge) 0;
+}
+
+.board,
+.slot {
+  --field: var(--tray);
+  --on-field: var(--paper);
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+  text-decoration: none;
+  color: var(--ink);
+}
+
+/* Width and height ceiling travel together. The ceiling is what keeps the
+   hierarchy the plan promises: a wide board reads large, a narrow one small,
+   whatever aspect its drawing happens to have. Without it a square emblem in
+   a narrow board grows taller than the Tetris well beside it. */
+.tray a.board:nth-of-type(3n + 1) { grid-column: span 5; --art-cap: 300px; }
+.tray a.board:nth-of-type(3n + 2) { grid-column: span 4; --art-cap: 268px; }
+.tray a.board:nth-of-type(3n + 3) { grid-column: span 3; --art-cap: 228px; }
+
+/* the printed face of the board */
+.board__field {
+  position: relative;
+  display: block;
+  background: var(--field);
+  color: var(--on-field);
+  border: 3px solid var(--ink);
+  padding: 18px;
+  margin-right: var(--edge);
+  /* the board's own cut edge: a flat plate under it, and nothing else. No
+     blur anywhere in this system — depth is one flat plate over another. */
+  box-shadow: var(--edge) var(--edge) 0 0 var(--ink);
+  transition: transform .16s cubic-bezier(.2, .9, .3, 1), box-shadow .16s cubic-bezier(.2, .9, .3, 1);
+}
+
+/* Height follows the drawing up to the board's own ceiling, so the row is a
+   composed plan of different sizes rather than a band of equal plates — and
+   a narrow board can never out-grow a wide one. */
+.board__art {
+  display: block;
+  width: 100%;
+  height: auto;
+  max-height: var(--art-cap, 300px);
+  color: var(--on-field);
+}
+
+/* the set number, printed into the corner of every board */
+.board__no {
+  position: absolute;
+  top: 0;
+  right: 0;
+  background: var(--ink);
+  color: var(--paper);
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: .14em;
+  text-transform: uppercase;
+  padding: 5px 10px 4px;
+}
+
+/* the glued-on label strip along the bottom of the board */
+.board__foot {
+  display: block;
+  background: var(--paper);
+  color: var(--ink);
+  border: 3px solid var(--ink);
+  border-top: 0;
+  margin-right: var(--edge);
+  padding: 14px 16px 15px;
+  box-shadow: var(--edge) var(--edge) 0 0 var(--ink);
+  transition: transform .16s cubic-bezier(.2, .9, .3, 1), box-shadow .16s cubic-bezier(.2, .9, .3, 1);
+}
+
+.board__title {
+  display: block;
+  font: 400 clamp(21px, 2.3vw, 27px)/1 Lid, Georgia, serif;
+  text-transform: uppercase;
+  letter-spacing: .01em;
+}
+
+.board__rule {
+  display: block;
+  margin-top: 8px;
+  font-size: 14.5px;
+  line-height: 1.45;
+  max-width: 46ch;
+  color: var(--ink-70);
+}
+
+.board__spec {
+  display: block;
+  margin-top: 11px;
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: .15em;
+  text-transform: uppercase;
+  color: var(--ink);
+}
+
+/* the printed record strip: what the box remembers about you */
+.board__record {
+  display: block;
+  margin-top: 12px;
+  padding-top: 9px;
+  border-top: 2px solid var(--ink-15);
+  font-size: 12px;
+  font-weight: 700;
+  letter-spacing: .09em;
+  text-transform: uppercase;
+  font-variant-numeric: tabular-nums;
+  color: var(--ink);
+}
+
+.board__record--none { color: var(--ink-70); font-weight: 400; letter-spacing: .06em; }
+
+/* picking up a board */
+.board:hover .board__field,
+.board:hover .board__foot,
+.board:focus-visible .board__field,
+.board:focus-visible .board__foot {
+  transform: translate(-3px, -3px);
+  box-shadow: calc(var(--edge) + 3px) calc(var(--edge) + 3px) 0 0 var(--ink);
+}
+.board:hover .board__foot,
+.board:focus-visible .board__foot {
+  box-shadow: calc(var(--edge) + 3px) calc(var(--edge) + 3px) 0 0 var(--ink);
+}
+.board:active .board__field,
+.board:active .board__foot { transform: translate(1px, 1px); }
+
+.board:hover .board__title,
+.board:focus-visible .board__title { color: var(--red); }
+
+.board:focus-visible { outline: none; }
+.board:focus-visible .board__field { outline: 3px solid var(--red-lit); outline-offset: 4px; }
+
+/* the fields, one per game */
+.board--tetris { --field: var(--f-tetris); --on-field: var(--paper); }
+.board--2048   { --field: var(--f-2048);   --on-field: var(--ink); }
+.board--ttt    { --field: var(--f-ttt);    --on-field: var(--paper); }
+.board--math   { --field: var(--f-math);   --on-field: var(--paper); }
+.board--romp   { --field: var(--f-romp);   --on-field: var(--ink); }
+
+/* ── drawn components inside the boards ──────────────────────────────── */
+
+.ink-fill-8  { fill: var(--ink-08); }
+.ink-line-15 { stroke: currentColor; opacity: .28; fill: none; }
+
+.art-caption text {
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: .16em;
+  fill: currentColor;
+  text-transform: uppercase;
+  text-anchor: middle;
+  font-family: Slab, Georgia, serif;
+}
+.art-caption--left text { text-anchor: start; }
+
+.tiles text {
+  font: 700 19px/1 Slab, Georgia, serif;
+  fill: var(--ink);
+  text-anchor: middle;
+  font-variant-numeric: tabular-nums;
+}
+.tiles text.sm { font-size: 15px; }
+.tiles text.rev { fill: var(--paper); }
+
+.mark-x { stroke: var(--paper); }
+.mark-o { stroke: #e8c25a; }
+.mark-win { stroke: var(--red-lit); fill: none; }
+
+.pz-tile rect { fill: var(--paper); stroke: var(--ink); stroke-width: 2.5; }
+.pz-num text { font: 700 21px/1 Slab, Georgia, serif; fill: var(--ink); text-anchor: middle; font-variant-numeric: tabular-nums; }
+.pz-num.sm text { font-size: 16px; }
+.pz-eq { font: 700 12.5px/1 Slab, Georgia, serif; fill: currentColor; text-anchor: middle; letter-spacing: .14em; }
+.pz-cage { stroke: #e8c25a; }
+.pz-clue text { font: 700 10px/1 Slab, Georgia, serif; fill: currentColor; }
+
+.pf rect { fill: #2e7d3a; stroke: var(--ink); stroke-width: 2.5; }
+.runner  { fill: var(--ink); stroke: var(--ink); }
+.arc     { stroke: var(--ink); opacity: .45; }
+.pickup circle { fill: #e8c25a; stroke: var(--ink); stroke-width: 2.5; }
+.flag    { fill: var(--red); stroke: var(--ink); }
+
+/* ── the open space in the tray ──────────────────────────────────────── */
+
+/* The slot closes whatever the last row of boards left open. Because the board
+   widths cycle 5-4-3, how much is left depends only on where the last board
+   falls in that cycle, so the tray reads its own board count and sizes the
+   slot to match: 3 columns after a 5+4, 7 after a lone 5, the full width when
+   the last row came out even. A browser without :has() gets the full-width
+   well every time — wider than needed, never broken. */
+.slot {
+  grid-column: span 12;
+  min-height: 246px;
+  margin-right: var(--edge);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  padding: 26px 18px;
+  color: var(--paper-dim);
+  border: 3px dashed rgba(230, 220, 196, .34);
+  background:
+    repeating-linear-gradient(135deg,
+      rgba(230, 220, 196, .05) 0 9px,
+      transparent 9px 18px);
+}
+
+.slot__no {
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: .16em;
+  text-transform: uppercase;
+}
+
+.slot__line {
+  margin: 0;
+  text-align: center;
+  font-size: 15px;
+  line-height: 1.35;
+  color: var(--paper-dim);
+}
+
+.slot__cut { width: 34px; height: 34px; color: rgba(230, 220, 196, .4); }
+
+.tray:has(a.board:last-of-type:nth-of-type(3n + 1)) .slot { grid-column: span 7; }
+.tray:has(a.board:last-of-type:nth-of-type(3n + 2)) .slot { grid-column: span 3; }
+
+/* ── colophon ─────────────────────────────────────────────────────────── */
+
+.colophon {
+  max-width: 1320px;
+  margin: clamp(44px, 7vw, 78px) auto 0;
+  padding-top: 22px;
+  border-top: 2px solid rgba(230, 220, 196, .2);
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px clamp(24px, 5vw, 60px);
+  align-items: baseline;
+}
+
+.colophon__set {
+  margin: 0;
+  flex: none;
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: .18em;
+  text-transform: uppercase;
+  color: #d9b46a;
+}
+
+.colophon__note {
+  margin: 0;
+  flex: 1 1 380px;
+  max-width: 72ch;
+  font-size: 14px;
+  line-height: 1.6;
+  color: rgba(230, 220, 196, .78);
+}
+
+/* ── narrow ───────────────────────────────────────────────────────────── */
+
+/* Two boards to a row, still unequal — 7 and 5, never a pair of matching
+   halves. The slot keeps closing the row on its own. */
+@media (max-width: 1080px) {
+  .tray a.board:nth-of-type(3n + 1),
+  .tray a.board:nth-of-type(3n + 2),
+  .tray a.board:nth-of-type(3n + 3) { grid-column: span 5; --art-cap: 268px; }
+  .tray a.board:nth-of-type(2n + 1) { grid-column: span 7; --art-cap: 300px; }
+  .slot { grid-column: span 12; }
+  .tray:has(a.board:last-of-type:nth-of-type(3n + 1)) .slot,
+  .tray:has(a.board:last-of-type:nth-of-type(3n + 2)) .slot { grid-column: span 12; }
+  .tray:has(a.board:last-of-type:nth-of-type(2n + 1)) .slot { grid-column: span 5; }
+}
+
+@media (max-width: 700px) {
+  :root { --edge: 5px; --gap: 20px; }
+  .lid { flex-direction: column; align-items: flex-start; gap: 18px; }
+  .lid__stamp { padding-bottom: 0; }
+  .tray a.board:nth-of-type(3n + 1),
+  .tray a.board:nth-of-type(3n + 2),
+  .tray a.board:nth-of-type(3n + 3),
+  .tray a.board:nth-of-type(2n + 1) { grid-column: 1 / -1; --art-cap: 220px; }
+  /* one column, so the slot is always the full width — these have to beat the
+     :has() spans, which are more specific than a bare .slot rule */
+  .slot,
+  .tray:has(a.board:last-of-type:nth-of-type(3n + 1)) .slot,
+  .tray:has(a.board:last-of-type:nth-of-type(3n + 2)) .slot,
+  .tray:has(a.board:last-of-type:nth-of-type(2n + 1)) .slot {
+    grid-column: 1 / -1;
+    min-height: 150px;
+  }
+  .board__field { padding: 14px; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .board__field, .board__foot { transition: none; }
+}

@@ -1,0 +1,95 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Tetris — Game Hub</title>
+<link rel="stylesheet" href="type.css">
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+<a href="../../index.html" class="hub-link">
+  <svg class="hub-link__arrow" viewBox="0 0 16 16" aria-hidden="true" focusable="false"><path d="M10 2 4 8l6 6" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="square"/></svg>
+  Back to the box
+</a>
+
+<main class="wrap">
+  <header class="head">
+    <p class="head__no">No.&nbsp;01</p>
+    <h1>Tetris</h1>
+    <p class="head__rule">Turn and drop the falling shapes. Fill a row and it clears.</p>
+  </header>
+
+  <div class="layout">
+    <aside class="panel panel-left">
+      <div class="box">
+        <span class="box-label">Hold</span>
+        <canvas id="hold" width="110" height="80"></canvas>
+      </div>
+      <div class="stat">
+        <span class="stat-label">Score</span>
+        <span class="stat-value" id="score">0</span>
+      </div>
+      <div class="stat">
+        <span class="stat-label">Best</span>
+        <span class="stat-value" id="best">0</span>
+      </div>
+    </aside>
+
+    <div class="stage">
+      <canvas id="board" width="300" height="600"></canvas>
+      <div class="overlay" id="overlay">
+        <h2 id="overlayTitle">Tetris</h2>
+        <p id="overlayText">Press Enter to start</p>
+      </div>
+    </div>
+
+    <aside class="panel panel-right">
+      <div class="box">
+        <span class="box-label">Next</span>
+        <canvas id="next" width="110" height="220"></canvas>
+      </div>
+      <div class="stat">
+        <span class="stat-label">Lines</span>
+        <span class="stat-value" id="lines">0</span>
+      </div>
+      <div class="stat">
+        <span class="stat-label">Level</span>
+        <span class="stat-value" id="level">1</span>
+      </div>
+    </aside>
+  </div>
+
+  <div class="controls">
+    <button class="btn btn-primary" id="newGameBtn">New game</button>
+    <button class="btn btn-ghost" id="pauseBtn">Pause</button>
+    <button class="btn btn-ghost" id="soundBtn" aria-pressed="true">Sound: On</button>
+  </div>
+
+  <details class="help">
+    <summary>Controls &amp; scoring</summary>
+    <dl>
+      <div><dt>&larr; / &rarr;</dt><dd>Move sideways &mdash; hold to keep going</dd></div>
+      <div><dt>&darr;</dt><dd>Drop faster, one row at a time</dd></div>
+      <div><dt>Space</dt><dd>Drop it all the way, now</dd></div>
+      <div><dt>&uarr; / X</dt><dd>Turn clockwise</dd></div>
+      <div><dt>Z / Ctrl</dt><dd>Turn anticlockwise</dd></div>
+      <div><dt>C / Shift</dt><dd>Set the piece aside &mdash; once per piece</dd></div>
+      <div><dt>Esc / P</dt><dd>Pause</dd></div>
+      <div><dt>Enter</dt><dd>Start, or start over</dd></div>
+    </dl>
+    <p class="help-note">
+      Scoring follows the standard guideline: 100 / 300 / 500 / 800 for one to four lines,
+      multiplied by the level, plus back-to-back combo bonuses. A soft drop scores 1 per row,
+      a hard drop 2. The level, and the speed with it, rises every 10 lines.
+    </p>
+  </details>
+</main>
+
+<script src="tetromino.js"></script>
+<script src="board.js"></script>
+<script src="render.js"></script>
+<script src="audio.js"></script>
+<script src="game.js"></script>
+</body>
+</html>
