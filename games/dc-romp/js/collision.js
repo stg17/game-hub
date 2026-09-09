@@ -3,14 +3,21 @@
 Game.Collision = (function () {
   var overlap = Game.Utils.aabbOverlap;
 
-  function resolvePlayerX(player, platforms, dt) {
-    player.x += player.vx * dt;
+  function resolvePlayerX(player, platforms, dt, carryDx) {
+    var dx = player.vx * dt + carryDx;
+    player.x += dx;
     for (var i = 0; i < platforms.length; i++) {
       var plat = platforms[i];
       if (!overlap(player, plat)) continue;
-      if (player.vx > 0) {
+
+      // A platform moving into the player's feet/head is a vertical contact,
+      // not a wall. Leave it for the Y pass, using both previous positions.
+      var oldTop = plat.y - (plat.lastDy || 0);
+      if (player.prevY + player.h <= oldTop + 1 || player.prevY >= oldTop + plat.h - 1) continue;
+
+      if (dx > 0) {
         player.x = plat.x - player.w;
-      } else if (player.vx < 0) {
+      } else if (dx < 0) {
         player.x = plat.x + plat.w;
       }
       player.vx = 0;
@@ -27,30 +34,23 @@ Game.Collision = (function () {
       var plat = platforms[i];
       if (!overlap(player, plat)) continue;
 
-      // Compare against the platform's position from BEFORE its own movement
-      // this frame (plat.y minus the vertical delta it just moved), not where
-      // it ends up. Using the post-move position here breaks for vertically
-      // moving platforms: a 1px epsilon only tolerates ~60px/s of platform
-      // motion before "was I standing above it" starts failing every frame,
-      // which is what made vertical movers kick the player off.
+      // Classify contact relative to the platform's movement, including when
+      // a rising platform catches the player near the top of a jump.
       var oldTop = plat.y - (plat.lastDy || 0);
       var oldBottom = oldTop + plat.h;
+      var relativeDy = player.y - player.prevY - (plat.lastDy || 0);
 
-      if (player.vy >= 0 && player.prevY + player.h <= oldTop + 1) {
+      if (relativeDy >= 0 && player.prevY + player.h <= oldTop + 1) {
         // Falling (or resting) onto the platform's top surface.
         player.y = plat.y - player.h;
         player.vy = 0;
         player.onGround = true;
         player.standingPlatform = plat;
-      } else if (player.vy < 0 && player.prevY >= oldBottom - 1) {
+      } else if (relativeDy < 0 && player.prevY >= oldBottom - 1) {
         // Hit the underside of a platform while moving up.
         player.y = plat.y + plat.h;
         player.vy = 0;
       }
-    }
-
-    if (player.onGround && player.standingPlatform && player.standingPlatform.type === 'moving') {
-      player.x += player.standingPlatform.lastDx;
     }
 
     if (player.onGround && wasStomping) {
@@ -133,7 +133,16 @@ Game.Collision = (function () {
 
   return {
     resolvePlayer: function (player, platforms, dt) {
-      resolvePlayerX(player, platforms, dt);
+      // Carry an existing rider before collision checks on both axes. Jumping
+      // or taking a hit clears onGround in player.update()/takeHit(), releasing
+      // the player immediately; a new landing starts riding next frame.
+      var standing = player.onGround ? player.standingPlatform : null;
+      var carryDx = 0;
+      if (standing && standing.type === 'moving') {
+        carryDx = standing.lastDx;
+        player.y += standing.lastDy;
+      }
+      resolvePlayerX(player, platforms, dt, carryDx);
       resolvePlayerY(player, platforms, dt);
     },
     handleEnemyCollisions: handleEnemyCollisions,

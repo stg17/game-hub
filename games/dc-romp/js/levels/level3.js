@@ -20,7 +20,6 @@ Game.Levels.level3 = {
   ],
 
   enemies: [
-    { type: 'goon', x: 100, y: 668, patrolRange: 100 },
     { type: 'drone', x: 350, y: 560, patrolRange: 60 },
     { type: 'drone', x: 350, y: 380, patrolRange: 60 },
     { type: 'drone', x: 350, y: 200, patrolRange: 60 },

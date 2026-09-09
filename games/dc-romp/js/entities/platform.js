@@ -16,18 +16,21 @@ Game.Platform = function (opts) {
       p.lastDx = 0;
       p.lastDy = 0;
       if (p.type !== 'moving') return;
+      var oldX = p.x;
+      var oldY = p.y;
       var delta = p.speed * p.dir * dt;
       if (p.axis === 'x') {
         p.x += delta;
-        p.lastDx = delta;
         if (p.x > p.baseX + p.range) { p.x = p.baseX + p.range; p.dir = -1; }
         if (p.x < p.baseX - p.range) { p.x = p.baseX - p.range; p.dir = 1; }
       } else {
         p.y += delta;
-        p.lastDy = delta;
         if (p.y > p.baseY + p.range) { p.y = p.baseY + p.range; p.dir = -1; }
         if (p.y < p.baseY - p.range) { p.y = p.baseY - p.range; p.dir = 1; }
       }
+      // Report actual travel after clamping at a turnaround, so riders stay aligned.
+      p.lastDx = p.x - oldX;
+      p.lastDy = p.y - oldY;
     },
 
     draw: function (ctx, cam) {
