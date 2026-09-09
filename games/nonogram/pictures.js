@@ -1,4 +1,4 @@
-// Ink by Numbers — the plates.
+// Nonogram — the plates.
 //
 // Every picture is drawn by hand, not generated. A random nonogram of the right
 // density is still solvable, but it resolves into noise, and the whole payoff of

@@ -1,4 +1,4 @@
-// Ink by Numbers — headless self-check.  Run it with:  node selfcheck.js
+// Nonogram — headless self-check.  Run it with:  node selfcheck.js
 //
 // The throwaway-Node-script pattern CLAUDE.md documents for the other
 // generators, kept in the folder because this game makes a promise that has to

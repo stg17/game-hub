@@ -22,7 +22,7 @@ games/
   tetris/          Canvas Tetris with SRS rotation, hold, and a ghost piece
   2048/            DOM sliding-tile puzzle with a multi-step undo
   terms-and-conditions/  Reaction game about small print that overrides a big instruction
-  ink-by-numbers/  Nonogram: reconstruct a printed picture from run-length clues
+  nonogram/        Reconstruct a printed picture from run-length clues
 ```
 
 Each subfolder under `games/` is a fully independent game: its own `index.html`, its own styles, its own scripts, nothing shared or imported across game folders. This is deliberate — games can use completely different code styles/conventions from each other, and none of them can break another by being edited.
@@ -295,9 +295,9 @@ viewport to a 485px minimum, so a true 390px capture needs the iframe), play it
 synchronously in one tick so no virtual time passes mid-run, then fire a `blur`
 at the iframe's window to freeze the clock before capturing.
 
-### Ink by Numbers (`games/ink-by-numbers/`)
+### Nonogram (`games/nonogram/`)
 
-A nonogram. The numbers beside each row and column are the run lengths of ink
+The numbers beside each row and column are the run lengths of ink
 in that line, in order, and reconstructing them turns a blank grid into a
 picture. Three sizes (5×5, 10×10, 15×15), 40 hand-drawn plates, best time kept
 per plate.
@@ -349,10 +349,11 @@ their own grid.
 
 Elapsed time is banked from a wall-clock base (`clockOff` adds to `state.base`),
 never counted in ticks, and stops on `visibilitychange` and `blur`. Persistence
-is `inkbynumbers_stats_v1`: best time per plate, plus the plate **currently in
-progress** as a flat string of marks — a 15×15 is twenty minutes of careful
-deduction and losing it to a stray reload would be unforgivable, the same
-reasoning as 2048 keeping its board and undo stack.
+is `inkbynumbers_stats_v1` — the key predates the rename from Ink by Numbers
+and is deliberately frozen so existing times survive it. It holds the best time
+per plate, plus the plate **currently in progress** as a flat string of marks —
+a 15×15 is twenty minutes of careful deduction and losing it to a stray reload
+would be unforgivable, the same reasoning as 2048 keeping its board and undo stack.
 
 Pointer input cycles ink → cross → clear, a drag applies whatever the first
 square became (so sweeping a run does not toggle each square in turn), and the
@@ -361,7 +362,7 @@ crosses, `H` hints, `Esc` steps back. Every square carries
 `aria-describedby="rc<y> cc<x>"`, so a screen reader reads the two clue lines
 that govern it rather than making the player go and find them.
 
-### Verifying Ink by Numbers
+### Verifying Nonogram
 
 Two committed Node scripts, both plain `node`, no dependencies:
 

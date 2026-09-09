@@ -1,4 +1,4 @@
-// Ink by Numbers — end-to-end check.  Run it with:  node playcheck.js
+// Nonogram — end-to-end check.  Run it with:  node playcheck.js
 //
 // selfcheck.js proves the plates and the solver. This drives the whole game —
 // game.js included — against a small fake DOM and a clock we own, which is the

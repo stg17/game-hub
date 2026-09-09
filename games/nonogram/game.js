@@ -1,4 +1,4 @@
-// Ink by Numbers — screens, the board, input, the clock.
+// Nonogram — screens, the board, input, the clock.
 //
 // All the reasoning lives in nonogram.js, which is pure and self-checked. This
 // file draws a plate and takes marks. Conventions kept from the rest of the

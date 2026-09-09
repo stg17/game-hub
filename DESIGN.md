@@ -203,7 +203,7 @@ Each game owns exactly one colour, used at full strength on its hub board and ag
 - **Plum** (`{colors.field-math}`) — Math Puzzles, No. 04
 - **Sky** (`{colors.field-romp}`) — D.C. Romp, No. 05
 - **Document Slate** (`{colors.field-terms}`) — Terms & Conditions, No. 06
-- **Press Brown** (`{colors.field-ink}`) — Ink by Numbers, No. 07
+- **Press Brown** (`{colors.field-ink}`) — Nonogram, No. 07
 
 ### Neutral
 - **Printed Black** (`{colors.ink}`): every keyline, every cut edge, every set stamp ground, and body text on paper. Its alpha steps (`{colors.ink-70}` secondary copy, `{colors.ink-45}` disabled, `{colors.ink-30}` and `{colors.ink-15}` rules and wells, `{colors.ink-08}` printed grid tint) are the only tonal scale in the system.

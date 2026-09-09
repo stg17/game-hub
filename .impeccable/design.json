@@ -119,7 +119,7 @@
       },
       "field-ink": {
         "role": "tertiary",
-        "displayName": "Press Brown (Ink by Numbers, No. 07)",
+        "displayName": "Press Brown (Nonogram, No. 07)",
         "canonical": "#6d4326",
         "tonalRamp": ["#1a1009", "#2c1b0f", "#40270e", "#54321a", "#613a20", "#6d4326", "#a97b52", "#dcc4ad"]
       }

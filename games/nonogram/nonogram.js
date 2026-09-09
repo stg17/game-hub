@@ -1,4 +1,4 @@
-// Ink by Numbers — the logic, with no DOM and no timers in sight.
+// Nonogram — the logic, with no DOM and no timers in sight.
 //
 // A nonogram is a printed picture described only by how much ink each row and
 // column carries. The numbers along the top and side are the run lengths of

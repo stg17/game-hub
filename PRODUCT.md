@@ -29,9 +29,9 @@ Opened as a static site — either straight off disk (`file://`) or from `python
 - Each folder under `games/` is fully independent — nothing is shared or imported across game folders, deliberately, so no game can break another. Any shared visual system is therefore duplicated per folder, not linked.
 - D.C. Romp is a single HTML5 Canvas: its menus, HUD, pause screens, and all art are drawn procedurally in JS (`js/ui.js`, `js/utils.js`). It has no CSS surfaces to restyle. Code there is strict ES5 (`var`, `function`, no arrows/`let`/`const`/template literals).
 - Tetris and 2048 render their play areas to canvas and DOM respectively; both split pure logic out of the DOM.
-- Persistence is `localStorage` only, one key per game: `dcromp_unlocked`, `ttt_scores_v1`, `mathpuzzles_stats_v1`, `tetris_best_v1`, `2048_state_v1`.
+- Persistence is `localStorage` only, one key per game: `dcromp_unlocked`, `ttt_scores_v1`, `mathpuzzles_stats_v1`, `tetris_best_v1`, `2048_state_v1`, `terms_stats_v1`, `inkbynumbers_stats_v1` (Nonogram — the key predates the rename and is frozen so recorded times survive it).
 - Verification is manual — reload and play. There is no lint or test command.
-- Seven games ship today: D.C. Romp (platformer, 5 levels), Tic Tac Toe (2-player, scoreboard), Math Puzzles (Make 24 / Calcudoku / Number Pyramid, 3 difficulties, timed toggle), Tetris (SRS, hold, ghost), 2048 (undo), Terms & Conditions (reaction, overriding clauses), Ink by Numbers (nonogram, 40 hand-drawn plates).
+- Seven games ship today: D.C. Romp (platformer, 5 levels), Tic Tac Toe (2-player, scoreboard), Math Puzzles (Make 24 / Calcudoku / Number Pyramid, 3 difficulties, timed toggle), Tetris (SRS, hold, ghost), 2048 (undo), Terms & Conditions (reaction, overriding clauses), Nonogram (40 hand-drawn plates, deduction only).
 - **The collection is open-ended and expected to grow.** Seven is where it stands, not where it stops. Any visual system, layout, or navigation must absorb an eighth, twentieth or fiftieth game without being redesigned, and adding one must stay a small, repeatable operation.
 
 ## Brand Commitments
