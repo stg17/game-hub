@@ -274,6 +274,8 @@ Canvas surfaces obey the same rule by hand: `Game.UI.plate()` fills an ink rect 
 
 **Motion.** Transitions are announced, not faded: `.12s`–`.16s` on `transform` and `box-shadow` with `cubic-bezier(.2, .9, .3, 1)`, and `.12s linear` on colour swaps. Opacity is never used to convey elevation. All of it is disabled under `prefers-reduced-motion: reduce`.
 
+**The opening.** The hub has one authored set piece, ~2.7s, built in `hub.js` and played once per browser session: the closed box sits on the table, its cover lifts off, the table cloth over the set dissolves so the page beneath becomes the inside of the box, the view pushes in from `scale(.88)`, the boards rise in printed order, and the cover flies to the top-left corner and *becomes* the title tag. The cover and the tag are one object throughout — the flying element is a clone of `.lid__plate` inside a positioning wrapper, so the plate keeps its own `rotate(-1.1deg)` while the wrapper carries the flight, and its final transform is `none`. That is what makes the last frame of the opening and the resting page the same thing rather than two things that resemble each other; it is verified by capturing both and comparing them byte for byte. Rules that hold: the intro is built by script and never by markup, so no-JS gets the finished page; every class and inline style it sets is removed at the end, with a hard timer as backstop; it is skippable by click, Escape, Enter or Space; and it never runs under `prefers-reduced-motion`. The printed mark beside the lid (`.lid__replay`) opens the box again.
+
 ### Named Rules
 **The No Blur Rule.** Every `box-shadow` in this system has a blur radius of exactly 0. A blurred shadow, a gradient, a glass panel or a backdrop filter is out of world, full stop.
 
