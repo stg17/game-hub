@@ -95,7 +95,10 @@
   function syncHud() {
     var stats = Store.get();
     el.hudStreak.textContent = String(state.streak);
-    el.hudClauses.textContent = state.active.length + ' of ' + CLAUSE_CAP;
+    var clauseCount = state.active.length + ' of ' + CLAUSE_CAP;
+    el.hudClauses.textContent = clauseCount;
+    /* the printed badge is legible as a fraction; said aloud it needs a noun */
+    el.hudClauses.setAttribute('aria-label', clauseCount + ' clauses in force');
     el.hudBest.textContent = 'Best streak ' + stats.bestStreak;
   }
 

@@ -155,10 +155,13 @@ h1 {
 .hud[hidden] { display: none; }
 .hud b { font-size: 15px; }
 
+/* The rest of the running head is tracked caps; this one reads as a sentence,
+   so it takes sentence tracking. Caps tracking on mixed-case text pulls the
+   word shapes apart and slows the glance it exists for. */
 #hudBest {
   margin-left: auto;
   font-weight: 400;
-  letter-spacing: .08em;
+  letter-spacing: .02em;
   text-transform: none;
   font-size: 13px;
   color: rgba(230, 220, 196, .7);
@@ -212,13 +215,12 @@ kbd {
   background: var(--ink);
   color: var(--paper);
   padding: 3px 6px 2px;
-  letter-spacing: .06em;
 }
 
 .menu-best {
   margin: 0 0 22px;
   font-size: 13px;
-  letter-spacing: .06em;
+  letter-spacing: .02em;
   color: rgba(230, 220, 196, .78);
   font-variant-numeric: tabular-nums;
 }
