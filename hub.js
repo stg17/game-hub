@@ -57,9 +57,23 @@
     },
 
     ttt: function () {
-      var s = json('ttt_scores_v1');
-      if (!s) return null;
-      var x = num(s.X), o = num(s.O), d = num(s.draws);
+      /* v2 keeps two tallies, two-player and vs-computer, so that beating the
+         computer cannot inflate a two-player record inside the game. Here they
+         are summed: this strip is the record of a board, not of a person, and
+         it has never claimed to know who X and O were. v1 is still read for
+         anyone who has not reopened the game since the split. */
+      var x, o, d;
+      var s = json('ttt_scores_v2');
+      if (s) {
+        var two = s.two || {}, cpu = s.cpu || {};
+        x = num(two.X) + num(cpu.X);
+        o = num(two.O) + num(cpu.O);
+        d = num(two.draws) + num(cpu.draws);
+      } else {
+        var old = json('ttt_scores_v1');
+        if (!old) return null;
+        x = num(old.X); o = num(old.O); d = num(old.draws);
+      }
       if (!(x + o + d)) return null;
       return 'X ' + x + ' · O ' + o + ' · ' + plural(d, 'draw', 'draws');
     },

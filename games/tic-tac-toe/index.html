@@ -17,15 +17,22 @@
   <header class="head">
     <p class="head__no">No.&nbsp;03</p>
     <h1>Tic&nbsp;Tac&nbsp;Toe</h1>
-    <p class="head__rule">Three in a row wins. Whoever starts alternates each round.</p>
+    <p class="head__rule" id="headRule">Three in a row wins. Whoever starts alternates each round.</p>
   </header>
+
+  <!-- Who you are playing. Above the scoreboard because it changes what the
+       scoreboard is counting. -->
+  <div class="modes" role="group" aria-label="Opponent">
+    <button class="mode-btn is-on" type="button" id="modeTwo" aria-pressed="true">2 players</button>
+    <button class="mode-btn" type="button" id="modeCpu" aria-pressed="false">Computer</button>
+  </div>
 
   <div class="scoreboard">
     <div class="score-card" data-player="X" id="scoreX">
       <span class="lamp" aria-hidden="true"></span>
       <span class="mark mark-x">X</span>
       <span class="score-value" id="scoreXValue">0</span>
-      <span class="score-label">wins</span>
+      <span class="score-label" id="scoreXLabel">wins</span>
     </div>
     <div class="score-card draws" id="scoreDraws">
       <span class="mark mark-draw">&ndash;</span>
@@ -36,7 +43,7 @@
       <span class="lamp" aria-hidden="true"></span>
       <span class="mark mark-o">O</span>
       <span class="score-value" id="scoreOValue">0</span>
-      <span class="score-label">wins</span>
+      <span class="score-label" id="scoreOLabel">wins</span>
     </div>
   </div>
 

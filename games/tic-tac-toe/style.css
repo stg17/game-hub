@@ -132,6 +132,44 @@ h1 {
   color: rgba(230, 220, 196, .88);
 }
 
+/* ── who you are playing ──────────────────────────────────────────────── */
+
+/* One plate cut into two, rather than two buttons with a gap: the segments
+   share an edge so it reads as one control with a position, which is what a
+   choice between two opponents is. */
+.modes {
+  display: inline-flex;
+  margin: 0 var(--edge) 20px 0;
+  border: 3px solid var(--ink);
+  box-shadow: var(--edge) var(--edge) 0 0 var(--ink);
+}
+
+.mode-btn {
+  appearance: none;
+  -webkit-appearance: none;
+  font: 700 11.5px/1 Slab, Georgia, serif;
+  letter-spacing: .16em;
+  text-transform: uppercase;
+  padding: 12px 18px 11px;
+  border: 0;
+  background: var(--paper);
+  color: var(--ink-70);
+  cursor: pointer;
+}
+.mode-btn + .mode-btn { border-left: 3px solid var(--ink); }
+.mode-btn:hover:not(.is-on) { color: var(--ink); }
+
+/* The chosen side is printed in this game own ink. Not red and not lit
+   chrome: red is reserved for the thing you press and lit chrome for live
+   state, and a segmented control is neither — it is a setting. */
+.mode-btn.is-on {
+  background: var(--field);
+  color: var(--paper);
+}
+
+/* the ring would otherwise be swallowed by the plate shadow behind it */
+.mode-btn:focus-visible { position: relative; z-index: 1; }
+
 /* ── the score plates ─────────────────────────────────────────────────── */
 
 .scoreboard {
