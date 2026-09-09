@@ -312,6 +312,28 @@ in that line, in order, and reconstructing them turns a blank grid into a
 picture. Three sizes (5×5, 10×10, 15×15), 40 hand-drawn plates, best time kept
 per plate.
 
+**Two screens, and almost no prose.** `#screen-index` and `#screen-play`, and
+that is the whole machine. The index carries a SMALL / MEDIUM / LARGE tab strip
+(the segmented control copied from math-puzzles) that swaps the panel rather
+than navigating, so choosing a size costs no screen. Instructions are one 46ch
+rule line on the head plate plus a printed key beside the board — three mark
+states and five keys, as tracked-caps apparatus. There is deliberately no
+how-to panel: an earlier build printed a tagline, a four-item list and a
+keyboard sentence before a single square was visible, which is the same
+mistake Terms & Conditions records under "the menu explains nothing on
+purpose".
+
+**Finishing resolves the plate in place** rather than moving to a screen of its
+own. `finish()` adds `board--done`, which drops the crosses and kills pointer
+events while leaving the ruling and the ink exactly as the player left them;
+a finish slip appears in the apparatus column with the name, the time and the
+next control. The finished board *is* the picture, so an earlier build that hid
+it and reprinted the solution as a separate `.proof` grid was handing back a
+copy of the reward instead of the reward — and a full overlay sheet, the
+pattern 2048 uses, would cover the one thing worth looking at. Because the
+finish is a state of the play screen and not a screen, `state.done` guards the
+clock, the pointer handlers, the hint and `Esc`.
+
 Script order in `index.html` is the dependency graph: `nonogram.js` →
 `pictures.js` → `storage.js` → `game.js`. The first two are **pure** — no DOM,
 no timers — which is what makes the guarantee below checkable.
@@ -331,7 +353,9 @@ density is solvable but resolves into noise, and the payoff of the form is that
 the last few squares turn a field of marks into something you recognise. The
 plate's title is therefore hidden — in the index and while playing — until it is
 finished; the reveal is the reward, and `playcheck.js` asserts the name does not
-leak. When adding a plate, expect symmetric hollow shapes to be the thing that
+leak. An unprinted plate prints a ruled blank where its title will go, so the
+index reads as a collection with gaps rather than as forty disabled cards.
+When adding a plate, expect symmetric hollow shapes to be the thing that
 stalls the solver; breaking the symmetry slightly is normally enough.
 
 **Marks are three-state**, and `EMPTY` means "the player asserts this is blank",
@@ -368,7 +392,8 @@ would be unforgivable, the same reasoning as 2048 keeping its board and undo sta
 Pointer input cycles ink → cross → clear, a drag applies whatever the first
 square became (so sweeping a run does not toggle each square in turn), and the
 right button goes straight to a cross. Keyboard: arrows move, `Space` inks, `X`
-crosses, `H` hints, `Esc` steps back. Every square carries
+crosses, `H` hints, `Esc` goes back to the index; the tab strip takes left and
+right arrows on a roving tabindex. Every square carries
 `aria-describedby="rc<y> cc<x>"`, so a screen reader reads the two clue lines
 that govern it rather than making the player go and find them.
 
@@ -388,14 +413,36 @@ Two committed Node scripts, both plain `node`, no dependencies:
   classes, the hint (including that a hint's claim matches the plate *and* that
   the square it names actually carries the mark), finishing, the withheld title
   appearing in the index afterwards, a slower second run not overwriting the
-  best time, a keyboard-only finish, `Esc` walking back out, the clock stopping
-  while the tab is hidden, and — by rebooting the game against the same
-  storage — that a part-finished plate and its clock survive a reload. It solves
-  by **reading the clue gutters back out of the DOM**, so a pass is evidence the
-  printed numbers are sufficient.
+  best time, a keyboard-only finish, the clock stopping while the tab is hidden,
+  and — by rebooting the game against the same storage — that a part-finished
+  plate and its clock survive a reload. It solves by **reading the clue gutters
+  back out of the DOM**, so a pass is evidence the printed numbers are
+  sufficient.
+
+Three things about `playcheck.js` are load-bearing and easy to undo by accident:
+
+- It **derives the element ids, their classes and attributes, and the script
+  order from `index.html`** instead of keeping its own copy. A hand-maintained
+  list drifts, and the fake `getElementById` would then hand the game a live
+  element for an id the page no longer has — the run passes while testing
+  nothing. Elements are seeded with their markup classes and `data-` attributes
+  because `game.js` routes clicks through `closest('.tab')` and
+  `closest('.plate-card')`.
+- `screen()` is **not** "first unhidden section wins". The finish is a state of
+  the play screen, so that rule would answer `'play'` for ever and every
+  finish assertion would pass without testing anything. It reads the finish
+  slip, and fails outright if the index and the plate are ever open together.
+- The `Esc` test asserts the **guarantee** — from the deepest state, repeated
+  `Esc` reaches the index in a bounded number of presses and settles there —
+  rather than pinning today's ladder, which has now changed twice. Assertions
+  that only pinned copy were dropped where a stronger one already sat beside
+  them; the finish check compares the inked squares against the picture rather
+  than counting cells, which would pass on a blank plate.
 
 For pixels, drive it in headless Chrome through a sized iframe with
-`--allow-file-access-from-files`, clicking real squares.
+`--allow-file-access-from-files`. Note the squares listen for `pointerdown`,
+not `click`, so a driver calling `.click()` marks nothing and silently reports
+an empty board.
 
 ### Verifying Tetris and 2048
 
