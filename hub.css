@@ -422,30 +422,43 @@ html { scrollbar-color: var(--tray) var(--table-deep); }
   transform-origin: 0 0;
 }
 
-/* The walls of the tray, drawn around the real page so the boards are
-   genuinely inside the box rather than beside a prop of one. The interior is
-   the same green as the table — it is the same table — so when the view
-   pushes past the walls there is nothing to notice going. */
-.boot-walls {
+/* The box, drawn as a window onto the top of the page rather than as walls
+   around the whole of it — which is what lets the cards inside be big enough
+   to read. One element does both jobs: its concentric outer shadows are the
+   chipboard walls, and the last one is a spread wide enough to hide
+   everything beyond the window.
+
+   It lives inside .boot-stage, so the single transform that flies the view in
+   scales the box and the cards together with no second animation to keep in
+   step. Its rect is set from JS and sized so that at scale(1) all four walls
+   are outside the viewport — which is why it can simply be removed at the end
+   with nothing fading away in view. */
+.boot-frame {
   position: absolute;
-  z-index: -1;
-  background: var(--table);
-  background-image:
-    repeating-linear-gradient(90deg, var(--table-weft) 0 1px, transparent 1px 4px),
-    repeating-linear-gradient(0deg,  var(--table-weft) 0 1px, transparent 1px 4px);
-  border: 3px solid var(--ink);
+  z-index: 2;
+  pointer-events: none;
   box-shadow:
-    inset 0 0 0 26px var(--tray),
-    inset 0 0 0 29px var(--ink);
+    0 0 0 3px var(--ink),
+    0 0 0 29px var(--tray),
+    0 0 0 32px var(--ink),
+    0 0 0 6000px var(--table);
 }
 
+/* Before the box exists: hide the contents but keep the baize, so what shows
+   is an empty table rather than a blank page or a flash of the finished one. */
+html.boot-hold body { visibility: hidden; }
+
+/* `scrollbar-gutter` keeps the gutter reserved while scrolling is locked.
+   Without it the page measures ~15px wider during the opening than it does at
+   rest, and the whole layout snaps sideways when the class comes off. */
+html.booting { scrollbar-gutter: stable; }
 html.booting,
 html.booting body { overflow: hidden; }
 
+/* The contents need no hiding of their own: the cloth covers the window and
+   the frame occludes everything past it. Only the lid is held back, because
+   the tag does not arrive until the cover lands on it. */
 html.booting .lid { opacity: 0; }
-html.booting .board,
-html.booting .slot,
-html.booting .colophon { opacity: 0; }
 
 .boot {
   position: fixed;
@@ -453,14 +466,13 @@ html.booting .colophon { opacity: 0; }
   z-index: 100;
 }
 
-/* The cloth over the contents while the box is closed. It lives inside the
-   box and scales with it, so the chipboard walls are visible around it from
-   the first frame — a closed box, not a sign — and it fades as the cover
+/* The cloth over the contents while the box is closed. It is set to the same
+   rect as the frame and scales with it, so the chipboard is visible around it
+   from the first frame — a closed box, not a sign — and it fades as the cover
    comes off to reveal the boards already sitting in the tray. */
 .boot-cloth {
   position: absolute;
-  inset: 0;
-  z-index: 1;
+  z-index: 3;
   background: var(--table-deep);
   background-image:
     repeating-linear-gradient(90deg, var(--table-weft) 0 1px, transparent 1px 4px),
@@ -501,11 +513,10 @@ html.booting .colophon { opacity: 0; }
 .lid__replay:hover { color: var(--paper); }
 
 @media (prefers-reduced-motion: reduce) {
-  /* no opening at all — hub.js checks this too and never starts one */
-  html.booting .lid,
-  html.booting .board,
-  html.booting .slot,
-  html.booting .colophon { opacity: 1; }
+  /* no opening at all — hub.js checks this too and never starts one, so this
+     is belt and braces against either state being left on the page */
+  html.boot-hold body { visibility: visible; }
+  html.booting .lid { opacity: 1; }
   .boot { display: none; }
 }
 

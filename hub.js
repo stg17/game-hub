@@ -143,15 +143,26 @@
      Everything is driven off the real elements, and every state it sets is
      removed at the end. If any of it fails, a hard timer tears it down. */
 
-  var TIMING = {
-    settle: 520,    /* the closed box arrives on the table */
-    lift: 700,      /* the cover comes off and you can see inside */
-    fly: 1700,      /* the view pushes all the way in, the cover to the corner */
-    handover: 200   /* the real lid takes over from the flying copy */
-  };
-  var WALL = 46;    /* chipboard around the set, in page pixels */
-  var TOTAL = TIMING.settle + TIMING.lift + TIMING.fly + TIMING.handover;
-  var EASE_OUT = 'cubic-bezier(.22, .9, .3, 1)';
+  /* The beats, as absolute milliseconds on one clock. Everything below reads
+     from these, so retiming the opening means editing this block only. */
+  var CLOSED_UNTIL = 1000;   /* the closed box sits still this long */
+  var LIFTED_AT    = 1800;   /* the cover is off and you can see inside */
+  var FLY_FROM     = 2500;   /* the look-inside beat ends, the view moves */
+  var FLY_TO       = 4400;   /* the cards are full size, the tag has landed */
+  var TOTAL        = 4600;   /* handover done, everything torn down */
+
+  function at(ms) { return ms / TOTAL; }
+
+  /* Easing goes on individual keyframes, never in the options. An effect-level
+     easing warps iteration progress *before* keyframe offsets are read, which
+     silently crushes the held beats — a one-second hold becomes about two
+     hundred milliseconds. The beats above only mean what they say because
+     every animation below runs linear at the effect level. */
+  var EASE_LIFT = 'cubic-bezier(.2, .85, .3, 1)';    /* the house curve */
+  var EASE_PUSH = 'cubic-bezier(.48, .04, .24, 1)';  /* a long camera move */
+
+  var WALL_TOTAL = 32;   /* the chipboard rings drawn outside the window */
+  var FIT = 0.88;        /* how much of the screen the closed box takes up */
   var SEEN_KEY = 'gamehub_intro_seen';
 
   var html = document.documentElement;
@@ -160,12 +171,41 @@
   var stamp = document.querySelector('.lid__stamp');
   var reduced = window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
   var canAnimate = !!(lid && plate && document.body.animate);
+  /* On a phone the URL bar collapses mid-scroll and grows innerHeight, which
+     would pull the bottom wall back into view; leave it more room down there. */
+  var coarse = window.matchMedia && window.matchMedia('(pointer: coarse)').matches;
 
   function seen() {
     try { return sessionStorage.getItem(SEEN_KEY) === '1'; } catch (e) { return false; }
   }
   function markSeen() {
     try { sessionStorage.setItem(SEEN_KEY, '1'); } catch (e) { /* fine, it just replays */ }
+  }
+
+  /* Two states, and the distinction matters.
+
+     `boot-hold` hides the page's contents but not the baize behind them, so
+     what shows is an empty table — which is the first frame of the story
+     anyway. It has to go on synchronously, before anything is awaited: the
+     box cannot appear until the lid face has loaded, and `document.fonts`
+     does not settle until the load event, which is after the first paint. Add
+     it late and the finished page is guaranteed to flash up first.
+
+     `booting` is the animation itself. Both are removed at the end, and a
+     guard timer releases the hold if the opening never starts, so the page
+     can never be left hidden. */
+  function hold() {
+    if (html.className.indexOf('boot-hold') === -1) html.className += ' boot-hold';
+  }
+  function release() {
+    html.className = html.className.replace(/\s*\bboot-hold\b/, '');
+  }
+  function boot_on() {
+    if (html.className.indexOf('booting') === -1) html.className += ' booting';
+  }
+  function unboot() {
+    release();
+    html.className = html.className.replace(/\s*\bbooting\b/, '');
   }
 
   /* The lid plate is rotated, so its bounding box is not its layout box.
@@ -179,51 +219,98 @@
   }
 
   function openTheBox() {
+    /* Measure and place from the top of the page. A replay is a reload, and
+       the browser would otherwise restore the old scroll offset under us. */
+    if ('scrollRestoration' in history) history.scrollRestoration = 'manual';
+    window.scrollTo(0, 0);
+
     var stage = document.createElement('div');
     stage.className = 'boot-stage';
     while (document.body.firstChild) stage.appendChild(document.body.firstChild);
     document.body.appendChild(stage);
 
     var target = plateBox();
-    html.className += ' booting';
+    var anims = [];
+    var boot, frame, cloth;
 
-    /* The set sits in a tray whose walls are drawn around the real page, so
-       the whole box — boards and all — is one thing the view flies into.
-       Measured at rest, then scaled down to fit the viewport as a closed box;
-       the flight is that scale running back up to 1, which is why the boards
-       finish at full size and the walls finish outside the frame. */
+    boot_on();
+    release();
+    /* real links must not stay tabbable behind the overlay */
+    if ('inert' in stage) stage.inert = true;
+
+    /* Armed here, before anything can go wrong. finish() is hoisted and
+       defensive, so if any of the setup below throws — leaving the cloth over
+       the page — this still gives the page back. */
+    setTimeout(function () { finish(); }, TOTAL + 2500);
+
+    /* The box is a window onto the top of the page, not walls around all of
+       it — that is what lets the cards inside be big enough to read.
+
+       The window is exactly the viewport plus a margin. That is the whole
+       requirement: it has to cover the viewport at scale(1) so every wall
+       ends up outside the frame and the box can be removed at the end with
+       nothing fading away in view. Asking for any more than that — a boxier
+       aspect ratio, a wider overhang — buys nothing and is paid for directly
+       in how small the cards start, which is the thing being fixed. It also
+       gives the piece a nice property: the window frames the above-the-fold
+       view, so the flight reveals nothing new. It is purely a camera move. */
     var vw = window.innerWidth;
     var vh = window.innerHeight;
+    var sr = stage.getBoundingClientRect();
 
-    var walls = document.createElement('div');
-    walls.className = 'boot-walls';
-    walls.style.inset = (-WALL) + 'px';
-    stage.insertBefore(walls, stage.firstChild);
+    var MX = Math.min(40, Math.round(vw * 0.045));  /* slack each side */
+    var MY = coarse ? 160 : 56;                     /* and below; see below */
 
-    /* the cloth sits inside the box and scales with it */
-    var cloth = document.createElement('div');
+    var winW = Math.round(vw + MX * 2);
+    var winH = Math.round(vh + MY);
+    var winX = Math.round(-sr.left - MX);   /* relative to the stage */
+
+    /* The stage's transform-origin is its own top-left, so the translate has
+       to be measured from there — not from the viewport origin. Getting that
+       wrong leaves the box off-centre by sr.left * (1 - s0). */
+    var outerW = winW + WALL_TOTAL * 2;
+    var outerH = winH + WALL_TOTAL * 2;
+    var s0 = Math.min(FIT * vw / outerW, FIT * vh / outerH);
+
+    frame = document.createElement("div");
+    frame.className = 'boot-frame';
+    frame.style.left = winX + 'px';
+    frame.style.top = '0px';
+    frame.style.width = winW + 'px';
+    frame.style.height = winH + 'px';
+    /* wide enough to reach the screen edges once scaled, and no wider */
+    frame.style.boxShadow =
+      '0 0 0 3px var(--ink),' +
+      '0 0 0 29px var(--tray),' +
+      '0 0 0 32px var(--ink),' +
+      '0 0 0 ' + (Math.ceil(Math.max(vw, vh) / s0) + 240) + 'px var(--table)';
+    stage.appendChild(frame);
+
+    /* the cloth covers the window, bled 2px under the frame's keyline so no
+       hairline can open up between them */
+    cloth = document.createElement("div");
     cloth.className = 'boot-cloth';
+    cloth.style.left = (winX - 2) + 'px';
+    cloth.style.top = '-2px';
+    cloth.style.width = (winW + 4) + 'px';
+    cloth.style.height = (winH + 4) + 'px';
     stage.appendChild(cloth);
 
-    var sr = stage.getBoundingClientRect();
-    var boxL = sr.left - WALL;
-    var boxT = sr.top - WALL;
-    var boxW = sr.width + WALL * 2;
-    var boxH = sr.height + WALL * 2;
-
-    var s0 = Math.min(vw * 0.84 / boxW, vh * 0.84 / boxH);
-    var tx = vw / 2 - s0 * (boxL + boxW / 2);
-    var ty = vh / 2 - s0 * (boxT + boxH / 2);
+    var boxCX = sr.left + winX - WALL_TOTAL + outerW / 2;
+    var boxCY = sr.top - WALL_TOTAL + outerH / 2;
+    var tx = vw / 2 - sr.left - s0 * (boxCX - sr.left);
+    var ty = vh / 2 - sr.top - s0 * (boxCY - sr.top);
     var closed = 'translate(' + tx + 'px, ' + ty + 'px) scale(' + s0 + ')';
 
-    /* the cover lies across the top of the tray at that same scale */
-    var coverW = s0 * boxW;
+    /* the cover lies across the top of the box, at that same scale. Where the
+       box's outer top-left lands on screen, under the same transform. */
+    var cx = sr.left + tx + s0 * (winX - WALL_TOTAL);
+    var cy = sr.top + ty + s0 * (-WALL_TOTAL);
+    var coverW = s0 * outerW;
     var scale = coverW / target.width;
     var coverH = target.height * scale;
-    var cx = tx + s0 * boxL;
-    var cy = ty + s0 * boxT;
 
-    var boot = document.createElement('div');
+    boot = document.createElement("div");
     boot.className = 'boot';
     boot.setAttribute('aria-hidden', 'true');
 
@@ -249,74 +336,59 @@
     var dx = cx - target.left;
     var dy = cy - target.top;
     var from = 'translate(' + dx + 'px, ' + dy + 'px) scale(' + scale + ')';
-    var off = 'translate(' + dx + 'px, ' + (dy - coverH * 0.62) + 'px) scale(' + (scale * 1.03) + ') rotate(-1.6deg)';
+    /* Off, but not gone: lifted just clear of the cards and held there, so
+       the look-inside beat has the lid hanging over the open box rather than
+       an empty screen with the lid parked off the top of it. */
+    var off = 'translate(' + dx + 'px, ' + (dy - coverH * 0.34) + 'px) scale(' + (scale * 1.03) + ') rotate(-1.9deg)';
 
-    var openAt = TIMING.settle;              /* the cover starts to move */
-    var openedAt = TIMING.settle + TIMING.lift;   /* it is clear of the box */
-
-    var anims = [];
     function play(el, frames, opts) {
       var a = el.animate(frames, opts);
       anims.push(a);
       return a;
     }
 
-    /* the cloth over the set dissolves as the cover clears it: this is the
-       moment you can see into the box */
-    play(cloth, [{ opacity: 1 }, { opacity: 0 }], {
-      duration: 520,
-      delay: openAt + TIMING.lift * 0.30,
-      easing: 'linear',
-      fill: 'both'
-    });
+    var span = { duration: TOTAL, fill: 'both' };
 
+    /* the cloth goes as the cover clears it: this is the moment you can see
+       into the box, and what you see is a tray already full */
+    play(cloth, [
+      { opacity: 1, offset: 0 },
+      { opacity: 1, offset: at(CLOSED_UNTIL + 280), easing: 'linear' },
+      { opacity: 0, offset: at(CLOSED_UNTIL + 830) },
+      { opacity: 0, offset: 1 }
+    ], span);
+
+    /* closed, then off, then held there long enough to be looked at, then
+       away to the corner across the flight */
     play(cover, [
       { transform: from, offset: 0 },
-      { transform: from, offset: openAt / TOTAL },
-      { transform: off, offset: openedAt / TOTAL, easing: EASE_OUT },
+      { transform: from, offset: at(CLOSED_UNTIL), easing: EASE_LIFT },
+      { transform: off, offset: at(LIFTED_AT) },
+      { transform: off, offset: at(FLY_FROM), easing: EASE_PUSH },
+      { transform: 'none', offset: at(FLY_TO) },
       { transform: 'none', offset: 1 }
-    ], { duration: TOTAL, easing: EASE_OUT, fill: 'both' });
+    ], span);
 
-    /* the whole tray sits closed and small, then the view flies into it until
-       the boards are full size — the walls leave the frame rather than fade */
+    /* The box holds still while the cover comes off, then the view flies into
+       it until the cards are full size and the chipboard leaves the frame.
+       Shares EASE_PUSH with the cover, or the two visibly drift apart over
+       nearly two seconds. */
     play(stage, [
       { transform: closed, offset: 0 },
-      { transform: closed, offset: (openAt + TIMING.lift * 0.30) / TOTAL },
+      { transform: closed, offset: at(FLY_FROM), easing: EASE_PUSH },
+      { transform: 'none', offset: at(FLY_TO) },
       { transform: 'none', offset: 1 }
-    ], { duration: TOTAL, easing: EASE_OUT, fill: 'both' });
+    ], span);
 
-    /* by the time this runs the chipboard is already past the edges of the
-       screen, and the interior was always the same green as the table, so
-       there is nothing visible left to take away */
-    play(walls, [{ opacity: 1 }, { opacity: 0 }], {
-      duration: 420,
-      delay: TOTAL - 480,
-      easing: 'linear',
-      fill: 'forwards'
-    });
-
-    /* The boards do not arrive — they were in the box the whole time. They
-       come up with the cloth, so what the lifting cover reveals is a tray
-       already full, and every bit of movement after that is the view moving
-       rather than the contents rearranging themselves. */
-    var pieces = document.querySelectorAll('.tray .board, .tray .slot, .colophon');
-    for (var p = 0; p < pieces.length; p++) {
-      play(pieces[p], [{ opacity: 0 }, { opacity: 1 }], {
-        duration: 380,
-        delay: openAt + TIMING.lift * 0.30,
-        easing: 'linear',
-        fill: 'both'
-      });
-    }
-
-    if (stamp) {
-      play(stamp, [{ opacity: 0 }, { opacity: 1 }], {
-        duration: 400,
-        delay: TOTAL - 120,
-        easing: EASE_OUT,
-        fill: 'both'
-      });
-    }
+    /* The handover, as a step on the same clock rather than a stray timer:
+       the real lid appears underneath at the instant the flying copy lands
+       on it, so the swap is the same pixels replacing themselves. */
+    play(lid, [
+      { opacity: 0, offset: 0 },
+      { opacity: 0, offset: at(FLY_TO) },
+      { opacity: 1, offset: at(FLY_TO) },
+      { opacity: 1, offset: 1 }
+    ], span);
 
     var done = false;
     function finish() {
@@ -325,13 +397,19 @@
       for (var i = 0; i < anims.length; i++) {
         try { anims[i].cancel(); } catch (e) { /* already gone */ }
       }
-      if (boot.parentNode) boot.parentNode.removeChild(boot);
-      if (walls.parentNode) walls.parentNode.removeChild(walls);
-      if (cloth.parentNode) cloth.parentNode.removeChild(cloth);
-      html.className = html.className.replace(/\s*\bbooting\b/, '');
+      /* The frame's border box overflows the stage by MX, so it has to go
+         before `booting` releases the scroll lock — otherwise a horizontal
+         scrollbar flashes for a frame on the way out. */
+      if (boot && boot.parentNode) boot.parentNode.removeChild(boot);
+      if (frame && frame.parentNode) frame.parentNode.removeChild(frame);
+      if (cloth && cloth.parentNode) cloth.parentNode.removeChild(cloth);
+      unboot();
       stage.style.transform = '';
+      if ('inert' in stage) stage.inert = false;
       markSeen();
       document.removeEventListener('keydown', onKey, true);
+      window.removeEventListener('resize', finish);
+      window.removeEventListener('orientationchange', finish);
     }
     function onKey(e) {
       if (e.key === 'Escape' || e.key === 'Enter' || e.key === ' ') finish();
@@ -340,13 +418,13 @@
     skip.addEventListener('click', finish);
     boot.addEventListener('click', finish);
     document.addEventListener('keydown', onKey, true);
+    /* the window rect is baked in pixels, so a reflow mid-flight would
+       unstick the box from its contents — bail out rather than show that */
+    window.addEventListener('resize', finish);
+    window.addEventListener('orientationchange', finish);
 
-    /* the lid appears underneath just before the flying copy goes, so the
-       handover is the same pixels swapping places with themselves */
-    setTimeout(function () { lid.style.opacity = '1'; }, TOTAL - TIMING.handover);
-    setTimeout(finish, TOTAL + 120);
-    /* and a belt-and-braces teardown if anything above never fires */
-    setTimeout(finish, TOTAL + 2500);
+    /* the ordinary end; the belt-and-braces one was armed before setup began */
+    setTimeout(finish, TOTAL);
   }
 
   function replay() {
@@ -370,13 +448,22 @@
   }
 
   if (canAnimate && !reduced && !seen()) {
-    /* wait for the lid face, or the box would open in a fallback font */
-    var start = function () { requestAnimationFrame(openTheBox); };
-    if (document.fonts && document.fonts.ready) {
-      var raced = false;
-      var go = function () { if (!raced) { raced = true; start(); } };
-      document.fonts.ready.then(go);
-      setTimeout(go, 800);
+    var started = false;
+    var start = function () {
+      if (started) return;
+      started = true;
+      requestAnimationFrame(openTheBox);
+    };
+    /* Arm the escape hatch before hiding anything, so a throw between here
+       and openTheBox cannot leave the page hidden. */
+    setTimeout(function () { if (!started) release(); }, 1400);
+    hold();
+    /* Wait for the lid face only — the box would otherwise open in a
+       fallback font, and the one face its measurements depend on settles far
+       sooner than the document-wide promise. */
+    if (document.fonts && document.fonts.load) {
+      document.fonts.load('400 88px Lid').then(start, start);
+      setTimeout(start, 500);
     } else {
       start();
     }
