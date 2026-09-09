@@ -144,11 +144,12 @@
      removed at the end. If any of it fails, a hard timer tears it down. */
 
   var TIMING = {
-    settle: 600,    /* the closed box arrives on the table */
-    lift: 760,      /* the cover comes off */
-    fly: 1180,      /* it travels to the corner while the view pushes in */
+    settle: 520,    /* the closed box arrives on the table */
+    lift: 700,      /* the cover comes off and you can see inside */
+    fly: 1700,      /* the view pushes all the way in, the cover to the corner */
     handover: 200   /* the real lid takes over from the flying copy */
   };
+  var WALL = 46;    /* chipboard around the set, in page pixels */
   var TOTAL = TIMING.settle + TIMING.lift + TIMING.fly + TIMING.handover;
   var EASE_OUT = 'cubic-bezier(.22, .9, .3, 1)';
   var SEEN_KEY = 'gamehub_intro_seen';
@@ -186,38 +187,45 @@
     var target = plateBox();
     html.className += ' booting';
 
-    /* The closed box, centred on the table. Sized from the viewport rather
-       than as a plain multiple of the tag: on a narrow screen the tag is
-       already nearly as wide as the screen, and a multiple would push the box
-       and its walls off the edge. */
+    /* The set sits in a tray whose walls are drawn around the real page, so
+       the whole box — boards and all — is one thing the view flies into.
+       Measured at rest, then scaled down to fit the viewport as a closed box;
+       the flight is that scale running back up to 1, which is why the boards
+       finish at full size and the walls finish outside the frame. */
     var vw = window.innerWidth;
     var vh = window.innerHeight;
-    var wallW = 30;              /* chipboard either side of the cover */
-    var coverW = Math.min(target.width * 1.5, vw - wallW - 26, 620);
+
+    var walls = document.createElement('div');
+    walls.className = 'boot-walls';
+    walls.style.inset = (-WALL) + 'px';
+    stage.insertBefore(walls, stage.firstChild);
+
+    /* the cloth sits inside the box and scales with it */
+    var cloth = document.createElement('div');
+    cloth.className = 'boot-cloth';
+    stage.appendChild(cloth);
+
+    var sr = stage.getBoundingClientRect();
+    var boxL = sr.left - WALL;
+    var boxT = sr.top - WALL;
+    var boxW = sr.width + WALL * 2;
+    var boxH = sr.height + WALL * 2;
+
+    var s0 = Math.min(vw * 0.84 / boxW, vh * 0.84 / boxH);
+    var tx = vw / 2 - s0 * (boxL + boxW / 2);
+    var ty = vh / 2 - s0 * (boxT + boxH / 2);
+    var closed = 'translate(' + tx + 'px, ' + ty + 'px) scale(' + s0 + ')';
+
+    /* the cover lies across the top of the tray at that same scale */
+    var coverW = s0 * boxW;
     var scale = coverW / target.width;
     var coverH = target.height * scale;
-    var bodyH = coverH * 1.8;
-    var cx = (vw - coverW) / 2;
-    /* centre the box, not the cover, so the well below it is not pushed low */
-    var bodyTop = (vh - bodyH) / 2;
-    var cy = bodyTop + 9;
+    var cx = tx + s0 * boxL;
+    var cy = ty + s0 * boxT;
 
     var boot = document.createElement('div');
     boot.className = 'boot';
     boot.setAttribute('aria-hidden', 'true');
-
-    var ground = document.createElement('div');
-    ground.className = 'boot__ground';
-
-    /* deep enough to read as a box rather than a sign: the cover covers its
-       top edge, and about three quarters of a cover-height of wall and well
-       stands below it, waiting to be looked into */
-    var base = document.createElement('div');
-    base.className = 'boot__base';
-    base.style.width = (coverW + wallW) + 'px';
-    base.style.height = bodyH + 'px';
-    base.style.left = (cx - wallW / 2) + 'px';
-    base.style.top = bodyTop + 'px';
 
     var cover = document.createElement('div');
     cover.className = 'boot__cover';
@@ -232,8 +240,6 @@
     skip.className = 'boot__skip';
     skip.textContent = 'Skip';
 
-    boot.appendChild(ground);
-    boot.appendChild(base);
     boot.appendChild(cover);
     boot.appendChild(skip);
     document.body.appendChild(boot);
@@ -255,25 +261,13 @@
       return a;
     }
 
-    play(base, [
-      { transform: 'scale(.97)', opacity: 0 },
-      { transform: 'scale(1)', opacity: 1 }
-    ], { duration: TIMING.settle, easing: EASE_OUT, fill: 'both' });
-
-    /* the table cloth over the set dissolves as the cover clears it: this is
-       the moment the page underneath becomes the inside of the box */
-    play(ground, [{ opacity: 1 }, { opacity: 0 }], {
-      duration: 560,
-      delay: openAt + TIMING.lift * 0.42,
+    /* the cloth over the set dissolves as the cover clears it: this is the
+       moment you can see into the box */
+    play(cloth, [{ opacity: 1 }, { opacity: 0 }], {
+      duration: 520,
+      delay: openAt + TIMING.lift * 0.30,
       easing: 'linear',
       fill: 'both'
-    });
-
-    play(base, [{ opacity: 1 }, { opacity: 0 }], {
-      duration: 380,
-      delay: openedAt - 40,
-      easing: 'linear',
-      fill: 'forwards'
     });
 
     play(cover, [
@@ -283,37 +277,34 @@
       { transform: 'none', offset: 1 }
     ], { duration: TOTAL, easing: EASE_OUT, fill: 'both' });
 
-    /* the view pushes into the box as the cover clears it */
+    /* the whole tray sits closed and small, then the view flies into it until
+       the boards are full size — the walls leave the frame rather than fade */
     play(stage, [
-      { transform: 'scale(.88)' },
-      { transform: 'scale(1)' }
-    ], {
-      duration: TIMING.fly + 320,
-      delay: openAt + TIMING.lift * 0.42,
-      easing: EASE_OUT,
-      fill: 'both'
+      { transform: closed, offset: 0 },
+      { transform: closed, offset: (openAt + TIMING.lift * 0.30) / TOTAL },
+      { transform: 'none', offset: 1 }
+    ], { duration: TOTAL, easing: EASE_OUT, fill: 'both' });
+
+    /* by the time this runs the chipboard is already past the edges of the
+       screen, and the interior was always the same green as the table, so
+       there is nothing visible left to take away */
+    play(walls, [{ opacity: 1 }, { opacity: 0 }], {
+      duration: 420,
+      delay: TOTAL - 480,
+      easing: 'linear',
+      fill: 'forwards'
     });
 
-    /* the contents settle in the order they are printed */
-    var pieces = document.querySelectorAll('.tray .board, .tray .slot');
+    /* The boards do not arrive — they were in the box the whole time. They
+       come up with the cloth, so what the lifting cover reveals is a tray
+       already full, and every bit of movement after that is the view moving
+       rather than the contents rearranging themselves. */
+    var pieces = document.querySelectorAll('.tray .board, .tray .slot, .colophon');
     for (var p = 0; p < pieces.length; p++) {
-      play(pieces[p], [
-        { opacity: 0, transform: 'translateY(30px)' },
-        { opacity: 1, transform: 'none' }
-      ], {
-        duration: 520,
-        delay: openedAt - 120 + 55 * p,
-        easing: EASE_OUT,
-        fill: 'both'
-      });
-    }
-
-    var tail = document.querySelector('.colophon');
-    if (tail) {
-      play(tail, [{ opacity: 0 }, { opacity: 1 }], {
-        duration: 460,
-        delay: openedAt - 120 + 55 * pieces.length,
-        easing: EASE_OUT,
+      play(pieces[p], [{ opacity: 0 }, { opacity: 1 }], {
+        duration: 380,
+        delay: openAt + TIMING.lift * 0.30,
+        easing: 'linear',
         fill: 'both'
       });
     }
@@ -335,6 +326,8 @@
         try { anims[i].cancel(); } catch (e) { /* already gone */ }
       }
       if (boot.parentNode) boot.parentNode.removeChild(boot);
+      if (walls.parentNode) walls.parentNode.removeChild(walls);
+      if (cloth.parentNode) cloth.parentNode.removeChild(cloth);
       html.className = html.className.replace(/\s*\bbooting\b/, '');
       stage.style.transform = '';
       markSeen();

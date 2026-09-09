@@ -417,7 +417,27 @@ html { scrollbar-color: var(--tray) var(--table-deep); }
    and the resting page the same thing rather than two things that resemble
    each other. */
 
-.boot-stage { transform-origin: 50% 30%; }
+.boot-stage {
+  position: relative;
+  transform-origin: 0 0;
+}
+
+/* The walls of the tray, drawn around the real page so the boards are
+   genuinely inside the box rather than beside a prop of one. The interior is
+   the same green as the table — it is the same table — so when the view
+   pushes past the walls there is nothing to notice going. */
+.boot-walls {
+  position: absolute;
+  z-index: -1;
+  background: var(--table);
+  background-image:
+    repeating-linear-gradient(90deg, var(--table-weft) 0 1px, transparent 1px 4px),
+    repeating-linear-gradient(0deg,  var(--table-weft) 0 1px, transparent 1px 4px);
+  border: 3px solid var(--ink);
+  box-shadow:
+    inset 0 0 0 26px var(--tray),
+    inset 0 0 0 29px var(--ink);
+}
 
 html.booting,
 html.booting body { overflow: hidden; }
@@ -433,40 +453,23 @@ html.booting .colophon { opacity: 0; }
   z-index: 100;
 }
 
-/* The bare table, laid over the set while the box is still closed. It fades
-   to nothing as the cover comes off — the same green is underneath, so what
-   the eye reads is not a screen lifting but a lid, and then the contents. */
-.boot__ground {
-  position: fixed;
+/* The cloth over the contents while the box is closed. It lives inside the
+   box and scales with it, so the chipboard walls are visible around it from
+   the first frame — a closed box, not a sign — and it fades as the cover
+   comes off to reveal the boards already sitting in the tray. */
+.boot-cloth {
+  position: absolute;
   inset: 0;
-  background: var(--table);
+  z-index: 1;
+  background: var(--table-deep);
   background-image:
     repeating-linear-gradient(90deg, var(--table-weft) 0 1px, transparent 1px 4px),
     repeating-linear-gradient(0deg,  var(--table-weft) 0 1px, transparent 1px 4px);
 }
 
-/* the box itself: chipboard walls around a dark well, deep enough to hold
-   something, with the cover seated over its top edge */
-.boot__base {
-  position: fixed;
-  background: var(--tray);
-  border: 3px solid var(--ink);
-  box-shadow:
-    inset 0 0 0 3px var(--tray-cut),
-    var(--edge) var(--edge) 0 0 var(--ink);
-}
-
-.boot__base::after {
-  content: "";
-  position: absolute;
-  inset: 13px;
-  background: var(--table-deep);
-  box-shadow: inset 0 0 0 2px rgba(0, 0, 0, .4);
-}
-
 /* carries the flight from the middle of the table to the top-left corner;
    the plate inside it keeps its own -1.1deg the whole way */
-.boot__cover { position: fixed; }
+.boot__cover { position: fixed; transform-origin: 0 0; }
 .boot__cover .lid__plate { width: 100%; height: 100%; }
 
 .boot__skip {
