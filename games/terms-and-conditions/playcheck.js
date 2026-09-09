@@ -8,7 +8,7 @@
 // can: a typo in a draw function that throws on the first round.
 //
 // THE INTERESTING PART is how it decides what to click. It does not ask the
-// game. It reads the fake DOM exactly as a player reads the sheet — the stock
+// game. It reads the fake DOM exactly as a player reads the sheet — the backdrop
 // stamp, each shape's printed label, the numbered clause list — rebuilds the
 // round from that alone, and resolves it independently. So a passing run is
 // evidence of the game's actual promise: everything needed to know the answer
@@ -92,7 +92,7 @@ var lastFocused = null;
 
 var IDS = ['screen-menu', 'screen-amendment', 'screen-play', 'screen-over',
   'hud', 'hudStreak', 'hudClauses', 'hudBest', 'menuBest', 'startBtn',
-  'amendNo', 'amendText', 'amendBtn', 'sheet', 'stockStamp', 'headline',
+  'amendNo', 'amendText', 'amendBtn', 'sheet', 'backdropStamp', 'headline',
   'shapes', 'clauseList', 'barFill', 'overTitle', 'overWhy', 'overDetail',
   'againBtn'];
 
@@ -160,13 +160,15 @@ function advance(ms) { now += ms; pump(); }
 
 /* ── reading the sheet the way a player does ───────────────────────────── */
 
-// Rebuilds the round from the printed DOM only: the stock stamp, each shape's
+// Rebuilds the round from the printed DOM only: the backdrop stamp, each shape's
 // label, and the numbered clause list. Nothing here reaches into the game.
 var LABEL = /^Shape (\d+): (\w+) (\w+), size (\d+) of (\d+)/;
 
 function readSheet() {
-  var stockText = byId.stockStamp.textContent;           /* "Stock: YELLOW" */
-  var stock = stockText.replace(/^Stock:\s*/, '').trim().toLowerCase();
+  var stampText = byId.backdropStamp.textContent;        /* "Backdrop: YELLOW" */
+  var backdrop = stampText.replace(/^Backdrop:\s*/, '').trim().toLowerCase();
+  check(stampText !== backdrop,
+    'the corner stamp does not say what it is naming: "' + stampText + '"');
 
   var buttons = byId.shapes.children;
   var shapes = buttons.map(function (btn, i) {
@@ -192,14 +194,22 @@ function readSheet() {
     return id ? C.byId(id) : null;
   }).filter(Boolean);
 
-  return { stock: stock, shapes: shapes, clauses: clauses, labels: buttons };
+  return { backdrop: backdrop, shapes: shapes, clauses: clauses, labels: buttons };
 }
 
 function solveFromSheet() {
   var sheet = readSheet();
   check(sheet.shapes.every(Boolean), 'a shape carried no readable label');
-  check(C.stock(sheet.stock) !== null, 'the stock stamp reads "' + sheet.stock + '", which is not a stock');
-  var res = C.resolve({ stock: sheet.stock, shapes: sheet.shapes, clauses: sheet.clauses });
+  check(C.backdrop(sheet.backdrop) !== null,
+    'the corner stamp reads "' + sheet.backdrop + '", which is not a backdrop');
+  /* Every printed clause must read as an override of the headline, and must be
+     one the engine actually knows — a line the player can only read as advice
+     is a line that will cost them a run. */
+  sheet.clauses.forEach(function (c) {
+    check(/^Except when /.test(c.text),
+      'a printed clause does not read as an override: "' + c.text + '"');
+  });
+  var res = C.resolve({ backdrop: sheet.backdrop, shapes: sheet.shapes, clauses: sheet.clauses });
   return { sheet: sheet, answer: res.answer, clauseCount: sheet.clauses.length };
 }
 
@@ -413,6 +423,58 @@ check(byId.hud.hidden === false, 'the HUD is hidden mid-run');
     check(screen() === before, 'pressing 9 with ' + count + ' shapes changed the screen');
   }
   console.log('keyboard-only rounds   ' + played);
+})();
+
+/* ── two runs must not be the same lesson ────────────────────────────────
+   The catalogue holds several clauses at every difficulty tier and a run deals
+   one from each, so restarting should hand you different small print rather
+   than the same six lines in a slightly different order. Checked through the
+   real game loop, reading the amendment screens, because that is where a
+   player meets them. */
+(function () {
+  function freshRun() {
+    while (screen() === 'amendment') byId.amendBtn.fire('click');
+    if (screen() === 'play') {
+      /* answer wrong on purpose — the quickest honest way back to the start */
+      var solved = solveFromSheet();
+      var wrong = solved.answer === 0 ? 1 : 0;
+      clickShape(wrong);
+    }
+    if (screen() === 'over') byId.againBtn.fire('click');
+    else if (screen() === 'menu') byId.startBtn.fire('click');
+  }
+
+  var OPENERS = 3;      /* how many clauses in before two runs are compared */
+  var RUNS = 14;
+  var sets = {};
+  var everySeen = {};
+
+  for (var r = 0; r < RUNS; r++) {
+    freshRun();
+    var seen = [];
+    for (var step = 0; step < 60 && seen.length < OPENERS; step++) {
+      if (screen() === 'amendment') {
+        var text = byId.amendText.textContent;
+        check(/^Except when /.test(text),
+          'an amendment does not read as an override: "' + text + '"');
+        seen.push(text);
+        everySeen[text] = true;
+        byId.amendBtn.fire('click');
+        continue;
+      }
+      if (screen() !== 'play') break;
+      clickShape(solveFromSheet().answer);
+    }
+    check(seen.length === OPENERS,
+      'a run dealt only ' + seen.length + ' clauses in 60 rounds');
+    sets[seen.join(' | ')] = true;
+  }
+
+  var distinct = Object.keys(sets).length;
+  check(distinct >= 4, 'only ' + distinct + ' different openings in ' + RUNS +
+    ' runs — every run is teaching the same thing');
+  console.log('openings in ' + RUNS + ' runs   ' + distinct + ' distinct, ' +
+    Object.keys(everySeen).length + ' different clauses');
 })();
 
 /* ── report ────────────────────────────────────────────────────────────── */

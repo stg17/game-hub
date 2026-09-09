@@ -21,30 +21,26 @@
 
   <div class="hud" id="hud" hidden>
     <span>Streak <b id="hudStreak">0</b></span>
-    <span class="badge" id="hudClauses">0 of 10</span>
+    <span class="badge" id="hudClauses">0 of 6</span>
     <span id="hudBest">Best streak 0</span>
   </div>
 
-  <!-- ── the menu ───────────────────────────────────────────────────── -->
+  <!-- ── the menu ───────────────────────────────────────────────────────
+       Deliberately almost empty. An earlier build printed the whole
+       agreement here — precedence, the ramp, the lot — which is the one
+       explanation this game must not give away: working out that the small
+       print overrides the headline IS the game. One line, and let them find
+       the rest on the sheet. ─────────────────────────────────────────── -->
   <section id="screen-menu" class="screen">
-    <p class="tagline">One instruction is printed large. The rest is printed small, and it contradicts the large one. Click the right shape before the clock runs out.</p>
-
-    <div class="terms-card">
-      <p class="terms-card__label">The agreement</p>
-      <ol class="terms-card__list">
-        <li>The headline says <b>click the biggest shape</b>. That is the instruction, until a clause says otherwise.</li>
-        <li>Clauses are numbered. Any clause whose condition is met replaces the instruction.</li>
-        <li><b>A later clause overrides an earlier one.</b> When two apply, the one further down the page wins.</li>
-        <li>A new clause is added every third correct answer, and the clock gets shorter. One wrong answer ends the run.</li>
-      </ol>
-      <p class="terms-card__note">Every shape is labelled with its colour and its number, so you can play this by reading and by keyboard: press <kbd>1</kbd>&hairsp;&ndash;&hairsp;<kbd>6</kbd> to choose.</p>
-    </div>
+    <p class="tagline">Follow the instructions carefully.</p>
 
     <p class="menu-best">Best streak so far: <b id="menuBest">0</b></p>
 
     <div class="btn-row">
-      <button class="btn btn-primary" id="startBtn">Accept and begin</button>
+      <button class="btn btn-primary" id="startBtn">Begin</button>
     </div>
+
+    <p class="menu-keys">Every shape is labelled, and keys <kbd>1</kbd>&hairsp;&ndash;&hairsp;<kbd>6</kbd> pick one.</p>
   </section>
 
   <!-- ── a new clause ───────────────────────────────────────────────── -->
@@ -59,16 +55,22 @@
     </div>
   </section>
 
-  <!-- ── the round ──────────────────────────────────────────────────── -->
+  <!-- ── the round ──────────────────────────────────────────────────────
+       Order on the sheet is the order of authority: the headline, then the
+       small print that overrides it, then the shapes it is all about. The
+       clauses sit directly under the headline rather than in a footer,
+       because a rider that contradicts a line has to be read next to that
+       line to be read at all. ────────────────────────────────────────── -->
   <section id="screen-play" class="screen" hidden>
     <div class="sheet" id="sheet" tabindex="-1">
-      <p class="sheet__stamp" id="stockStamp">Stock: Yellow</p>
+      <p class="sheet__stamp" id="backdropStamp">Backdrop: Yellow</p>
       <h2 class="sheet__headline" id="headline">Click the biggest shape</h2>
+      <!-- The visible "Terms and conditions" heading is gone: under the
+           headline the list needs no introducing, and a label there would push
+           the clauses away from the line they override. A screen reader still
+           gets the grouping, from here. -->
+      <ol class="fine" id="clauseList" aria-label="Terms and conditions"></ol>
       <div class="shapes" id="shapes"></div>
-      <div class="fine">
-        <p class="fine__label">Terms and conditions</p>
-        <ol class="fine__list" id="clauseList"></ol>
-      </div>
       <div class="bar" aria-hidden="true"><span class="bar__fill" id="barFill"></span></div>
     </div>
   </section>

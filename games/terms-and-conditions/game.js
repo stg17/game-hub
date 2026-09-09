@@ -15,7 +15,9 @@
 
   /* ── the ramp ───────────────────────────────────────────────────────── */
 
-  var CLAUSE_CAP = 6;
+  /* One clause per difficulty tier, so the cap is the catalogue's tier count
+     rather than a number typed here twice. */
+  var CLAUSE_CAP = R.RUN_CLAUSES;
   var EASE_IN_ROUNDS = 2;   /* rounds of headline-only, to learn the base */
   var PER_CLAUSE = 3;       /* correct answers between amendments */
   var TIME_START = 6000;
@@ -70,7 +72,7 @@
     el.amendBtn = document.getElementById('amendBtn');
 
     el.sheet = document.getElementById('sheet');
-    el.stockStamp = document.getElementById('stockStamp');
+    el.backdropStamp = document.getElementById('backdropStamp');
     el.headline = document.getElementById('headline');
     el.shapes = document.getElementById('shapes');
     el.clauseList = document.getElementById('clauseList');
@@ -93,7 +95,7 @@
   function syncHud() {
     var stats = Store.get();
     el.hudStreak.textContent = String(state.streak);
-    el.hudClauses.textContent = state.active.length + ' of ' + C.CLAUSES.length;
+    el.hudClauses.textContent = state.active.length + ' of ' + CLAUSE_CAP;
     el.hudBest.textContent = 'Best streak ' + stats.bestStreak;
   }
 
@@ -101,10 +103,10 @@
 
   function drawRound() {
     var round = state.round;
-    var stock = C.stock(round.stock);
+    var backdrop = C.backdrop(round.backdrop);
 
-    el.sheet.style.background = stock.hex;
-    el.stockStamp.textContent = 'Stock: ' + stock.label;
+    el.sheet.style.background = backdrop.hex;
+    el.backdropStamp.textContent = 'Backdrop: ' + backdrop.label;
     el.headline.textContent = C.HEADLINE.text;
 
     /* Size rank, biggest first. A sighted player reads the ordering off the

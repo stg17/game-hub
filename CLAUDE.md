@@ -143,32 +143,65 @@ Reaching 2048 sets `won` and shows the win overlay once; "Keep going" sets `keep
 ### Terms & Conditions (`games/terms-and-conditions/`)
 
 A reaction game about small print. One instruction is printed large —
-`CLICK THE BIGGEST SHAPE` — and beneath it a numbered list of clauses
-conditionally overrides it ("If the stock is yellow, click the smallest"). A
-new clause arrives every third correct answer and the clock shortens; one wrong
-answer or one timeout ends the run, and best streak is the score.
+`CLICK THE BIGGEST SHAPE` — and directly beneath it a numbered list of clauses
+conditionally overrides it ("Except when the backdrop is yellow, click the
+smallest shape"). A new clause arrives every third correct answer and the clock
+shortens; one wrong answer or one timeout ends the run, and best streak is the
+score.
+
+**The menu explains nothing on purpose.** It prints one line — "Follow the
+instructions carefully" — plus the best streak and a keyboard note. An earlier
+build printed the whole agreement there: precedence, the ramp, the lot. That is
+the one explanation this game must not give, because working out that the small
+print overrides the headline *is* the game. The clauses arrive one at a time on
+their own screen, which is teaching enough.
 
 Script order in `index.html` is the dependency graph: `clauses.js` → `round.js`
 → `storage.js` → `game.js`. `clauses.js` and `round.js` are **pure** — no DOM,
 no timers — which is what makes the whole thing checkable without a browser.
 
 **`clauses.js` holds the one invariant that matters.** A clause is
-`{id, rank, text, needs, when, pick}`, where `text` is the printed English and
+`{id, rank, text, when, pick}`, where `text` is the printed English and
 `when`/`pick` are the code. If those two ever disagree, the game is lying to the
 player, and that is the worst bug it can have. `resolve()` starts at the
 headline's target and lets every clause whose `when` is true replace it, walking
 in printed order — so **the later clause wins**, and since new clauses are
-appended at the bottom, the newest is always the most powerful.
+appended at the bottom, the newest is always the most powerful. Every `text` is
+phrased `Except when …`, which is how that relationship gets printed rather than
+merely implemented.
 
-**Shape sizes are perceptual, not geometric.** A shape's `size` is its intended
-visual weight; the box it is actually drawn in is `size × KIND_SCALE[kind]`,
-where the scales equalise *ink area* across silhouettes. Drawn at one box a
-triangle carries 38% of a square's ink and a slim star about 24%, so without
-this a "large" triangle genuinely is smaller than a "small" square and the
-headline has no answer. `GLYPH` stores each kind's defining geometry once and
+**A clause's text must state its WHOLE firing condition**, not a friendly
+approximation. This is the corollary that is easy to get wrong and shipped
+broken once: "If there is a star, click the star" reads as though it fires
+whenever a star is on the sheet, but the code needs *exactly one* star to be
+able to name a single shape, so a player looking at two stars cannot tell
+whether the clause is live. Every clause now spells out the count it needs
+("exactly one shape is a star"), even where that costs a few words. The
+self-check's independent readings are written from the text alone, so a clause
+that hides a count fails there.
+
+**Shape sizes are perceptual, and split between two cues.** A shape's `size` is
+its intended visual weight; the box it is drawn in is `size × KIND_SCALE[kind]`.
+An eye reads "big" two ways at once — ink on the paper, and how far the shape
+reaches — and for different silhouettes those cannot both be exact. Scale to
+equal *ink* and the star's box runs well over the square's, so a smaller star
+looks wider than a bigger square; scale nothing and equal boxes differ ~1.44x in
+ink. The first of those was the original build, and it is what made "which is
+biggest" genuinely hard to answer.
+
+So `KIND_SCALE` is the **square root** of the ink-equalising factor
+(`AREA_WEIGHT = 0.5`). Both cues are then off by the same modest factor, which
+is the smallest that factor can be made: extent needs `step > (Kmax/Kmin)^t` and
+ink needs `step > (Kmax/Kmin)^(1-t)`, and those are jointly hardest at `t = 1/2`.
+With the `SIZE_POOL` steps at ~1.27x, one step up is at least **1.16x wider and
+1.34x more ink**, whatever the two silhouettes — so nothing on the sheet
+disagrees with anything else about which shape is bigger. The glyphs are also
+drawn as full as their silhouettes allow (a nearly box-filling triangle, a fat
+star at `innerRatio 0.66`), which is what keeps `Kmax/Kmin` near 1.10 and leaves
+both margins comfortable. `GLYPH` stores each kind's defining geometry once and
 both the SVG path and the area are derived from it, so the drawn shape and the
-maths cannot drift apart. Don't hand-edit a scale factor — change the geometry
-and let the scale fall out.
+maths cannot drift apart. Don't hand-edit a scale factor, and don't slim the
+star back down without re-reading the self-check's reported margins.
 
 **`round.js` rejects rather than constructs.** It builds a candidate, resolves
 it, and keeps it only if it passes `dealable()`: the answer resolves to exactly
@@ -184,11 +217,25 @@ decided by a clause) and spreads *which* clause decides: if clauses rarely fire
 the right strategy is to ignore them, and if they always fire the right strategy
 is to ignore the headline. Either way the game stops being about reading.
 
-The `fallback()` round is chosen so every clause in the catalogue is switched
-off, and it is resolved **with** the live clause list. Resolving it against `[]`
-and then printing the live clauses is a trap worth naming: with `three-left`
-active, a three-shape fallback would print a clause that plainly applies while
-the stored answer ignored it.
+**Two runs must not be the same lesson.** The catalogue holds 18 clauses across
+6 difficulty tiers (`rank`), and `runOrder()` deals **one clause per tier,
+easiest tier first** — so a run sees 6 of the 18 and `RUN_CLAUSES` is just the
+tier count rather than a number typed in two places. With three clauses a tier
+that is 729 different sets of small print, while the shape of the ramp never
+varies: slot 1 is always tier 1 and slot 6 always tier 6, because a run that
+opened with "one colour appears twice and no colour appears more often" would
+not be teaching, it would just be losing. **Keep the tiers evenly stocked** when
+adding clauses — a tier holding one clause is a slot that prints the same line
+every run, which the self-check fails on.
+
+The `fallback()` round switches off all but one clause in the catalogue, and it
+is resolved **with** the live clause list. Resolving it against `[]` and then
+printing the live clauses is a trap worth naming: with `three-left` active, a
+three-shape fallback would print a clause that plainly applies while the stored
+answer ignored it. The one clause it cannot dodge is `four-second-smallest`,
+because avoiding it needs fewer than four shapes while avoiding `blue-middle`
+needs an even count and three is `three-left`; that is harmless, since it picks
+the second smallest and so satisfies the override law rather than breaking it.
 
 **The clock is never counted in ticks.** One `rAF` loop recomputes the
 remainder from a wall-clock deadline (same rule as the rest of the repo). It
@@ -204,11 +251,14 @@ Persistence is `terms_stats_v1` — `{bestStreak, runs, bestClauses}` — with t
 same merge-onto-defaults load and try/catch fallback as the other games.
 
 **Colour is never the only channel.** Every shape prints its colour as a word
-and the sheet carries a corner stamp naming the stock, so the colour clauses are
-playable without colour vision. Each shape's `aria-label` announces its size
+and the sheet carries a corner stamp naming the backdrop, so the colour
+clauses are playable without colour vision. Each shape's `aria-label` announces its size
 *rank* rather than a pixel value, which gives a screen-reader player exactly the
 ordering a sighted player reads off the sheet and nothing more. Keys `1`–`9`
-pick a shape and Enter/Space advances every screen.
+pick a shape and Enter/Space advances every screen. The clause list is placed
+directly under the headline rather than in a footer — a rider that contradicts
+a line has to be read next to that line — and carries an aria-label, since
+removing its visible heading would otherwise leave it unnamed.
 
 ### Verifying Terms & Conditions
 
@@ -220,19 +270,24 @@ always there in the small print, and that promise is checkable:
   clause depth. The load-bearing trick is that it **re-implements each clause
   from its printed English**, reading only attributes a player can see, and
   asserts the clause's own `when` agrees; a clause that drifted from its wording
-  or keyed on something invisible fails here. It also proves ink area is
-  equalised across kinds and strictly monotone in `size` for every kind and size
-  pair, checks each glyph stays inside its box, checks the override law and the
-  inert fallback, and reports the fire rate and the spread of deciding clauses.
+  or keyed on something invisible fails here. It also proves BOTH size cues —
+  ink area and drawn width — are strictly monotone in `size` for every kind and
+  size pair and reports the two worst-case margins, checks each glyph stays
+  inside its box, checks the override law and the fallback (against every clause
+  alone, and against 200 real run orders), checks the tiers are evenly stocked
+  and that 400 runs deal plenty of distinct clause sets, and reports the fire
+  rate and the spread of deciding clauses.
 - **`node playcheck.js`** — the whole game, `game.js` included, against a small
   fake DOM and a hand-pumped clock (the pattern described for Tetris and 2048
   below). It decides what to click by **reading the fake DOM the way a player
-  reads the sheet** — the stock stamp, each shape's printed label, the numbered
-  clause list — rebuilding the round from that alone and resolving it
+  reads the sheet** — the backdrop stamp, each shape's printed label, the
+  numbered clause list — rebuilding the round from that alone and resolving it
   independently. A passing run is therefore evidence that everything needed to
   answer is actually printed. It also covers the ramp, the amendment beat, focus
   handling, the drain of the time bar, both suspend paths, the loss and timeout
-  screens and their wording, the stored record, and a keyboard-only run.
+  screens and their wording, the stored record, a keyboard-only run, and — by
+  restarting fourteen times and reading the amendment screens — that two runs
+  are dealt different small print.
 
 Neither covers pixels. For those, drive the game in headless Chrome through a
 sized iframe with `--allow-file-access-from-files` (headless clamps a real

@@ -1,7 +1,7 @@
 /* ==========================================================================
    Terms & Conditions — No. 06 in the Game Hub compendium.
 
-   The round is a printed slip: pale stock, a headline set large, and the
+   The round is a printed slip: pale backdrop, a headline set large, and the
    clauses set small underneath it. Same world as the rest of the box — flat
    ink on board, hard keylines, depth from one plate overlapping another, never
    from blur. Duplicated rather than imported, because game folders here
@@ -125,11 +125,14 @@ h1 {
   color: var(--paper);
 }
 
+/* The whole of the menu copy. It gets the weight the agreement used to take
+   up, and full-strength paper rather than a dimmed tint — one short line has
+   to carry the screen on its own. */
 .tagline {
-  margin: 0 0 24px;
-  max-width: 62ch;
-  font-size: 15.5px;
-  color: rgba(230, 220, 196, .82);
+  margin: 0 0 26px;
+  max-width: 30ch;
+  font: 400 clamp(21px, 3.6vw, 30px)/1.28 Lid, Georgia, serif;
+  color: var(--paper);
 }
 
 /* ── the running head ─────────────────────────────────────────────────── */
@@ -193,44 +196,14 @@ h1 {
 .btn-primary { background: var(--red); color: var(--paper); }
 .btn-ghost   { background: var(--paper); color: var(--ink); }
 
-/* ── the agreement, on the menu ───────────────────────────────────────── */
+/* ── the menu ─────────────────────────────────────────────────────────── */
 
-.terms-card {
-  background: var(--paper);
-  color: var(--ink);
-  border: 3px solid var(--ink);
-  box-shadow: var(--edge) var(--edge) 0 0 var(--ink);
-  margin: 0 var(--edge) 24px 0;
-  padding: 20px 24px 22px;
-}
-
-.terms-card__label,
-.fine__label,
 .amend-card__no {
   margin: 0 0 12px;
   font-size: 11px;
   font-weight: 700;
   letter-spacing: .18em;
   text-transform: uppercase;
-  color: var(--ink-70);
-}
-
-.terms-card__list {
-  margin: 0;
-  padding-left: 22px;
-  font-size: 14.5px;
-  line-height: 1.6;
-  max-width: 62ch;
-}
-.terms-card__list li + li { margin-top: 8px; }
-.terms-card__list b { font-weight: 700; }
-
-.terms-card__note {
-  margin: 16px 0 0;
-  padding-top: 14px;
-  border-top: 2px solid var(--ink-15);
-  font-size: 13.5px;
-  line-height: 1.55;
   color: var(--ink-70);
 }
 
@@ -250,6 +223,15 @@ kbd {
   font-variant-numeric: tabular-nums;
 }
 .menu-best b { color: var(--paper); font-size: 16px; }
+
+/* Not an instruction about the game — just how to reach the shapes without a
+   mouse. Kept quiet, but above the contrast floor: it is the only route in for
+   a keyboard player and must not read as decoration. */
+.menu-keys {
+  margin: 18px 0 0;
+  font-size: 13.5px;
+  color: rgba(230, 220, 196, .88);
+}
 
 /* ── an amendment ─────────────────────────────────────────────────────── */
 
@@ -280,6 +262,11 @@ kbd {
 
 .sheet {
   position: relative;
+  /* Every round overwrites this with its own backdrop tint from game.js. The
+     default is here so the slip is never ink-on-green in the moment before
+     that runs — the text colour below is set for pale paper, not for the
+     table. */
+  background: var(--paper);
   border: 3px solid var(--ink);
   box-shadow: var(--edge) var(--edge) 0 0 var(--ink);
   margin: 0 var(--edge) 0 0;
@@ -303,7 +290,7 @@ kbd {
 }
 
 .sheet__headline {
-  margin: 8px 0 22px;
+  margin: 8px 0 14px;
   max-width: 22ch;
   font: 400 clamp(26px, 5.6vw, 44px)/1.02 Lid, Georgia, serif;
   text-transform: uppercase;
@@ -393,27 +380,36 @@ kbd {
   justify-content: center;
 }
 
-/* ── the fine print ───────────────────────────────────────────────────── */
+/* ── the small print ──────────────────────────────────────────────────────
+   It sits directly under the headline because it is the thing that
+   contradicts the headline. Printed in a footer it reads as boilerplate you
+   skip; printed here, against the line it overrides, it reads as part of the
+   instruction — which is what it is.
 
+   Genuinely small: the clock is what stops you re-reading it every round. But
+   full-strength ink, not a grey tint. The joke is that the small print is easy
+   to ignore, not that it is hard to see, and a dimmed rider would make losing
+   feel like a trick rather than a lesson. Rules above and below rather than a
+   tinted panel, so it reads as struck onto the same sheet. */
 .fine {
-  border-top: 3px solid var(--ink);
-  margin: 0 -22px;
-  padding: 14px 22px 16px;
-  background: rgba(255, 255, 255, .28);
-}
-
-.fine__label { margin-bottom: 8px; }
-
-.fine__list {
-  margin: 0;
-  padding-left: 20px;
-  /* Genuinely small. The clock is what stops you re-reading it every round. */
-  font-size: 12.5px;
+  margin: 0 0 20px;
+  padding: 10px 0 12px 22px;
+  border-top: 2px solid var(--ink-30);
+  border-bottom: 2px solid var(--ink-30);
+  font-size: 13px;
   line-height: 1.5;
   max-width: 74ch;
+  font-variant-numeric: tabular-nums;
 }
-.fine__list li + li { margin-top: 3px; }
-.tc-clause--none { list-style: none; margin-left: -20px; color: var(--ink-45); }
+.fine li + li { margin-top: 4px; }
+.fine li::marker { font-weight: 700; }
+
+/* Before the first amendment. Says the sheet is complete as printed, rather
+   than leaving a gap that looks like something failed to load. */
+/* --ink-70, not the --ink-45 this used to be: at 45% on the palest backdrop
+   the line lands at 2.8:1, which is under AA and, worse, reads as a disabled
+   control rather than as a statement about the sheet. */
+.tc-clause--none { list-style: none; margin-left: -22px; color: var(--ink-70); }
 
 /* ── the clock ────────────────────────────────────────────────────────── */
 
@@ -483,8 +479,8 @@ kbd {
   :root { --edge: 5px; }
   .head { padding: 18px 84px 20px 18px; }
   .sheet { padding: 18px 16px 0; }
-  .fine, .bar { margin: 0 -16px; }
-  .fine { padding: 12px 16px 14px; }
+  .bar { margin: 0 -16px; }
+  .fine { padding: 8px 0 10px 20px; font-size: 12.5px; margin-bottom: 16px; }
   /* No blanket scale-down here on purpose. A six-shape round is already
      shrink-bound at this width, so a fixed factor would change nothing for it
      while needlessly shrinking the three-shape rounds that have room to spare.

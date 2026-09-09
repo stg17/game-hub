@@ -22,7 +22,11 @@ window.TC.Round = (function () {
   var MIN_SHAPES = 3;
   var MAX_SHAPES = 6;
   var FIRE_RATE = 0.5;    /* share of rounds where a clause changes the answer */
-  var ATTEMPTS = 80;      /* per round, before settling for what we have */
+  var ATTEMPTS = 120;     /* per round, before settling for what we have */
+
+  // How many clauses one run deals: one from each difficulty tier. See
+  // runOrder below for why that is the number.
+  var RUN_CLAUSES = C.TIERS;
 
   /* A small seeded generator, so the self-check can reproduce a failure. */
   function lcg(seed) {
@@ -65,7 +69,7 @@ window.TC.Round = (function () {
       });
     }
     return {
-      stock: pick(rng, shapeIds(C.STOCKS)),
+      backdrop: pick(rng, shapeIds(C.BACKDROPS)),
       shapes: shapes,
       clauses: clauses
     };
@@ -137,49 +141,78 @@ window.TC.Round = (function () {
     return onTarget || closeEnough || anything || fallback(clauses);
   }
 
-  /* If eighty attempts somehow produce nothing dealable, hand back a round that
+  /* If every attempt somehow produces nothing dealable, hand back a round that
      cannot fail to resolve. Better a dull round than a broken one.
 
-     Every attribute here is picked to switch every clause in the catalogue OFF,
-     and it is resolved with the real clause list rather than an empty one — so
-     what the sheet prints and what the answer is cannot disagree. Resolving
-     against [] and then printing the live clauses would be the worst bug this
-     game can have: with 'three-left' active, a three-shape fallback prints a
-     clause that plainly applies while the stored answer ignores it, and the
-     player who read correctly is the one who loses.
+     It is resolved with the REAL clause list rather than an empty one, so what
+     the sheet prints and what the answer is cannot disagree. Resolving against
+     [] and then printing the live clauses would be the worst bug this game can
+     have: with 'three-left' active, a three-shape fallback prints a clause that
+     plainly applies while the stored answer ignores it, and the player who read
+     correctly is the one who loses.
 
-       four shapes      — not three, so 'three-left' is off
-       all circles      — 'no-circle-biggest', 'star', 'two-triangles' off
-       four inks, no black, no repeat
-                        — 'black', 'all-one-ink-right', 'shared-ink' off
-       blue stock       — the yellow, pink and grey clauses off
+     Every attribute is picked to switch off all but one clause in the
+     catalogue:
 
-     A clause added later that this round would trip is a real hazard, so the
-     self-check asserts the fallback resolves with nothing applied. */
+       blue backdrop   — the yellow, green, pink and grey clauses off
+       four shapes     — 'three-left' off, and 'blue-middle' needs an odd count
+       one circle      — 'no-circle-biggest' and 'two-circles' both off
+       two squares     — 'no-square-smallest' off
+       one triangle    — 'two-triangles' off
+       no star         — 'star' off
+       biggest is a square
+                       — 'biggest-is-circle' off
+       red x3 + gold   — no black and no blue ink, so 'black' and
+                         'match-backdrop' are off; not all one colour, so
+                         'all-one-ink-right' is off; a colour repeats, so
+                         'all-inks-different' is off; it repeats three times,
+                         so 'shared-ink' (which needs a lone pair) is off
+
+     The one clause that cannot be switched off is 'four-second-smallest',
+     because dodging it would need fewer than four shapes and dodging
+     'blue-middle' needs an even count — and three is 'three-left'. That is
+     fine: it picks the second smallest, which is never the headline's biggest,
+     so it satisfies the override law rather than breaking it. The self-check
+     asserts both that at most this one clause fires and that the round is
+     dealable against every clause on its own. */
   function fallback(clauses) {
     var round = {
-      stock: 'blue',
+      backdrop: 'blue',
       shapes: [
-        { i: 0, kind: 'circle', ink: 'red',   size: 34 },
-        { i: 1, kind: 'circle', ink: 'blue',  size: 51 },
-        { i: 2, kind: 'circle', ink: 'gold',  size: 75 },
-        { i: 3, kind: 'circle', ink: 'green', size: 90 }
+        { i: 0, kind: 'circle',   ink: 'red',  size: 34 },
+        { i: 1, kind: 'square',   ink: 'red',  size: 56 },
+        { i: 2, kind: 'square',   ink: 'red',  size: 116 },
+        { i: 3, kind: 'triangle', ink: 'gold', size: 91 }
       ],
       clauses: clauses
     };
     return { round: round, resolved: C.resolve(round) };
   }
 
-  /* ── the order clauses arrive in ────────────────────────────────────── */
+  /* ── the clauses a run deals, and in what order ─────────────────────── */
 
-  // Sorted by how hard they are to hold in mind, with enough jitter that two
-  // runs differ. The ramp stays a ramp: the sixth clause you meet is always
-  // harder than the first.
+  // One clause from each difficulty tier, easiest tier first.
+  //
+  // This is what makes two runs different games rather than the same lesson
+  // twice. The catalogue holds several clauses at every tier, so the run picks
+  // among them: with three per tier and six tiers that is 729 different sets of
+  // small print, and the clause you meet third is a different rule almost every
+  // time. What does NOT vary is the shape of the ramp — slot 1 is always a
+  // tier-1 clause and slot 6 always a tier-6 one — because a run that opened
+  // with "one colour appears twice and no colour appears more often" would be
+  // teaching nothing, it would just be losing.
+  //
+  // Tiers should stay evenly stocked. A tier holding one clause is a slot that
+  // prints the same line every run.
   function runOrder(rng) {
     rng = rng || Math.random;
-    return C.CLAUSES.slice().sort(function (a, b) {
-      return (a.rank + rng() * 1.4) - (b.rank + rng() * 1.4);
-    });
+    var out = [];
+    for (var tier = 1; tier <= C.TIERS; tier++) {
+      var inTier = C.CLAUSES.filter(function (c) { return c.rank === tier; });
+      if (!inTier.length) continue;
+      out.push(pick(rng, inTier));
+    }
+    return out;
   }
 
   return {
@@ -191,6 +224,7 @@ window.TC.Round = (function () {
     fallback: fallback,
     MIN_SHAPES: MIN_SHAPES,
     MAX_SHAPES: MAX_SHAPES,
+    RUN_CLAUSES: RUN_CLAUSES,
     FIRE_RATE: FIRE_RATE
   };
 })();

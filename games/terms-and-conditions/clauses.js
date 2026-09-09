@@ -10,17 +10,29 @@
 // game is lying. Every clause below is written so the English and the code say
 // the same thing, and the self-check asserts it.
 //
+// A corollary that is easy to get wrong: the text must state the WHOLE firing
+// condition, not a friendly approximation of it. "If there is a star, click the
+// star" reads as though it fires whenever a star is on the sheet, but the code
+// needs exactly one star to be able to name a single shape. A player looking at
+// two stars cannot tell whether the clause is on. So every clause here spells
+// out the count it needs — "exactly one shape is a star" — even where that
+// costs a few words.
+//
 // PRECEDENCE: the later clause wins. Resolution starts at the headline's target
 // and every clause whose `when` is true replaces it, in order. So the newest
-// clause — always appended at the bottom — is always the most powerful.
+// clause — always appended at the bottom — is always the most powerful. Every
+// clause is phrased "Except when …" to print that relationship on the sheet.
 window.TC = window.TC || {};
 window.TC.Clauses = (function () {
   'use strict';
 
   /* ── the materials ──────────────────────────────────────────────────── */
 
-  // The stock is the paper the round is printed on. Pale tints, so ink reads.
-  var STOCKS = [
+  // The backdrop is the paper the round is printed on. Pale tints, so ink
+  // reads. ("Backdrop", not "stock": stock is what a printer calls it, and a
+  // clause that turns on a word the player has to look up is a clause that
+  // cannot be read at speed.)
+  var BACKDROPS = [
     { id: 'yellow', label: 'YELLOW', hex: '#e8d9a0' },
     { id: 'grey',   label: 'GREY',   hex: '#b9bcb4' },
     { id: 'pink',   label: 'PINK',   hex: '#e0bcbc' },
@@ -29,7 +41,9 @@ window.TC.Clauses = (function () {
   ];
 
   // Ink colours for the shapes, borrowed from the other games in the box so
-  // the whole set looks like it was printed in one run.
+  // the whole set looks like it was printed in one run. Two of the names are
+  // shared with the backdrops on purpose — that is what makes the
+  // 'match-backdrop' clause readable, since both are printed as words.
   var INKS = [
     { id: 'red',   label: 'RED',   hex: '#b13f1f' },
     { id: 'blue',  label: 'BLUE',  hex: '#1f4f9c' },
@@ -42,43 +56,66 @@ window.TC.Clauses = (function () {
 
   // Sizes are drawn from this pool without replacement, so no two shapes in a
   // round are ever the same size. Every "biggest / smallest / second largest"
-  // selector depends on that, and one step apart is ~45% more ink — a
-  // difference nobody has to squint at.
-  var SIZE_POOL = [34, 42, 51, 62, 75, 90];
+  // selector depends on that.
+  //
+  // The steps are ~1.27x apart, and that number is load-bearing rather than
+  // decorative — see the note on KIND_SCALE below for what it has to clear.
+  var SIZE_POOL = [34, 44, 56, 71, 91, 116];
 
   /* ── the glyphs, and why they are sized the way they are ────────────────
      The headline of this game is CLICK THE BIGGEST SHAPE, so "biggest" has to
-     have an answer. Drawn at the same box, a triangle carries 38% of a
-     square's ink and a slim five-point star about 24% — so a "large" triangle
-     beside a "small" square would genuinely be the smaller of the two, and the
-     headline would be asking an unanswerable question. That is not a polish
-     issue; it is the game lying.
+     have an answer, and — just as important — it has to have an answer the eye
+     can find in a couple of seconds under a clock.
 
-     So a shape's `size` is its intended visual weight, not its drawn box, and
-     each kind's box is scaled by 1/sqrt(unitArea) to put every kind on equal
-     ink at equal weight. Area is the right measure to equalise — it is the
-     standard for comparing symbols of different silhouette, and it is the one
-     that makes the ordering provable: with areas equal per unit weight, ink
-     area is strictly monotone in `size` for every pair of kinds, which the
-     self-check verifies exhaustively rather than taking on trust.
+     An eye reads "big" two ways at once: how much ink is on the paper, and how
+     far the shape reaches across. Those are different functions of the
+     silhouette, so for shapes of different kinds they can be made to agree only
+     up to a point. Drawn in the same box a triangle carries ~70% of a square's
+     ink and a star ~69%, so:
 
-     The cost is extent: equal ink means the star's bounding box runs ~1.4x the
-     square's, and a shape's extent is the other thing an eye reads as "big".
-     Nothing can make both metrics agree — they are different functions of the
-     silhouette — so the star is drawn deliberately fat (inner radius .55 of
-     the outer, rather than the slim .382 of a pentagram) to hold that
-     disagreement down. A slim star would need a 1.68x box.
+       - scale every kind to equal INK at equal weight, and the star's box runs
+         well over the square's, so a smaller star looks wider than a bigger
+         square;
+       - scale nothing, and equal-looking boxes differ by ~1.44x in ink.
+
+     Either way the two cues contradict each other and the player is left
+     guessing. So this build splits the difference geometrically: each kind's
+     box is scaled by the SQUARE ROOT of the ink-equalising factor. Neither cue
+     is exact, both are off by the same modest factor, and — the point — a
+     single step up the size pool is more than enough to swamp that factor in
+     BOTH of them at once. One step up is at least 1.15x wider AND at least
+     1.33x more ink, whatever the two silhouettes are. Nothing on the sheet
+     disagrees with anything else about which shape is bigger.
+
+     The arithmetic behind "one step is enough": with box = size * K^t (K the
+     ink-equalising factor, t the split), extent needs step > (Kmax/Kmin)^t and
+     ink needs step > (Kmax/Kmin)^(1-t). Both are hardest at the same value when
+     t = 1/2, which is why the split is a square root and not a taste call. The
+     self-check verifies the resulting margins exhaustively over every pair of
+     kinds and every pair of sizes, from the glyph geometry rather than from the
+     table, so a hand-edited factor cannot slip through.
+
+     The glyphs are also drawn as full as their silhouettes allow — a nearly
+     box-filling triangle, a deliberately fat star — which shrinks Kmax/Kmin to
+     ~1.10 and is what leaves both margins comfortable at a 1.27x step. Don't
+     slim the star back down without re-reading the self-check's margins.
 
      The defining numbers live here, once. The SVG path and the area are both
      derived from them, so the drawn shape and the shape the maths believes in
      cannot drift apart. */
   var GLYPH = {
     /* every kind is drawn inside a 100x100 viewBox, centred on (50, 50) */
-    circle:   { r: 44 },
+    circle:   { r: 46 },
     square:   { side: 82 },
-    triangle: { base: 90, height: 84 },
-    star:     { points: 5, r: 46, innerRatio: 0.55 }
+    triangle: { base: 98, height: 96 },
+    star:     { points: 5, r: 49, innerRatio: 0.66 }
   };
+
+  // How the two readings of "big" are traded off. 1 = equal ink at equal
+  // weight (extent disagrees), 0 = equal box at equal weight (ink disagrees),
+  // 0.5 = both off by the same factor, which is the smallest that factor can
+  // be made. See the note above.
+  var AREA_WEIGHT = 0.5;
 
   // Ink area of one kind's glyph, as a fraction of its 100x100 box.
   function unitArea(kind) {
@@ -90,13 +127,13 @@ window.TC.Clauses = (function () {
     return g.points * g.r * (g.r * g.innerRatio) * Math.sin(Math.PI / g.points) / 10000;
   }
 
-  // Scale each kind's box so equal `size` means equal ink. The square is the
-  // reference simply because it is the densest, which keeps every factor >= 1.
+  // The scale each kind's box gets. The square is the reference simply because
+  // it is the densest, which keeps every factor >= 1.
   var KIND_SCALE = (function () {
     var ref = unitArea('square');
     var out = {};
     for (var i = 0; i < KINDS.length; i++) {
-      out[KINDS[i]] = Math.sqrt(ref / unitArea(KINDS[i]));
+      out[KINDS[i]] = Math.pow(Math.sqrt(ref / unitArea(KINDS[i])), AREA_WEIGHT);
     }
     return out;
   })();
@@ -144,10 +181,11 @@ window.TC.Clauses = (function () {
     var order = shapes.slice().sort(function (a, b) { return b.size - a.size; });
     return order.length > rank ? order[rank].i : -1;
   }
-  function smallest(shapes) {
+  function bySmallRank(shapes, rank) {     /* rank 0 = smallest */
     var order = shapes.slice().sort(function (a, b) { return a.size - b.size; });
-    return order.length ? order[0].i : -1;
+    return order.length > rank ? order[rank].i : -1;
   }
+  function smallest(shapes) { return bySmallRank(shapes, 0); }
   function ofKind(shapes, kind) {
     var found = shapes.filter(function (s) { return s.kind === kind; });
     return found.length === 1 ? found[0].i : -1;
@@ -162,6 +200,15 @@ window.TC.Clauses = (function () {
     found.sort(function (a, b) { return a.size - b.size; });
     return found[0].i;
   }
+  function biggestOfKind(shapes, kind) {
+    var found = shapes.filter(function (s) { return s.kind === kind; });
+    if (!found.length) return -1;
+    found.sort(function (a, b) { return b.size - a.size; });
+    return found[0].i;
+  }
+  function middle(shapes) {
+    return shapes.length % 2 === 1 ? shapes[(shapes.length - 1) / 2].i : -1;
+  }
 
   function countKind(shapes, kind) {
     var n = 0;
@@ -173,10 +220,19 @@ window.TC.Clauses = (function () {
     for (var i = 0; i < shapes.length; i++) if (shapes[i].ink === ink) n++;
     return n;
   }
+  function allInksDistinct(shapes) {
+    for (var i = 0; i < shapes.length; i++) {
+      for (var j = i + 1; j < shapes.length; j++) {
+        if (shapes[i].ink === shapes[j].ink) return false;
+      }
+    }
+    return true;
+  }
 
   // The one ink shared by exactly two shapes, when there is exactly one such
   // ink and no ink appears more often than twice. Otherwise null — which is
-  // what makes "the larger of the two" a single, defensible shape.
+  // what makes "the larger of the two" a single, defensible shape, and what
+  // the clause's wording has to spell out.
   function lonePair(shapes) {
     var counts = {};
     var i;
@@ -204,73 +260,112 @@ window.TC.Clauses = (function () {
 
   /* ── the clauses ────────────────────────────────────────────────────── */
 
-  // `rank` is how hard the clause is to hold in mind, and it decides the order
-  // clauses are introduced in — easy ones first, so the ramp is a ramp.
+  // `rank` is how hard the clause is to hold in mind. It is also the run's
+  // difficulty tier: round.js deals one clause per tier in ascending order, so
+  // the ramp stays a ramp while WHICH clause you meet at each step changes from
+  // run to run. Keep the tiers evenly stocked when adding to this list.
   //
-  // `needs` is what the generator must guarantee for this clause to be able to
-  // fire at all without ambiguity. The generator reads it; nothing else does.
+  // Every `text` states its full firing condition, counts included. If you
+  // find yourself writing a shorter, friendlier line that leaves a count out,
+  // that is the bug this game exists to not have.
   var CLAUSES = [
+    /* ── tier 1: one thing to look at, and it names the target outright ── */
     {
       id: 'yellow-smallest',
       rank: 1,
-      text: 'If the stock is yellow, click the smallest.',
-      needs: { stock: 'yellow' },
-      when: function (r) { return r.stock === 'yellow'; },
+      text: 'Except when the backdrop is yellow, click the smallest shape.',
+      when: function (r) { return r.backdrop === 'yellow'; },
       pick: function (r) { return smallest(r.shapes); }
     },
     {
       id: 'star',
       rank: 1,
-      text: 'If there is a star, click the star.',
-      needs: { exactlyOneKind: 'star' },
+      text: 'Except when exactly one shape is a star, click the star.',
       when: function (r) { return countKind(r.shapes, 'star') === 1; },
       pick: function (r) { return ofKind(r.shapes, 'star'); }
     },
     {
+      id: 'green-left',
+      rank: 1,
+      text: 'Except when the backdrop is green, click the shape on the left.',
+      when: function (r) { return r.backdrop === 'green'; },
+      pick: function (r) { return r.shapes[0].i; }
+    },
+
+    /* ── tier 2 ─────────────────────────────────────────────────────────── */
+    {
       id: 'pink-right',
       rank: 2,
-      text: 'If the stock is pink, click the shape on the right.',
-      needs: { stock: 'pink' },
-      when: function (r) { return r.stock === 'pink'; },
+      text: 'Except when the backdrop is pink, click the shape on the right.',
+      when: function (r) { return r.backdrop === 'pink'; },
       pick: function (r) { return r.shapes[r.shapes.length - 1].i; }
     },
     {
       id: 'black',
       rank: 2,
-      text: 'If a shape is black, click it.',
-      needs: { exactlyOneInk: 'black' },
+      text: 'Except when exactly one shape is black, click the black shape.',
       when: function (r) { return countInk(r.shapes, 'black') === 1; },
       pick: function (r) { return ofInk(r.shapes, 'black'); }
     },
     {
+      id: 'no-square-smallest',
+      rank: 2,
+      text: 'Except when no shape is a square, click the smallest shape.',
+      when: function (r) { return countKind(r.shapes, 'square') === 0; },
+      pick: function (r) { return smallest(r.shapes); }
+    },
+
+    /* ── tier 3: something has to be counted first ──────────────────────── */
+    {
       id: 'three-left',
       rank: 3,
-      text: 'If there are exactly three shapes, click the shape on the left.',
-      needs: { count: 3 },
+      text: 'Except when there are exactly three shapes, click the shape on the left.',
       when: function (r) { return r.shapes.length === 3; },
       pick: function (r) { return r.shapes[0].i; }
     },
     {
       id: 'no-circle-biggest',
       rank: 3,
-      text: 'If there is no circle, click the biggest.',
-      needs: { noKind: 'circle' },
+      text: 'Except when no shape is a circle, click the biggest shape.',
       when: function (r) { return countKind(r.shapes, 'circle') === 0; },
       pick: function (r) { return byRank(r.shapes, 0); }
     },
     {
+      id: 'two-circles',
+      rank: 3,
+      text: 'Except when two or more shapes are circles, click the biggest circle.',
+      when: function (r) { return countKind(r.shapes, 'circle') >= 2; },
+      pick: function (r) { return biggestOfKind(r.shapes, 'circle'); }
+    },
+
+    /* ── tier 4: the target is a rank or a comparison, not a thing ──────── */
+    {
       id: 'grey-second',
       rank: 4,
-      text: 'If the stock is grey, click the second largest.',
-      needs: { stock: 'grey', minCount: 2 },
-      when: function (r) { return r.stock === 'grey' && r.shapes.length >= 2; },
+      text: 'Except when the backdrop is grey, click the second biggest shape.',
+      when: function (r) { return r.backdrop === 'grey' && r.shapes.length >= 2; },
       pick: function (r) { return byRank(r.shapes, 1); }
     },
     {
-      id: 'all-one-ink-right',
+      id: 'four-second-smallest',
       rank: 4,
-      text: 'If every shape is the same colour, click the shape on the right.',
-      needs: { allOneInk: true },
+      text: 'Except when there are four or more shapes, click the second smallest shape.',
+      when: function (r) { return r.shapes.length >= 4; },
+      pick: function (r) { return bySmallRank(r.shapes, 1); }
+    },
+    {
+      id: 'match-backdrop',
+      rank: 4,
+      text: 'Except when exactly one shape is the same colour as the backdrop, click that shape.',
+      when: function (r) { return countInk(r.shapes, r.backdrop) === 1; },
+      pick: function (r) { return ofInk(r.shapes, r.backdrop); }
+    },
+
+    /* ── tier 5: a property of the whole sheet ──────────────────────────── */
+    {
+      id: 'all-one-ink-right',
+      rank: 5,
+      text: 'Except when every shape is the same colour, click the shape on the right.',
       when: function (r) {
         for (var i = 1; i < r.shapes.length; i++) {
           if (r.shapes[i].ink !== r.shapes[0].ink) return false;
@@ -282,16 +377,23 @@ window.TC.Clauses = (function () {
     {
       id: 'two-triangles',
       rank: 5,
-      text: 'If there are two or more triangles, click the smallest triangle.',
-      needs: { minKind: { kind: 'triangle', n: 2 } },
+      text: 'Except when two or more shapes are triangles, click the smallest triangle.',
       when: function (r) { return countKind(r.shapes, 'triangle') >= 2; },
       pick: function (r) { return smallestOfKind(r.shapes, 'triangle'); }
     },
     {
-      id: 'shared-ink',
+      id: 'all-inks-different',
       rank: 5,
-      text: 'If two shapes share a colour, click the larger of the two.',
-      needs: { lonePair: true },
+      text: 'Except when no two shapes share a colour, click the smallest shape.',
+      when: function (r) { return r.shapes.length > 1 && allInksDistinct(r.shapes); },
+      pick: function (r) { return smallest(r.shapes); }
+    },
+
+    /* ── tier 6: two things at once, or a condition about the answer ────── */
+    {
+      id: 'shared-ink',
+      rank: 6,
+      text: 'Except when one colour appears twice and no colour appears more often, click the larger of those two.',
       when: function (r) { return lonePair(r.shapes) !== null; },
       pick: function (r) {
         var ink = lonePair(r.shapes);
@@ -300,6 +402,23 @@ window.TC.Clauses = (function () {
         pair.sort(function (a, b) { return b.size - a.size; });
         return pair[0].i;
       }
+    },
+    {
+      id: 'blue-middle',
+      rank: 6,
+      text: 'Except when the backdrop is blue and the number of shapes is odd, click the middle shape.',
+      when: function (r) { return r.backdrop === 'blue' && r.shapes.length % 2 === 1; },
+      pick: function (r) { return middle(r.shapes); }
+    },
+    {
+      id: 'biggest-is-circle',
+      rank: 6,
+      text: 'Except when the biggest shape is a circle, click the smallest shape.',
+      when: function (r) {
+        var big = byRank(r.shapes, 0);
+        return big >= 0 && r.shapes[big].kind === 'circle';
+      },
+      pick: function (r) { return smallest(r.shapes); }
     }
   ];
 
@@ -333,8 +452,8 @@ window.TC.Clauses = (function () {
     return null;
   }
 
-  function stock(id) {
-    for (var i = 0; i < STOCKS.length; i++) if (STOCKS[i].id === id) return STOCKS[i];
+  function backdrop(id) {
+    for (var i = 0; i < BACKDROPS.length; i++) if (BACKDROPS[i].id === id) return BACKDROPS[i];
     return null;
   }
   function ink(id) {
@@ -342,13 +461,23 @@ window.TC.Clauses = (function () {
     return null;
   }
 
+  // The highest `rank` in the catalogue — the number of difficulty tiers, and
+  // therefore how many clauses a single run can deal without repeating a tier.
+  var TIERS = (function () {
+    var top = 0;
+    for (var i = 0; i < CLAUSES.length; i++) if (CLAUSES[i].rank > top) top = CLAUSES[i].rank;
+    return top;
+  })();
+
   return {
-    STOCKS: STOCKS,
+    BACKDROPS: BACKDROPS,
     INKS: INKS,
     KINDS: KINDS,
     SIZE_POOL: SIZE_POOL,
     GLYPH: GLYPH,
+    AREA_WEIGHT: AREA_WEIGHT,
     KIND_SCALE: KIND_SCALE,
+    TIERS: TIERS,
     unitArea: unitArea,
     drawnBox: drawnBox,
     glyphMarkup: glyphMarkup,
@@ -356,11 +485,12 @@ window.TC.Clauses = (function () {
     CLAUSES: CLAUSES,
     resolve: resolve,
     byId: byId,
-    stock: stock,
+    backdrop: backdrop,
     ink: ink,
     /* exported for the generator and the self-check */
     countKind: countKind,
     countInk: countInk,
+    allInksDistinct: allInksDistinct,
     lonePair: lonePair
   };
 })();
