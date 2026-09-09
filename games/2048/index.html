@@ -33,12 +33,23 @@
     </div>
   </header>
 
+  <fieldset class="grid-options">
+    <legend>Choose your grid</legend>
+    <div class="grid-options__buttons">
+      <button type="button" class="btn btn-ghost" data-size="3" aria-pressed="false">3 × 3 <span>Bonus</span></button>
+      <button type="button" class="btn btn-ghost" data-size="4" aria-pressed="true">4 × 4 <span>Classic</span></button>
+      <button type="button" class="btn btn-ghost" data-size="5" aria-pressed="false">5 × 5 <span>Bonus</span></button>
+    </div>
+    <p class="grid-options__rule" id="modeRule" aria-live="polite">4 × 4 classic: one new tile per move.</p>
+    <p class="grid-options__note">Each grid keeps its own game and best score.</p>
+  </fieldset>
+
   <div class="controls">
     <button class="btn btn-primary" id="newGameBtn">Empty the tray</button>
     <button class="btn btn-ghost" id="undoBtn">Take the move back</button>
   </div>
 
-  <div class="board" id="board">
+  <div class="board" id="board" role="group" aria-label="2048, 4 by 4 grid" aria-describedby="modeRule">
     <div class="cells" id="cells"></div>
     <div class="tiles" id="tiles"></div>
     <div class="overlay" id="overlay" hidden>

@@ -84,6 +84,7 @@ html { scrollbar-color: #6d5a41 var(--table-deep); }
 /* ── page ─────────────────────────────────────────────────────────────── */
 
 .wrap {
+  container-type: inline-size;
   max-width: 520px;
   margin: 0 auto;
   padding-top: clamp(74px, 12vw, 104px);
@@ -187,6 +188,28 @@ h1 {
 
 /* ── controls ─────────────────────────────────────────────────────────── */
 
+.grid-options {
+  min-width: 0;
+  border: 0;
+  padding: 0;
+  margin: 0 0 20px;
+}
+.grid-options legend {
+  padding: 0;
+  margin-bottom: 12px;
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: .18em;
+  text-transform: uppercase;
+  color: #d9b46a;
+}
+.grid-options__buttons { display: flex; gap: 10px; padding-right: 5px; }
+.grid-options__buttons .btn { flex: 1; padding: 12px 8px; }
+.grid-options__buttons span { display: block; margin-top: 6px; font-size: 11px; }
+.grid-options__buttons [aria-pressed="true"] { background: var(--red); color: var(--paper); }
+.grid-options__rule { margin: 16px 0 0; font-size: 14px; }
+.grid-options__note { margin: 4px 0 0; font-size: 14px; color: var(--paper-dim); }
+
 .controls {
   display: flex;
   flex-wrap: wrap;
@@ -221,14 +244,16 @@ h1 {
 
 /* ── the tray ─────────────────────────────────────────────────────────── */
 
-/* --tile and --gap drive everything below: the wells, the tray's own size,
-   the tile positions and the keyframes. Change tile geometry here only. */
+/* Every grid fits the same tray. Reserve its border, gaps and outer edge
+   before dividing the remaining space into tiles. */
 .board {
-  --tile: clamp(58px, 19vw, 96px);
+  --size: 4;
+  --board-size: min(450px, calc(100cqw - var(--edge)));
   --gap: 12px;
+  --tile: calc((var(--board-size) - 6px - (var(--size) + 1) * var(--gap)) / var(--size));
   position: relative;
-  width: calc(4 * var(--tile) + 5 * var(--gap));
-  height: calc(4 * var(--tile) + 5 * var(--gap));
+  width: var(--board-size);
+  height: var(--board-size);
   max-width: 100%;
   padding: var(--gap);
   background: var(--tray);
@@ -238,8 +263,8 @@ h1 {
 
 .cells {
   display: grid;
-  grid-template-columns: repeat(4, var(--tile));
-  grid-template-rows: repeat(4, var(--tile));
+  grid-template-columns: repeat(var(--size), var(--tile));
+  grid-template-rows: repeat(var(--size), var(--tile));
   gap: var(--gap);
 }
 
@@ -332,7 +357,7 @@ h1 {
 .tile-4096, .tile-8192, .tile-16384, .tile-32768, .tile-65536 {
   background: var(--table-deep);
   color: #e8c25a;
-  font-size: calc(var(--tile) * 0.24);
+  font-size: max(11px, calc(var(--tile) * 0.24));
   box-shadow: inset 0 0 0 3px #e8c25a;
 }
 

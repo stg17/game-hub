@@ -1,6 +1,6 @@
 // Pure 2048 board logic — no DOM, no timers, no rendering.
 //
-// A board is a SIZE x SIZE array of rows holding either null or a tile record
+// A board is a square array of rows holding either null or a tile record
 // {id, value}. Ids are stable across a move, which is what lets game.js animate
 // a slide by moving the SAME element rather than redrawing the grid: move()
 // reports, per tile id, the cell it ends up in.
@@ -12,11 +12,16 @@ var Board = (function () {
   var WIN_VALUE = 2048;
   var nextId = 1;
 
-  function create() {
+  function isValidSize(size) {
+    return size === 3 || size === 4 || size === 5;
+  }
+
+  function create(size) {
+    size = size || SIZE;
     var cells = [];
-    for (var r = 0; r < SIZE; r++) {
+    for (var r = 0; r < size; r++) {
       var row = [];
-      for (var c = 0; c < SIZE; c++) row.push(null);
+      for (var c = 0; c < size; c++) row.push(null);
       cells.push(row);
     }
     return cells;
@@ -24,8 +29,8 @@ var Board = (function () {
 
   function emptyCells(cells) {
     var out = [];
-    for (var r = 0; r < SIZE; r++) {
-      for (var c = 0; c < SIZE; c++) {
+    for (var r = 0; r < cells.length; r++) {
+      for (var c = 0; c < cells.length; c++) {
         if (!cells[r][c]) out.push({ r: r, c: c });
       }
     }
@@ -46,16 +51,16 @@ var Board = (function () {
   // Cell coordinates for each of the four lines that run along `dir`, ordered
   // from the destination edge inward — so compaction is always "pack toward
   // index 0" regardless of direction.
-  function lines(dir) {
+  function lines(dir, size) {
     var out = [];
     var i, j, line;
-    for (i = 0; i < SIZE; i++) {
+    for (i = 0; i < size; i++) {
       line = [];
-      for (j = 0; j < SIZE; j++) {
+      for (j = 0; j < size; j++) {
         if (dir === 'left') line.push({ r: i, c: j });
-        else if (dir === 'right') line.push({ r: i, c: SIZE - 1 - j });
+        else if (dir === 'right') line.push({ r: i, c: size - 1 - j });
         else if (dir === 'up') line.push({ r: j, c: i });
-        else line.push({ r: SIZE - 1 - j, c: i });
+        else line.push({ r: size - 1 - j, c: i });
       }
       out.push(line);
     }
@@ -73,12 +78,12 @@ var Board = (function () {
   // Each tile can merge at most once per move, which falls out of stepping the
   // scan forward by two whenever a pair merges.
   function move(cells, dir) {
-    var next = create();
+    var next = create(cells.length);
     var moves = [];
     var merges = [];
     var gained = 0;
     var moved = false;
-    var all = lines(dir);
+    var all = lines(dir, cells.length);
 
     for (var l = 0; l < all.length; l++) {
       var line = all[l];
@@ -120,12 +125,13 @@ var Board = (function () {
   // True while any move is still possible: an empty cell, or two equal
   // neighbours somewhere.
   function hasMove(cells) {
-    for (var r = 0; r < SIZE; r++) {
-      for (var c = 0; c < SIZE; c++) {
+    var size = cells.length;
+    for (var r = 0; r < size; r++) {
+      for (var c = 0; c < size; c++) {
         var tile = cells[r][c];
         if (!tile) return true;
-        if (c + 1 < SIZE && cells[r][c + 1] && cells[r][c + 1].value === tile.value) return true;
-        if (r + 1 < SIZE && cells[r + 1][c] && cells[r + 1][c].value === tile.value) return true;
+        if (c + 1 < size && cells[r][c + 1] && cells[r][c + 1].value === tile.value) return true;
+        if (r + 1 < size && cells[r + 1][c] && cells[r + 1][c].value === tile.value) return true;
       }
     }
     return false;
@@ -133,8 +139,8 @@ var Board = (function () {
 
   function maxValue(cells) {
     var max = 0;
-    for (var r = 0; r < SIZE; r++) {
-      for (var c = 0; c < SIZE; c++) {
+    for (var r = 0; r < cells.length; r++) {
+      for (var c = 0; c < cells.length; c++) {
         if (cells[r][c] && cells[r][c].value > max) max = cells[r][c].value;
       }
     }
@@ -143,8 +149,8 @@ var Board = (function () {
 
   function listTiles(cells) {
     var out = [];
-    for (var r = 0; r < SIZE; r++) {
-      for (var c = 0; c < SIZE; c++) {
+    for (var r = 0; r < cells.length; r++) {
+      for (var c = 0; c < cells.length; c++) {
         if (cells[r][c]) {
           out.push({ id: cells[r][c].id, value: cells[r][c].value, r: r, c: c });
         }
@@ -158,18 +164,18 @@ var Board = (function () {
   // ids avoid colliding with elements still on screen.
   function toValues(cells) {
     var values = [];
-    for (var r = 0; r < SIZE; r++) {
+    for (var r = 0; r < cells.length; r++) {
       var row = [];
-      for (var c = 0; c < SIZE; c++) row.push(cells[r][c] ? cells[r][c].value : 0);
+      for (var c = 0; c < cells.length; c++) row.push(cells[r][c] ? cells[r][c].value : 0);
       values.push(row);
     }
     return values;
   }
 
   function fromValues(values) {
-    var cells = create();
-    for (var r = 0; r < SIZE; r++) {
-      for (var c = 0; c < SIZE; c++) {
+    var cells = create(values.length);
+    for (var r = 0; r < values.length; r++) {
+      for (var c = 0; c < values.length; c++) {
         var v = values[r][c];
         if (v) cells[r][c] = { id: nextId++, value: v };
       }
@@ -178,11 +184,12 @@ var Board = (function () {
   }
 
   // Shape check for anything coming back out of localStorage.
-  function isValidValues(values) {
-    if (!values || values.length !== SIZE) return false;
-    for (var r = 0; r < SIZE; r++) {
-      if (!values[r] || values[r].length !== SIZE) return false;
-      for (var c = 0; c < SIZE; c++) {
+  function isValidValues(values, size) {
+    size = size || SIZE;
+    if (!isValidSize(size) || !Array.isArray(values) || values.length !== size) return false;
+    for (var r = 0; r < size; r++) {
+      if (!Array.isArray(values[r]) || values[r].length !== size) return false;
+      for (var c = 0; c < size; c++) {
         var v = values[r][c];
         if (typeof v !== 'number' || v < 0 || v % 2 !== 0) return false;
       }
@@ -193,6 +200,7 @@ var Board = (function () {
   return {
     SIZE: SIZE,
     WIN_VALUE: WIN_VALUE,
+    isValidSize: isValidSize,
     create: create,
     spawn: spawn,
     move: move,

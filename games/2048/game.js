@@ -4,9 +4,9 @@
 // Tiles are persistent DOM nodes keyed by tile id (see `nodes`). A move updates
 // each node's --r/--c custom properties, CSS transitions the transform, and a
 // single timer fires MOVE_MS later to retire absorbed tiles, relabel the
-// survivors and drop in the new tile.
+// survivors and drop in the new tiles.
 (function () {
-  var STORAGE_KEY = '2048_state_v1';
+  var SIZE_KEY = '2048_size_v1';
   var MOVE_MS = 130;      // must match the .tile transform transition in style.css
   var UNDO_LIMIT = 25;
 
@@ -23,7 +23,10 @@
   var overlayTextEl = document.getElementById('overlayText');
   var overlayPrimaryBtn = document.getElementById('overlayPrimary');
   var overlayUndoBtn = document.getElementById('overlayUndo');
+  var sizeButtons = document.querySelectorAll('[data-size]');
+  var modeRuleEl = document.getElementById('modeRule');
 
+  var size = Board.SIZE;
   var cells = Board.create();
   var nodes = {};         // tile id -> DOM element
   var history = [];       // snapshots, oldest first; the top is one undo back
@@ -50,7 +53,7 @@
 
   function save() {
     try {
-      localStorage.setItem(STORAGE_KEY, JSON.stringify({
+      localStorage.setItem(storageKey(), JSON.stringify({
         values: Board.toValues(cells),
         score: score,
         best: best,
@@ -62,17 +65,23 @@
     } catch (e) { /* localStorage unavailable — the game just won't resume next visit */ }
   }
 
+  // Keep the original key (and the hub's record) for the classic game.
+  function storageKey() {
+    return size === 4 ? '2048_state_v1' : '2048_state_' + size + '_v1';
+  }
+
   // Restores the board, score, best AND undo history, so undo survives a
   // reload. Anything malformed falls back to a fresh game.
   function load() {
     var saved = null;
+    best = 0;
     try {
-      var raw = localStorage.getItem(STORAGE_KEY);
+      var raw = localStorage.getItem(storageKey());
       if (raw) saved = JSON.parse(raw);
     } catch (e) { /* ignore — treated as no saved game */ }
 
     if (saved && typeof saved.best === 'number') best = saved.best;
-    if (!saved || !Board.isValidValues(saved.values)) return false;
+    if (!saved || !Board.isValidValues(saved.values, size)) return false;
 
     cells = Board.fromValues(saved.values);
     score = typeof saved.score === 'number' ? saved.score : 0;
@@ -80,10 +89,10 @@
     keepPlaying = !!saved.keepPlaying;
     over = !!saved.over;
     history = [];
-    if (saved.history && saved.history.length) {
-      for (var i = 0; i < saved.history.length; i++) {
+    if (Array.isArray(saved.history)) {
+      for (var i = Math.max(0, saved.history.length - UNDO_LIMIT); i < saved.history.length; i++) {
         var snap = saved.history[i];
-        if (snap && Board.isValidValues(snap.values)) {
+        if (snap && Board.isValidValues(snap.values, size)) {
           history.push({
             values: snap.values,
             score: typeof snap.score === 'number' ? snap.score : 0,
@@ -97,7 +106,10 @@
   }
 
   function buildCells() {
-    var total = Board.SIZE * Board.SIZE;
+    cellsEl.innerHTML = '';
+    boardEl.style.setProperty('--size', size);
+    boardEl.setAttribute('aria-label', '2048, ' + size + ' by ' + size + ' grid');
+    var total = size * size;
     for (var i = 0; i < total; i++) {
       var cell = document.createElement('div');
       cell.className = 'cell';
@@ -136,6 +148,15 @@
     bestEl.textContent = best;
     undoBtn.disabled = busy || history.length === 0;
     overlayUndoBtn.disabled = busy || history.length === 0;
+    newGameBtn.disabled = busy;
+    for (var i = 0; i < sizeButtons.length; i++) {
+      sizeButtons[i].disabled = busy;
+      sizeButtons[i].setAttribute('aria-pressed', String(Number(sizeButtons[i].dataset.size) === size));
+    }
+    var modeRule = size === 5
+      ? '5 × 5 bonus: two new tiles per move, when space allows.'
+      : size + ' × ' + size + (size === 4 ? ' classic' : ' bonus') + ': one new tile per move.';
+    if (modeRuleEl.textContent !== modeRule) modeRuleEl.textContent = modeRule;
   }
 
   function bumpScore(gained) {
@@ -235,8 +256,11 @@
         }
       }
 
-      var spawned = Board.spawn(cells);
-      if (spawned) addTile(spawned, true);
+      var spawnCount = size === 5 ? 2 : 1;
+      for (var s = 0; s < spawnCount; s++) {
+        var spawned = Board.spawn(cells);
+        if (spawned) addTile(spawned, true);
+      }
 
       busy = false;
       bumpScore(result.gained);
@@ -261,19 +285,44 @@
   }
 
   function newGame() {
-    cells = Board.create();
+    if (busy) return;
+    cells = Board.create(size);
     score = 0;
     history = [];
     won = false;
     keepPlaying = false;
     over = false;
     busy = false;
+    scoreAddEl.classList.remove('show');
     Board.spawn(cells);
     Board.spawn(cells);
     rebuild();
     hideOverlay();
     save();
     syncUi();
+  }
+
+  function openGame() {
+    touchStart = null;
+    scoreAddEl.classList.remove('show');
+    buildCells();
+    hideOverlay();
+    if (load()) {
+      rebuild();
+      if (over) showOverlay('over');
+      else if (won && !keepPlaying) showOverlay('win');
+      syncUi();
+    } else {
+      newGame();
+    }
+  }
+
+  function changeSize(nextSize) {
+    if (busy || nextSize === size || !Board.isValidSize(nextSize)) return;
+    save();
+    size = nextSize;
+    try { localStorage.setItem(SIZE_KEY, String(size)); } catch (e) { /* optional preference */ }
+    openGame();
   }
 
   var KEY_DIRS = {
@@ -322,11 +371,17 @@
   newGameBtn.addEventListener('click', newGame);
   undoBtn.addEventListener('click', undo);
   overlayUndoBtn.addEventListener('click', undo);
+  for (var b = 0; b < sizeButtons.length; b++) {
+    sizeButtons[b].addEventListener('click', function () {
+      changeSize(Number(this.dataset.size));
+    });
+  }
 
   overlayPrimaryBtn.addEventListener('click', function () {
     if (overlayEl.dataset.kind === 'win') {
       keepPlaying = true;
       hideOverlay();
+      checkEnd();
       save();
       syncUi();
     } else {
@@ -334,13 +389,9 @@
     }
   });
 
-  buildCells();
-  if (load()) {
-    rebuild();
-    if (over) showOverlay('over');
-    else if (won && !keepPlaying) showOverlay('win');
-    syncUi();
-  } else {
-    newGame();
-  }
+  try {
+    var savedSize = Number(localStorage.getItem(SIZE_KEY));
+    if (Board.isValidSize(savedSize)) size = savedSize;
+  } catch (e) { /* default to the classic grid */ }
+  openGame();
 })();
