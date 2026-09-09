@@ -1,0 +1,503 @@
+/* ==========================================================================
+   Terms & Conditions — No. 06 in the Game Hub compendium.
+
+   The round is a printed slip: pale stock, a headline set large, and the
+   clauses set small underneath it. Same world as the rest of the box — flat
+   ink on board, hard keylines, depth from one plate overlapping another, never
+   from blur. Duplicated rather than imported, because game folders here
+   deliberately share nothing.
+   ========================================================================== */
+
+:root {
+  --table:      #123b2c;
+  --table-deep: #0d2b20;
+  --table-weft: #16452f;
+
+  --ink:        #171410;
+  --ink-70:     rgba(23, 20, 16, .70);
+  --ink-45:     rgba(23, 20, 16, .45);
+  --ink-30:     rgba(23, 20, 16, .30);
+  --ink-15:     rgba(23, 20, 16, .15);
+  --paper:      #e6dcc4;
+  --paper-dim:  #c3b696;
+
+  --red:        #b32d17;
+  --red-lit:    #e8542f;
+  --good:       #12503a;
+
+  --field:      #3a4356;   /* this game's printed colour: document slate */
+  --gold:       #e8c25a;
+
+  --edge:       6px;
+}
+
+* { box-sizing: border-box; }
+
+html {
+  background: var(--table);
+  background-image:
+    repeating-linear-gradient(90deg, var(--table-weft) 0 1px, transparent 1px 4px),
+    repeating-linear-gradient(0deg,  var(--table-weft) 0 1px, transparent 1px 4px);
+  color: var(--paper);
+  -webkit-text-size-adjust: 100%;
+}
+
+body {
+  margin: 0;
+  font: 400 16px/1.55 Slab, Georgia, serif;
+  min-height: 100vh;
+  padding: 0 20px 72px;
+}
+
+::selection { background: var(--red); color: var(--paper); }
+:focus-visible { outline: 3px solid var(--red-lit); outline-offset: 3px; }
+html { scrollbar-color: #6d5a41 var(--table-deep); }
+::-webkit-scrollbar { width: 13px; height: 13px; }
+::-webkit-scrollbar-track { background: var(--table-deep); }
+::-webkit-scrollbar-thumb { background: #6d5a41; border: 3px solid var(--table-deep); }
+
+/* ── the tab back to the box ──────────────────────────────────────────── */
+
+.hub-link {
+  position: fixed;
+  top: 0;
+  left: clamp(14px, 4vw, 40px);
+  z-index: 30;
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  background: var(--paper);
+  color: var(--ink);
+  border: 3px solid var(--ink);
+  border-top: 0;
+  padding: 9px 16px 10px;
+  font-size: 11.5px;
+  font-weight: 700;
+  letter-spacing: .16em;
+  text-transform: uppercase;
+  text-decoration: none;
+  box-shadow: 4px 4px 0 0 var(--ink);
+  transition: transform .14s cubic-bezier(.2, .9, .3, 1);
+}
+.hub-link:hover, .hub-link:focus-visible { transform: translateY(3px); color: var(--red); }
+.hub-link__arrow { width: 13px; height: 13px; }
+
+/* ── page ─────────────────────────────────────────────────────────────── */
+
+.wrap {
+  max-width: 760px;
+  margin: 0 auto;
+  padding-top: clamp(74px, 12vw, 104px);
+}
+
+/* This game's own printed field, on its own page. */
+.head {
+  position: relative;
+  width: fit-content;
+  max-width: 100%;
+  background: var(--field);
+  color: var(--paper);
+  border: 3px solid var(--ink);
+  box-shadow: var(--edge) var(--edge) 0 0 var(--ink);
+  margin: 0 var(--edge) calc(20px + var(--edge)) 0;
+  padding: 22px 104px 24px 24px;
+}
+
+.head__no {
+  position: absolute;
+  top: 0;
+  right: 0;
+  background: var(--ink);
+  color: var(--paper);
+  padding: 5px 10px 4px;
+  margin: 0;
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: .16em;
+  text-transform: uppercase;
+}
+
+h1 {
+  margin: 0;
+  font: 400 clamp(30px, 7vw, 46px)/0.98 Lid, Georgia, serif;
+  text-transform: uppercase;
+  letter-spacing: .012em;
+  color: var(--paper);
+}
+
+.tagline {
+  margin: 0 0 24px;
+  max-width: 62ch;
+  font-size: 15.5px;
+  color: rgba(230, 220, 196, .82);
+}
+
+/* ── the running head ─────────────────────────────────────────────────── */
+
+.hud {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 9px 14px;
+  margin-bottom: 20px;
+  padding-bottom: 14px;
+  border-bottom: 2px solid rgba(230, 220, 196, .2);
+  font-size: 11.5px;
+  font-weight: 700;
+  letter-spacing: .14em;
+  text-transform: uppercase;
+  color: var(--paper);
+  font-variant-numeric: tabular-nums;
+}
+.hud[hidden] { display: none; }
+.hud b { font-size: 15px; }
+
+#hudBest {
+  margin-left: auto;
+  font-weight: 400;
+  letter-spacing: .08em;
+  text-transform: none;
+  font-size: 13px;
+  color: rgba(230, 220, 196, .7);
+}
+
+.badge {
+  background: var(--gold);
+  color: var(--ink);
+  border: 2px solid var(--ink);
+  padding: 3px 8px 2px;
+  font-variant-numeric: tabular-nums;
+}
+
+.screen[hidden] { display: none; }
+
+/* ── buttons ──────────────────────────────────────────────────────────── */
+
+.btn-row { display: flex; flex-wrap: wrap; gap: 10px; }
+
+.btn {
+  appearance: none;
+  -webkit-appearance: none;
+  font: 700 12px/1 Slab, Georgia, serif;
+  letter-spacing: .15em;
+  text-transform: uppercase;
+  padding: 13px 20px;
+  border: 3px solid var(--ink);
+  cursor: pointer;
+  box-shadow: 5px 5px 0 0 var(--ink);
+  transition: transform .12s cubic-bezier(.2, .9, .3, 1), box-shadow .12s cubic-bezier(.2, .9, .3, 1);
+}
+.btn:hover:not(:disabled), .btn:focus-visible { transform: translate(-2px, -2px); box-shadow: 7px 7px 0 0 var(--ink); }
+.btn:active:not(:disabled) { transform: translate(2px, 2px); box-shadow: 2px 2px 0 0 var(--ink); }
+
+.btn-primary { background: var(--red); color: var(--paper); }
+.btn-ghost   { background: var(--paper); color: var(--ink); }
+
+/* ── the agreement, on the menu ───────────────────────────────────────── */
+
+.terms-card {
+  background: var(--paper);
+  color: var(--ink);
+  border: 3px solid var(--ink);
+  box-shadow: var(--edge) var(--edge) 0 0 var(--ink);
+  margin: 0 var(--edge) 24px 0;
+  padding: 20px 24px 22px;
+}
+
+.terms-card__label,
+.fine__label,
+.amend-card__no {
+  margin: 0 0 12px;
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: .18em;
+  text-transform: uppercase;
+  color: var(--ink-70);
+}
+
+.terms-card__list {
+  margin: 0;
+  padding-left: 22px;
+  font-size: 14.5px;
+  line-height: 1.6;
+  max-width: 62ch;
+}
+.terms-card__list li + li { margin-top: 8px; }
+.terms-card__list b { font-weight: 700; }
+
+.terms-card__note {
+  margin: 16px 0 0;
+  padding-top: 14px;
+  border-top: 2px solid var(--ink-15);
+  font-size: 13.5px;
+  line-height: 1.55;
+  color: var(--ink-70);
+}
+
+kbd {
+  font: 700 12px/1 Slab, Georgia, serif;
+  background: var(--ink);
+  color: var(--paper);
+  padding: 3px 6px 2px;
+  letter-spacing: .06em;
+}
+
+.menu-best {
+  margin: 0 0 22px;
+  font-size: 13px;
+  letter-spacing: .06em;
+  color: rgba(230, 220, 196, .78);
+  font-variant-numeric: tabular-nums;
+}
+.menu-best b { color: var(--paper); font-size: 16px; }
+
+/* ── an amendment ─────────────────────────────────────────────────────── */
+
+.amend-card {
+  background: var(--gold);
+  color: var(--ink);
+  border: 3px solid var(--ink);
+  box-shadow: var(--edge) var(--edge) 0 0 var(--ink);
+  margin: 0 var(--edge) 0 0;
+  padding: 22px 24px 24px;
+  max-width: 560px;
+}
+
+.amend-card__text {
+  margin: 0 0 14px;
+  font: 400 clamp(20px, 3.4vw, 27px)/1.3 Lid, Georgia, serif;
+}
+
+.amend-card__note {
+  margin: 0 0 20px;
+  padding-top: 14px;
+  border-top: 2px solid var(--ink-30);
+  font-size: 13.5px;
+  color: var(--ink-70);
+}
+
+/* ── the round slip ───────────────────────────────────────────────────── */
+
+.sheet {
+  position: relative;
+  border: 3px solid var(--ink);
+  box-shadow: var(--edge) var(--edge) 0 0 var(--ink);
+  margin: 0 var(--edge) 0 0;
+  padding: 20px 22px 0;
+  color: var(--ink);
+  outline: none;   /* focused programmatically so 1-6 works; not a control */
+}
+
+.sheet__stamp {
+  position: absolute;
+  top: 0;
+  right: 0;
+  margin: 0;
+  background: var(--ink);
+  color: var(--paper);
+  padding: 5px 10px 4px;
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: .14em;
+  text-transform: uppercase;
+}
+
+.sheet__headline {
+  margin: 8px 0 22px;
+  max-width: 22ch;
+  font: 400 clamp(26px, 5.6vw, 44px)/1.02 Lid, Georgia, serif;
+  text-transform: uppercase;
+  letter-spacing: .01em;
+}
+
+/* ── the shapes ───────────────────────────────────────────────────────── */
+
+/* One line, always. Six shapes at full weight overrun a narrow sheet, and the
+   answer to "which is biggest" is much harder to read across a wrapped row
+   than along a single one — so the row scales down rather than wrapping. */
+.shapes {
+  --shape-scale: 1;
+  display: flex;
+  flex-wrap: nowrap;
+  align-items: stretch;
+  gap: 14px;
+  min-height: 108px;
+  margin-bottom: 24px;
+}
+
+/* flex: 0 1 auto with a shrinkable glyph is what keeps the row honest. Six
+   shapes at full weight can just exceed the sheet; rather than wrap or clip,
+   every shape shrinks in proportion to its own basis, so the ratios between
+   them — the only thing the round is asking about — survive intact. */
+.tc-shape {
+  appearance: none;
+  -webkit-appearance: none;
+  background: rgba(255, 255, 255, .34);
+  border: 3px solid var(--ink);
+  cursor: pointer;
+  flex: 0 1 auto;
+  min-width: 0;
+  --pad: 8px;
+  padding: var(--pad) var(--pad) 0;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 4px;
+  box-shadow: 4px 4px 0 0 var(--ink);
+  transition: transform .1s cubic-bezier(.2, .9, .3, 1), box-shadow .1s cubic-bezier(.2, .9, .3, 1);
+}
+.tc-shape:hover, .tc-shape:focus-visible { transform: translate(-2px, -2px); box-shadow: 6px 6px 0 0 var(--ink); }
+.tc-shape:active { transform: translate(2px, 2px); box-shadow: 2px 2px 0 0 var(--ink); }
+
+/* --box is set per shape by game.js: the shape's weight already scaled for its
+   silhouette, so equal weight is equal ink. --shape-scale then shrinks the
+   whole row together, which keeps the sizes comparable. */
+.tc-shape__art {
+  display: flex;
+  flex: 1 1 auto;
+  align-items: flex-end;
+  justify-content: center;
+  min-width: 0;
+  min-height: 88px;
+}
+.tc-shape__art svg {
+  display: block;
+  width: calc(var(--box, 60) * var(--shape-scale, 1) * 1px);
+  height: auto;
+  max-width: 100%;
+}
+
+/* The colour is printed as a word as well as inked, so a clause that turns on
+   colour is readable without relying on colour vision. */
+.tc-shape__label {
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: .1em;
+  text-transform: uppercase;
+  color: var(--ink);
+  background: var(--paper);
+  border-top: 3px solid var(--ink);
+  align-self: stretch;
+  text-align: center;
+  padding: 4px 4px 3px;
+  margin: 4px calc(var(--pad) * -1) 0;
+  font-variant-numeric: tabular-nums;
+  /* Two short lines when the shape is narrow, one when it is not. The fixed
+     height is what keeps every glyph in the row standing on the same line —
+     a label that grew by a line under one shape would lift that shape alone,
+     and comparing sizes is the whole job of this row. */
+  min-height: 2.6em;
+  line-height: 1.3;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+/* ── the fine print ───────────────────────────────────────────────────── */
+
+.fine {
+  border-top: 3px solid var(--ink);
+  margin: 0 -22px;
+  padding: 14px 22px 16px;
+  background: rgba(255, 255, 255, .28);
+}
+
+.fine__label { margin-bottom: 8px; }
+
+.fine__list {
+  margin: 0;
+  padding-left: 20px;
+  /* Genuinely small. The clock is what stops you re-reading it every round. */
+  font-size: 12.5px;
+  line-height: 1.5;
+  max-width: 74ch;
+}
+.fine__list li + li { margin-top: 3px; }
+.tc-clause--none { list-style: none; margin-left: -20px; color: var(--ink-45); }
+
+/* ── the clock ────────────────────────────────────────────────────────── */
+
+.bar {
+  height: 14px;
+  margin: 0 -22px;
+  background: var(--ink-15);
+  border-top: 3px solid var(--ink);
+}
+.bar__fill {
+  display: block;
+  height: 100%;
+  width: 100%;
+  background: var(--red);
+}
+
+/* ── the run ends ─────────────────────────────────────────────────────── */
+
+.over-card {
+  background: var(--paper);
+  color: var(--ink);
+  border: 3px solid var(--ink);
+  box-shadow: var(--edge) var(--edge) 0 0 var(--ink);
+  margin: 0 var(--edge) 0 0;
+  padding: clamp(22px, 5vw, 32px);
+  max-width: 560px;
+}
+
+.over-card h2 {
+  margin: 0 0 16px;
+  font: 400 clamp(34px, 8vw, 48px)/1 Lid, Georgia, serif;
+  text-transform: uppercase;
+  color: var(--red);
+}
+
+.tc-over__lead {
+  margin: 0 0 6px;
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: .16em;
+  text-transform: uppercase;
+  color: var(--ink-70);
+}
+
+/* the clause that decided it, quoted back at you */
+.tc-over__clause {
+  margin: 0 0 18px;
+  padding: 12px 14px;
+  background: var(--gold);
+  border: 3px solid var(--ink);
+  font-size: 15px;
+  font-weight: 700;
+  line-height: 1.4;
+}
+
+.over-card__detail {
+  margin: 0 0 22px;
+  font-size: 15px;
+  line-height: 1.6;
+  color: var(--ink-70);
+  font-variant-numeric: tabular-nums;
+}
+
+/* ── narrow ───────────────────────────────────────────────────────────── */
+
+@media (max-width: 560px) {
+  :root { --edge: 5px; }
+  .head { padding: 18px 84px 20px 18px; }
+  .sheet { padding: 18px 16px 0; }
+  .fine, .bar { margin: 0 -16px; }
+  .fine { padding: 12px 16px 14px; }
+  /* No blanket scale-down here on purpose. A six-shape round is already
+     shrink-bound at this width, so a fixed factor would change nothing for it
+     while needlessly shrinking the three-shape rounds that have room to spare.
+     The tighter gap and padding are what actually help: they are the part that
+     does not shrink, so trimming them leaves more of the width for the shapes
+     themselves. */
+  .shapes { gap: 8px; min-height: 84px; }
+  .tc-shape { --pad: 6px; }
+  .tc-shape__label { padding: 4px 2px 3px; letter-spacing: .06em; }
+  .tc-shape__art { min-height: 64px; }
+  #hudBest { margin-left: 0; flex-basis: 100%; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .btn, .hub-link, .tc-shape { transition: none; }
+}

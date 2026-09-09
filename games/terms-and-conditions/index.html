@@ -1,0 +1,94 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Terms &amp; Conditions — Game Hub</title>
+<link rel="stylesheet" href="type.css">
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+<a href="../../index.html" class="hub-link">
+  <svg class="hub-link__arrow" viewBox="0 0 16 16" aria-hidden="true" focusable="false"><path d="M10 2 4 8l6 6" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="square"/></svg>
+  Back to the box
+</a>
+
+<main class="wrap">
+  <header class="head">
+    <p class="head__no">No.&nbsp;06</p>
+    <h1>Terms &amp;<br>Conditions</h1>
+  </header>
+
+  <div class="hud" id="hud" hidden>
+    <span>Streak <b id="hudStreak">0</b></span>
+    <span class="badge" id="hudClauses">0 of 10</span>
+    <span id="hudBest">Best streak 0</span>
+  </div>
+
+  <!-- ── the menu ───────────────────────────────────────────────────── -->
+  <section id="screen-menu" class="screen">
+    <p class="tagline">One instruction is printed large. The rest is printed small, and it contradicts the large one. Click the right shape before the clock runs out.</p>
+
+    <div class="terms-card">
+      <p class="terms-card__label">The agreement</p>
+      <ol class="terms-card__list">
+        <li>The headline says <b>click the biggest shape</b>. That is the instruction, until a clause says otherwise.</li>
+        <li>Clauses are numbered. Any clause whose condition is met replaces the instruction.</li>
+        <li><b>A later clause overrides an earlier one.</b> When two apply, the one further down the page wins.</li>
+        <li>A new clause is added every third correct answer, and the clock gets shorter. One wrong answer ends the run.</li>
+      </ol>
+      <p class="terms-card__note">Every shape is labelled with its colour and its number, so you can play this by reading and by keyboard: press <kbd>1</kbd>&hairsp;&ndash;&hairsp;<kbd>6</kbd> to choose.</p>
+    </div>
+
+    <p class="menu-best">Best streak so far: <b id="menuBest">0</b></p>
+
+    <div class="btn-row">
+      <button class="btn btn-primary" id="startBtn">Accept and begin</button>
+    </div>
+  </section>
+
+  <!-- ── a new clause ───────────────────────────────────────────────── -->
+  <section id="screen-amendment" class="screen" hidden>
+    <div class="amend-card">
+      <p class="amend-card__no" id="amendNo">Amendment 1</p>
+      <p class="amend-card__text" id="amendText"></p>
+      <p class="amend-card__note">Added to the bottom of the page, so it outranks every clause above it.</p>
+      <div class="btn-row">
+        <button class="btn btn-primary" id="amendBtn">Read and continue</button>
+      </div>
+    </div>
+  </section>
+
+  <!-- ── the round ──────────────────────────────────────────────────── -->
+  <section id="screen-play" class="screen" hidden>
+    <div class="sheet" id="sheet" tabindex="-1">
+      <p class="sheet__stamp" id="stockStamp">Stock: Yellow</p>
+      <h2 class="sheet__headline" id="headline">Click the biggest shape</h2>
+      <div class="shapes" id="shapes"></div>
+      <div class="fine">
+        <p class="fine__label">Terms and conditions</p>
+        <ol class="fine__list" id="clauseList"></ol>
+      </div>
+      <div class="bar" aria-hidden="true"><span class="bar__fill" id="barFill"></span></div>
+    </div>
+  </section>
+
+  <!-- ── the run ends ───────────────────────────────────────────────── -->
+  <section id="screen-over" class="screen" hidden>
+    <div class="over-card">
+      <h2 id="overTitle">Void</h2>
+      <div id="overWhy"></div>
+      <p class="over-card__detail" id="overDetail"></p>
+      <div class="btn-row">
+        <button class="btn btn-primary" id="againBtn">Begin again</button>
+      </div>
+    </div>
+  </section>
+</main>
+
+<script src="clauses.js"></script>
+<script src="round.js"></script>
+<script src="storage.js"></script>
+<script src="game.js"></script>
+</body>
+</html>

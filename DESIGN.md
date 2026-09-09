@@ -170,7 +170,7 @@ components:
 
 The page is the inside of a boxed set of games. A bottle-green baize table fills the frame; the lid is propped at the top edge carrying the wordmark; the games are laid out on the table as separately printed boards, each with its own die-cut components, its own printed field colour, and its set number stamped into the corner. Nothing here is a card in a card grid — every surface is a piece of board stock with a real cut edge.
 
-The material rules are absolute and they are what make the world hold together across six independently-built folders. Depth is never light: no gradient, no blur, no glass, no soft shadow, no tonal lift anywhere in the shipped build. One flat plate overlaps another, the way die-cut board actually stacks, and the plate's thickness is drawn as a hard black offset with no falloff. Colour is unmixed and printed at full strength. Every keyline is 3px of warm printed black. Where the box needs texture — the baize weave, the empty slot's hatch — it is hard-stop 1px repeating rules, never soft noise or blended fill.
+The material rules are absolute and they are what make the world hold together across eight independently-built folders. Depth is never light: no gradient, no blur, no glass, no soft shadow, no tonal lift anywhere in the shipped build. One flat plate overlaps another, the way die-cut board actually stacks, and the plate's thickness is drawn as a hard black offset with no falloff. Colour is unmixed and printed at full strength. Every keyline is 3px of warm printed black. Where the box needs texture — the baize weave, the empty slot's hatch — it is hard-stop 1px repeating rules, never soft noise or blended fill.
 
 Density is composed rather than uniform. The hub's tray is a drawn twelve-column plan whose board widths cycle 5-4-3 by position, so a dense Tetris well is answered by a small quiet Tic Tac Toe plate on the same row, and adding a sixth game requires no CSS at all. Inside each game the same vocabulary reappears: a full-strength head plate in that game's own colour, paper slips for numbers, ink-stamped set numbers, and one reserved red for the thing you press.
 
@@ -192,7 +192,7 @@ Printed inks on board stock: one deep bottle-green ground, warm black keylines, 
 - **Lit Chrome** (`{colors.red-lit}`): live state and focus only — the 3px focus-visible outline on every surface, the turn lamp in Tic Tac Toe, the winning-line stroke. It is the only element in the world allowed to read as lit.
 
 ### Secondary
-- **Bottle Green Table** (`{colors.table}`): the page ground on all six surfaces, woven with hard 1px rules in **Table Weft** (`{colors.table-weft}`) and darkened to **Table Deep** (`{colors.table-deep}`) for scrollbar tracks, the lid recess and the highest 2048 tiles.
+- **Bottle Green Table** (`{colors.table}`): the page ground on all eight surfaces, woven with hard 1px rules in **Table Weft** (`{colors.table-weft}`) and darkened to **Table Deep** (`{colors.table-deep}`) for scrollbar tracks, the lid recess and the highest 2048 tiles.
 - **Chipboard Tray** (`{colors.tray}`, cut face `{colors.tray-cut}`): the default board field when a game has no colour of its own, and the scrollbar thumb.
 
 ### Tertiary — the printed fields, one per game
@@ -202,6 +202,8 @@ Each game owns exactly one colour, used at full strength on its hub board and ag
 - **Teal** (`{colors.field-ttt}`) — Tic Tac Toe, No. 03
 - **Plum** (`{colors.field-math}`) — Math Puzzles, No. 04
 - **Sky** (`{colors.field-romp}`) — D.C. Romp, No. 05
+- **Document Slate** (`{colors.field-terms}`) — Terms & Conditions, No. 06
+- **Press Brown** (`{colors.field-ink}`) — Ink by Numbers, No. 07
 
 ### Neutral
 - **Printed Black** (`{colors.ink}`): every keyline, every cut edge, every set stamp ground, and body text on paper. Its alpha steps (`{colors.ink-70}` secondary copy, `{colors.ink-45}` disabled, `{colors.ink-30}` and `{colors.ink-15}` rules and wells, `{colors.ink-08}` printed grid tint) are the only tonal scale in the system.
@@ -221,7 +223,7 @@ Each game owns exactly one colour, used at full strength on its hub board and ag
 **Display Font:** Lid (Bevan, 400) with Georgia, serif
 **Body Font:** Slab (Zilla Slab, 400/700) with Georgia, serif
 
-Both faces ship as base64 `@font-face` data URIs in `type.css`, byte-identical in all six folders, because Chrome will not fetch font files over `file://`.
+Both faces ship as base64 `@font-face` data URIs in `type.css`, byte-identical in all eight folders, because Chrome will not fetch font files over `file://`.
 
 **Character:** A heavy poster slab against a working text slab — the lid shouts the set's name in one weight, and everything that has to be read or counted is set in the lighter companion. There is no third family, no sans, and no icon font.
 
@@ -294,7 +296,7 @@ The cover and the tag are one object throughout — the flying element is a clon
 
 ## Shapes
 
-Square corners, everywhere, with no exceptions in the build: `border-radius` is not set on a single element across the six stylesheets. The form language is the die-cut rectangle — a hard 3px `var(--ink)` keyline around a flat fill, with an ink plate offset beneath it.
+Square corners, everywhere, with no exceptions in the build: `border-radius` is not set on a single element across the eight stylesheets. The form language is the die-cut rectangle — a hard 3px `var(--ink)` keyline around a flat fill, with an ink plate offset beneath it.
 
 Recurring silhouettes:
 - **The tab**: a plate with `border-top: 0`, hung from the top edge of the viewport and pushed *down* on hover. Used once per game page for the back link.
@@ -328,7 +330,7 @@ All iconography is inline SVG drawn from these same primitives with `currentColo
 - **Error:** red text on a 16% red wash (`.conflict`). No icon, no message chrome.
 
 ### Navigation
-The only navigation between surfaces is the back tab: `position: fixed; top: 0`, pulpboard, 3px ink, `border-top: 0`, slip edge, an inline SVG chevron at 13px, label "Back to the box" in Slab 700 11.5px/`0.16em` caps. Hover pushes it *down* 3px and turns the label red. It appears identically on all five game pages.
+The only navigation between surfaces is the back tab: `position: fixed; top: 0`, pulpboard, 3px ink, `border-top: 0`, slip edge, an inline SVG chevron at 13px, label "Back to the box" in Slab 700 11.5px/`0.16em` caps. Hover pushes it *down* 3px and turns the label red. It appears identically on all seven game pages.
 
 ### The Record Strip
 Every hub board prints what the box remembers about that game — best score, tally, puzzles solved, level unlocked — read live from that game's own `localStorage` key by `hub.js`. Set 12px Slab 700 tabular caps at `0.09em` above a 2px `{colors.ink-15}` rule. The unplayed state is a real state: it drops to 400 weight at 70% ink and reads as an invitation ("No score set yet"), never as a zero or a broken value.

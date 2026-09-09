@@ -110,6 +110,18 @@
         "displayName": "Sky (D.C. Romp, No. 05)",
         "canonical": "#4aa3d8",
         "tonalRamp": ["#0b2231", "#123a53", "#1a5478", "#25719e", "#3389c1", "#4aa3d8", "#8ac5e8", "#d2e9f7"]
+      },
+      "field-terms": {
+        "role": "tertiary",
+        "displayName": "Document Slate (Terms & Conditions, No. 06)",
+        "canonical": "#3a4356",
+        "tonalRamp": ["#0c0e12", "#171a22", "#212631", "#2b3240", "#333b4c", "#3a4356", "#677798", "#bfc6d4"]
+      },
+      "field-ink": {
+        "role": "tertiary",
+        "displayName": "Press Brown (Ink by Numbers, No. 07)",
+        "canonical": "#6d4326",
+        "tonalRamp": ["#1a1009", "#2c1b0f", "#40270e", "#54321a", "#613a20", "#6d4326", "#a97b52", "#dcc4ad"]
       }
     },
     "typographyMeta": {
@@ -144,7 +156,7 @@
     ],
     "distribution": {
       "rule": "Duplicate, never link.",
-      "body": "hub.css and each games/<name>/style.css re-declare the same :root token block locally, and type.css is byte-identical in all six folders with both faces embedded as base64 data URIs. Per-folder independence is a product constraint (no game may break another), and Chrome will not fetch @font-face files over file://. Extracting a shared stylesheet or an external font file breaks the build.",
+      "body": "hub.css and each games/<name>/style.css re-declare the same :root token block locally, and type.css is byte-identical in all eight folders with both faces embedded as base64 data URIs. Per-folder independence is a product constraint (no game may break another), and Chrome will not fetch @font-face files over file://. Extracting a shared stylesheet or an external font file breaks the build.",
       "canvasParity": "Surfaces without CSS carry the same system by hand: Game.UI's INK/PAPER/PAPER_DIM/TABLE/TABLE_WEFT/RED/RED_LIT/GOLD/FIELD constants and its plate(), sheet(), regMark(), setStamp(), button(), tracked() helpers; and Render.block()'s flat darker cut lip in Tetris."
     },
     "scopeBoundary": {

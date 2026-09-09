@@ -1,0 +1,104 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Ink by Numbers — Game Hub</title>
+<link rel="stylesheet" href="type.css">
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+<a href="../../index.html" class="hub-link">
+  <svg class="hub-link__arrow" viewBox="0 0 16 16" aria-hidden="true" focusable="false"><path d="M10 2 4 8l6 6" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="square"/></svg>
+  Back to the box
+</a>
+
+<main class="wrap">
+  <header class="head">
+    <p class="head__no">No.&nbsp;07</p>
+    <h1>Ink by<br>Numbers</h1>
+  </header>
+
+  <!-- ── choosing a size ────────────────────────────────────────────── -->
+  <section id="screen-menu" class="screen">
+    <p class="tagline">The numbers along a row are the runs of ink in it, in order. Work out where the ink goes and a picture comes up out of the grid. Every plate in this set can be finished by reasoning alone &mdash; you will never have to guess.</p>
+
+    <p class="progress" id="menuProgress">No plates printed yet.</p>
+
+    <div class="sizes" id="sizes"></div>
+
+    <div class="resume" id="resume" hidden>
+      <p class="resume__label">Still on the press</p>
+      <p class="resume__what" id="resumeWhat"></p>
+      <div class="btn-row">
+        <button class="btn btn-primary" id="resumeBtn">Carry on</button>
+        <button class="btn btn-ghost" id="discardBtn">Put it back</button>
+      </div>
+    </div>
+
+    <div class="howto">
+      <p class="howto__label">How to read a plate</p>
+      <ol class="howto__list">
+        <li><b>2&nbsp;3</b> beside a row means a run of two, then a gap, then a run of three &mdash; in that order, with at least one blank square between them.</li>
+        <li><b>0</b> means the line carries no ink at all.</li>
+        <li>Click a square to ink it. Click again to cross it off as blank, and once more to clear it. Drag to do a whole run at once.</li>
+        <li>Crossing off the blanks is only for your own bookkeeping &mdash; the plate is finished when the ink is right, whether or not you marked the rest.</li>
+      </ol>
+      <p class="howto__note">Keyboard: arrow keys move, <kbd>Space</kbd> inks, <kbd>X</kbd> crosses off, <kbd>H</kbd> asks for one deduction, <kbd>Esc</kbd> goes back.</p>
+    </div>
+  </section>
+
+  <!-- ── choosing a plate ───────────────────────────────────────────── -->
+  <section id="screen-index" class="screen" hidden>
+    <div class="index-head">
+      <h2 id="indexTitle">Small plates</h2>
+      <p class="index-sub" id="indexSub"></p>
+    </div>
+    <div class="plates" id="plates"></div>
+    <div class="btn-row">
+      <button class="btn btn-ghost" id="indexBackBtn">Choose another size</button>
+    </div>
+  </section>
+
+  <!-- ── the plate ──────────────────────────────────────────────────── -->
+  <section id="screen-play" class="screen" hidden>
+    <div class="hud">
+      <span class="hud__no" id="playNo">Plate 1</span>
+      <span class="badge" id="playSize">5 x 5</span>
+      <span class="hud__clock" id="clock">0:00</span>
+    </div>
+
+    <div class="press">
+      <div class="board" id="board"></div>
+    </div>
+
+    <p class="hint-line" id="hintLine" role="status" aria-live="polite"></p>
+
+    <div class="btn-row">
+      <button class="btn btn-ghost" id="hintBtn">One deduction</button>
+      <button class="btn btn-ghost" id="restartBtn">Start this plate over</button>
+      <button class="btn btn-ghost" id="playBackBtn">Back to the index</button>
+    </div>
+  </section>
+
+  <!-- ── finished ───────────────────────────────────────────────────── -->
+  <section id="screen-done" class="screen" hidden>
+    <div class="done-card">
+      <p class="done-card__label">Plate finished</p>
+      <h2 class="done-card__name" id="doneName">&nbsp;</h2>
+      <div class="done-card__proof" id="doneProof"></div>
+      <p class="done-card__stats" id="doneStats"></p>
+      <div class="btn-row">
+        <button class="btn btn-primary" id="nextBtn">Next plate</button>
+        <button class="btn btn-ghost" id="doneIndexBtn">Back to the index</button>
+      </div>
+    </div>
+  </section>
+</main>
+
+<script src="nonogram.js"></script>
+<script src="pictures.js"></script>
+<script src="storage.js"></script>
+<script src="game.js"></script>
+</body>
+</html>

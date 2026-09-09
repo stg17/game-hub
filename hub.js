@@ -1,5 +1,5 @@
 /* The box remembers. Each game keeps its own localStorage key and shares
-   nothing with the others, so the hub reads all five keys itself and prints
+   nothing with the others, so the hub reads every key itself and prints
    what it finds onto each board's record strip.
 
    Also counts the boards on the page, so adding a game is one block of markup:
@@ -82,6 +82,39 @@
     romp: function () {
       var lvl = num(read('dcromp_unlocked'));
       return lvl > 1 ? 'Level ' + lvl + ' of 5 unlocked' : null;
+    },
+
+    terms: function () {
+      var s = json('terms_stats_v1');
+      if (!s) return null;
+      var best = num(s.bestStreak);
+      var runs = num(s.runs);
+      if (best > 0) {
+        var line = 'Best streak ' + best;
+        var clauses = num(s.bestClauses);
+        if (clauses > 0) line += ' · ' + plural(clauses, 'clause', 'clauses');
+        return line;
+      }
+      /* Played and never scored is its own small joke, and worth printing. */
+      return runs > 0 ? plural(runs, 'run voided', 'runs voided') : null;
+    },
+
+    ink: function () {
+      var s = json('inkbynumbers_stats_v1');
+      if (!s) return null;
+      /* Counted rather than compared against a total: the hub cannot read that
+         game's picture list without linking across folders, and a number typed
+         here would go stale the first time a plate is added. */
+      var done = 0;
+      var bag = s.solved || {};
+      for (var size in bag) {
+        if (!Object.prototype.hasOwnProperty.call(bag, size)) continue;
+        var got = bag[size];
+        if (!got) continue;
+        for (var id in got) if (Object.prototype.hasOwnProperty.call(got, id)) done++;
+      }
+      if (done > 0) return plural(done, 'plate printed', 'plates printed');
+      return s.current ? 'One plate on the press' : null;
     }
   };
 
@@ -92,7 +125,9 @@
     '2048': 'No score set yet',
     ttt: 'No games played yet',
     math: 'No puzzles solved yet',
-    romp: 'Level 1 of 5 · unopened'
+    romp: 'Level 1 of 5 · unopened',
+    terms: 'Unread · no streak yet',
+    ink: 'No plates printed yet'
   };
 
   var strips = document.querySelectorAll('[data-record]');

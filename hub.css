@@ -34,6 +34,8 @@
   --f-ttt:      #155e58;
   --f-math:     #6a2e5c;
   --f-romp:     #4aa3d8;
+  --f-terms:    #3a4356;
+  --f-ink:      #6d4326;
 
   --edge:       6px;   /* the thickness of a board */
   --gap:        26px;
@@ -288,6 +290,8 @@ html { scrollbar-color: var(--tray) var(--table-deep); }
 .board--ttt    { --field: var(--f-ttt);    --on-field: var(--paper); }
 .board--math   { --field: var(--f-math);   --on-field: var(--paper); }
 .board--romp   { --field: var(--f-romp);   --on-field: var(--ink); }
+.board--terms  { --field: var(--f-terms);  --on-field: var(--paper); }
+.board--ink    { --field: var(--f-ink);    --on-field: var(--paper); }
 
 /* ── drawn components inside the boards ──────────────────────────────── */
 
@@ -317,6 +321,12 @@ html { scrollbar-color: var(--tray) var(--table-deep); }
 .mark-x { stroke: var(--paper); }
 .mark-o { stroke: #e8c25a; }
 .mark-win { stroke: var(--red-lit); fill: none; }
+
+/* Terms & Conditions: the clause that overrides is the live thing on the slip,
+   and the shape it points at is marked to match. Gold, not red — this is state
+   the sheet is reporting, not a control. */
+.mark-clause { stroke: #e8c25a; }
+.mark-clause-lit { fill: #e8c25a; }
 
 .pz-tile rect { fill: var(--paper); stroke: var(--ink); stroke-width: 2.5; }
 .pz-num text { font: 700 21px/1 Slab, Georgia, serif; fill: var(--ink); text-anchor: middle; font-variant-numeric: tabular-nums; }

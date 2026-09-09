@@ -13,12 +13,16 @@ Project architecture and game implementation notes for Game Hub. Shared workflow
 ```
 index.html         Game Hub — the menu/launcher page (root)
 hub.css            Hub-only styling
+hub.js             Hub record strips, set numbering, and the opening animation
+type.css           The two typefaces as base64 data URIs; copied into each game folder
 games/
   dc-romp/         Side-scrolling platformer (see its own section below)
   tic-tac-toe/     Classic 2-player grid game with score tracking
   math-puzzles/    Three math puzzle types (Make 24 / Calcudoku / Number Pyramid), see below
   tetris/          Canvas Tetris with SRS rotation, hold, and a ghost piece
   2048/            DOM sliding-tile puzzle with a multi-step undo
+  terms-and-conditions/  Reaction game about small print that overrides a big instruction
+  ink-by-numbers/  Nonogram: reconstruct a printed picture from run-length clues
 ```
 
 Each subfolder under `games/` is a fully independent game: its own `index.html`, its own styles, its own scripts, nothing shared or imported across game folders. This is deliberate — games can use completely different code styles/conventions from each other, and none of them can break another by being edited.
@@ -31,10 +35,20 @@ There is no lint or test command. Verification is manual: reload the page and pl
 
 ## Adding a new game
 
+The hub is a boxed compendium of printed games — see `DESIGN.md` for the design
+system and `PRODUCT.md` for what the collection is. **The set is open-ended.**
+Board widths, set numbering and the empty slot all derive themselves from how
+many boards are on the table, so adding one is additive: nothing gets
+renumbered and no layout gets re-tuned.
+
 1. Create `games/<game-name>/` with its own `index.html`, styles, and scripts (vanilla HTML/CSS/JS, no build tooling — keep every game a drop-in `file://`-runnable folder).
-2. Give it a `<a href="../../index.html" class="hub-link">← All Games</a>` back-link (see `games/tic-tac-toe/index.html` or `games/dc-romp/index.html` for the pattern and matching CSS).
-3. Add a `.card` entry to the `.grid` in root `index.html` linking to `games/<game-name>/index.html`, following the existing card markup (thumb icon, title, short description, tags, Play button).
-4. Update this file's **Games** section below with a short description.
+2. **Copy `type.css` from the repo root into the folder** and link it before the game's own stylesheet. It carries the two typefaces as base64 data URIs because Chrome refuses to fetch `@font-face` files over `file://`. It is duplicated into every game folder on purpose; do not link the root copy across folders.
+3. Give it the back-to-the-box tab: `<a href="../../index.html" class="hub-link">` with the inline chevron SVG and the label "Back to the box" (copy from `games/terms-and-conditions/index.html` or `games/tic-tac-toe/index.html`, along with the matching `.hub-link` CSS).
+4. Add an `<a class="board board--<slug>">` to the `.tray` in root `index.html`, **immediately before `<div class="slot">`**, copying the No. 03 block's structure exactly: `.board__field` wrapping an inline `.board__art` SVG plus `.board__no`, then `.board__foot` with `.board__title` / `.board__rule` / `.board__spec` / `.board__record[data-record="<key>"]`. Type a literal `No. NN` in the stamp as the no-JS fallback; `hub.js` overwrites it from position.
+5. Draw the board art in the house hand: a `0 0 250 250` viewBox, `stroke="currentColor"` at weight 5, paint set on a parent `<g>` with bare geometry inside, `fill="none"` explicit on stroked paths, a real `role="img"` + `aria-label`. No emoji and no icon-font glyphs anywhere in this project.
+6. Add one line to `hub.css`: `.board--<slug> { --field: var(--f-<slug>); --on-field: … }`, plus the `--f-<slug>` token in `:root`. Nothing else — widths come from `nth-of-type` position and the slot resizes itself via `:has()`.
+7. Add a reader to `readers` in `hub.js` (returns the printed record line, or `null` for unplayed) and a matching line to `unplayed`. Both are keyed by the `data-record` value.
+8. Update this file's **Games** section below, and add the game's field colour to `DESIGN.md`.
 
 ## Games
 
@@ -125,6 +139,197 @@ Positions are set as `--r`/`--c` custom properties, never as pixel offsets: `.ti
 `2048_state_v1` persists the board, score, best, win flags **and the undo history**, so undo survives a reload. Anything malformed coming back out (`Board.isValidValues`) falls back to a fresh game rather than throwing.
 
 Reaching 2048 sets `won` and shows the win overlay once; "Keep going" sets `keepPlaying` so it never reappears and only game-over is checked from then on.
+
+### Terms & Conditions (`games/terms-and-conditions/`)
+
+A reaction game about small print. One instruction is printed large —
+`CLICK THE BIGGEST SHAPE` — and beneath it a numbered list of clauses
+conditionally overrides it ("If the stock is yellow, click the smallest"). A
+new clause arrives every third correct answer and the clock shortens; one wrong
+answer or one timeout ends the run, and best streak is the score.
+
+Script order in `index.html` is the dependency graph: `clauses.js` → `round.js`
+→ `storage.js` → `game.js`. `clauses.js` and `round.js` are **pure** — no DOM,
+no timers — which is what makes the whole thing checkable without a browser.
+
+**`clauses.js` holds the one invariant that matters.** A clause is
+`{id, rank, text, needs, when, pick}`, where `text` is the printed English and
+`when`/`pick` are the code. If those two ever disagree, the game is lying to the
+player, and that is the worst bug it can have. `resolve()` starts at the
+headline's target and lets every clause whose `when` is true replace it, walking
+in printed order — so **the later clause wins**, and since new clauses are
+appended at the bottom, the newest is always the most powerful.
+
+**Shape sizes are perceptual, not geometric.** A shape's `size` is its intended
+visual weight; the box it is actually drawn in is `size × KIND_SCALE[kind]`,
+where the scales equalise *ink area* across silhouettes. Drawn at one box a
+triangle carries 38% of a square's ink and a slim star about 24%, so without
+this a "large" triangle genuinely is smaller than a "small" square and the
+headline has no answer. `GLYPH` stores each kind's defining geometry once and
+both the SVG path and the area are derived from it, so the drawn shape and the
+maths cannot drift apart. Don't hand-edit a scale factor — change the geometry
+and let the scale fall out.
+
+**`round.js` rejects rather than constructs.** It builds a candidate, resolves
+it, and keeps it only if it passes `dealable()`: the answer resolves to exactly
+one shape, every clause that fired could name exactly one shape (a selector
+returns `-1` precisely when it cannot), and — the **override law** — if any
+clause fired, at least one of them moved the target off the headline's pick.
+That last rule is what stops rounds where the fine print switches on and
+changes nothing, which would quietly teach the player not to read. It is
+deliberately written as "some clause moved the target" and not "the answer
+differs from the headline", so that reinstatement clauses like
+`no-circle-biggest` still work. It also targets `FIRE_RATE` (~half of rounds
+decided by a clause) and spreads *which* clause decides: if clauses rarely fire
+the right strategy is to ignore them, and if they always fire the right strategy
+is to ignore the headline. Either way the game stops being about reading.
+
+The `fallback()` round is chosen so every clause in the catalogue is switched
+off, and it is resolved **with** the live clause list. Resolving it against `[]`
+and then printing the live clauses is a trap worth naming: with `three-left`
+active, a three-shape fallback would print a clause that plainly applies while
+the stored answer ignored it.
+
+**The clock is never counted in ticks.** One `rAF` loop recomputes the
+remainder from a wall-clock deadline (same rule as the rest of the repo). It
+pauses on `visibilitychange` and `blur`, and separately carries a **stall
+backstop**: a gap over `STALL_MS` between frames is treated as time the player
+was not present for and handed back, because a closed lid or a sleeping machine
+takes real time without firing either event. `unpause()` and `dealRound()` both
+clear `lastFrameAt`, or the same absence gets refunded twice — `rAF` does not
+run in a hidden tab, so that variable is stale by exactly the gap `unpause`
+already credited.
+
+Persistence is `terms_stats_v1` — `{bestStreak, runs, bestClauses}` — with the
+same merge-onto-defaults load and try/catch fallback as the other games.
+
+**Colour is never the only channel.** Every shape prints its colour as a word
+and the sheet carries a corner stamp naming the stock, so the colour clauses are
+playable without colour vision. Each shape's `aria-label` announces its size
+*rank* rather than a pixel value, which gives a screen-reader player exactly the
+ordering a sighted player reads off the sheet and nothing more. Keys `1`–`9`
+pick a shape and Enter/Space advances every screen.
+
+### Verifying Terms & Conditions
+
+Two committed Node scripts, both run with plain `node` and no dependencies.
+They exist rather than being throwaway because this game promises the answer was
+always there in the small print, and that promise is checkable:
+
+- **`node selfcheck.js`** — the pure engine over 4,000 generated rounds at every
+  clause depth. The load-bearing trick is that it **re-implements each clause
+  from its printed English**, reading only attributes a player can see, and
+  asserts the clause's own `when` agrees; a clause that drifted from its wording
+  or keyed on something invisible fails here. It also proves ink area is
+  equalised across kinds and strictly monotone in `size` for every kind and size
+  pair, checks each glyph stays inside its box, checks the override law and the
+  inert fallback, and reports the fire rate and the spread of deciding clauses.
+- **`node playcheck.js`** — the whole game, `game.js` included, against a small
+  fake DOM and a hand-pumped clock (the pattern described for Tetris and 2048
+  below). It decides what to click by **reading the fake DOM the way a player
+  reads the sheet** — the stock stamp, each shape's printed label, the numbered
+  clause list — rebuilding the round from that alone and resolving it
+  independently. A passing run is therefore evidence that everything needed to
+  answer is actually printed. It also covers the ramp, the amendment beat, focus
+  handling, the drain of the time bar, both suspend paths, the loss and timeout
+  screens and their wording, the stored record, and a keyboard-only run.
+
+Neither covers pixels. For those, drive the game in headless Chrome through a
+sized iframe with `--allow-file-access-from-files` (headless clamps a real
+viewport to a 485px minimum, so a true 390px capture needs the iframe), play it
+synchronously in one tick so no virtual time passes mid-run, then fire a `blur`
+at the iframe's window to freeze the clock before capturing.
+
+### Ink by Numbers (`games/ink-by-numbers/`)
+
+A nonogram. The numbers beside each row and column are the run lengths of ink
+in that line, in order, and reconstructing them turns a blank grid into a
+picture. Three sizes (5×5, 10×10, 15×15), 40 hand-drawn plates, best time kept
+per plate.
+
+Script order in `index.html` is the dependency graph: `nonogram.js` →
+`pictures.js` → `storage.js` → `game.js`. The first two are **pure** — no DOM,
+no timers — which is what makes the guarantee below checkable.
+
+**THE GUARANTEE: every plate is finishable by deduction alone.** Never a guess,
+never a 50/50 you discover was wrong twenty moves later. This is enforced, not
+intended: `nonogram.js`'s `solveLine` finds *every* deduction available from a
+single line (it walks all arrangements of the runs consistent with what is
+known and keeps what they agree on), `solve` runs rows and columns to a fixed
+point, and `isFair` requires that to finish a plate from blank. Because every
+write is forced by one line, finishing that way is also proof the solution is
+unique — so fairness and uniqueness are the same check. `selfcheck.js` runs it
+over all 40 plates and fails the build on any that stalls.
+
+**Plates are drawn, not generated** (`pictures.js`). A random grid of the right
+density is solvable but resolves into noise, and the payoff of the form is that
+the last few squares turn a field of marks into something you recognise. The
+plate's title is therefore hidden — in the index and while playing — until it is
+finished; the reveal is the reward, and `playcheck.js` asserts the name does not
+leak. When adding a plate, expect symmetric hollow shapes to be the thing that
+stalls the solver; breaking the symmetry slightly is normally enough.
+
+**Marks are three-state**, and `EMPTY` means "the player asserts this is blank",
+not "untouched". Winning compares ink only (`isComplete`), so crossing off the
+blanks is bookkeeping the player may skip entirely. Nothing ever tells them
+mid-plate that a square is wrong — being interrupted with that would do the
+deducing for them. `mistakes()` exists for the finish card and for explaining a
+contradiction, not for live validation.
+
+**The hint is the solver, seeded with the player's own marks**, so it can only
+say what the numbers already say — it never consults `pictures.js`. If those
+marks contradict the clues, `solve` returns `contradiction` and the hint says so
+and points at the offending square; that is the one place the picture is
+consulted, and only to locate what the player got wrong.
+
+**The board is one CSS grid** whose first row and column are the clue gutters,
+so numbers and squares cannot drift out of alignment — which they would if the
+gutters were separately sized boxes. The track lists are written out by
+`game.js` rather than using `repeat(var(--dim), …)`. `sqClass` is the single
+place that decides a square's ruling (heavy every fifth line, outer rule on all
+four edges), used by both the build and the redraw so they cannot disagree.
+`.press` and `.board` are `width: fit-content` on purpose: the gutter track is
+`auto` and would otherwise swallow every spare pixel and push the numbers off
+their own grid.
+
+Elapsed time is banked from a wall-clock base (`clockOff` adds to `state.base`),
+never counted in ticks, and stops on `visibilitychange` and `blur`. Persistence
+is `inkbynumbers_stats_v1`: best time per plate, plus the plate **currently in
+progress** as a flat string of marks — a 15×15 is twenty minutes of careful
+deduction and losing it to a stray reload would be unforgivable, the same
+reasoning as 2048 keeping its board and undo stack.
+
+Pointer input cycles ink → cross → clear, a drag applies whatever the first
+square became (so sweeping a run does not toggle each square in turn), and the
+right button goes straight to a cross. Keyboard: arrows move, `Space` inks, `X`
+crosses, `H` hints, `Esc` steps back. Every square carries
+`aria-describedby="rc<y> cc<x>"`, so a screen reader reads the two clue lines
+that govern it rather than making the player go and find them.
+
+### Verifying Ink by Numbers
+
+Two committed Node scripts, both plain `node`, no dependencies:
+
+- **`node selfcheck.js`** — the solver on its own (overlap deductions, blank
+  lines, impossible lines, and that its output is idempotent, which is what
+  "every deduction is sound" means in practice), then every plate: right shape
+  for its size bucket, clues that total the ink they describe, sane density,
+  unique ids and names, the win test accepting the finished plate and rejecting
+  it with any single square wrong or missing, winning without crossing off the
+  blanks — and the fairness check above.
+- **`node playcheck.js`** — the whole game against a fake DOM and a clock we
+  own: the screen machine, three-state marking and its `aria-label`, the ruling
+  classes, the hint (including that a hint's claim matches the plate *and* that
+  the square it names actually carries the mark), finishing, the withheld title
+  appearing in the index afterwards, a slower second run not overwriting the
+  best time, a keyboard-only finish, `Esc` walking back out, the clock stopping
+  while the tab is hidden, and — by rebooting the game against the same
+  storage — that a part-finished plate and its clock survive a reload. It solves
+  by **reading the clue gutters back out of the DOM**, so a pass is evidence the
+  printed numbers are sufficient.
+
+For pixels, drive it in headless Chrome through a sized iframe with
+`--allow-file-access-from-files`, clicking real squares.
 
 ### Verifying Tetris and 2048
 
