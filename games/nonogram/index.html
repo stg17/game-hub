@@ -17,81 +17,81 @@
   <header class="head">
     <p class="head__no">No.&nbsp;07</p>
     <h1>Nonogram</h1>
+    <p class="head__rule">The numbers say how much ink each line carries. Work out the picture.</p>
   </header>
 
-  <!-- ── choosing a size ────────────────────────────────────────────── -->
-  <section id="screen-menu" class="screen">
-    <p class="tagline">The numbers along a row are the runs of ink in it, in order. Work out where the ink goes and a picture comes up out of the grid. Every plate in this set can be finished by reasoning alone &mdash; you will never have to guess.</p>
-
-    <p class="progress" id="menuProgress">No plates printed yet.</p>
-
-    <div class="sizes" id="sizes"></div>
+  <!-- ── the index of plates ──────────────────────────────────────────── -->
+  <section id="screen-index" class="screen">
 
     <div class="resume" id="resume" hidden>
-      <p class="resume__label">Still on the press</p>
+      <p class="badge">On the press</p>
       <p class="resume__what" id="resumeWhat"></p>
       <div class="btn-row">
-        <button class="btn btn-primary" id="resumeBtn">Carry on</button>
-        <button class="btn btn-ghost" id="discardBtn">Put it back</button>
+        <button class="btn btn-primary" type="button" id="resumeBtn">Carry on</button>
+        <button class="btn btn-ghost" type="button" id="discardBtn">Put it back</button>
       </div>
     </div>
 
-    <div class="howto">
-      <p class="howto__label">How to read a plate</p>
-      <ol class="howto__list">
-        <li><b>2&nbsp;3</b> beside a row means a run of two, then a gap, then a run of three &mdash; in that order, with at least one blank square between them.</li>
-        <li><b>0</b> means the line carries no ink at all.</li>
-        <li>Click a square to ink it. Click again to cross it off as blank, and once more to clear it. Drag to do a whole run at once.</li>
-        <li>Crossing off the blanks is only for your own bookkeeping &mdash; the plate is finished when the ink is right, whether or not you marked the rest.</li>
-      </ol>
-      <p class="howto__note">Keyboard: arrow keys move, <kbd>Space</kbd> inks, <kbd>X</kbd> crosses off, <kbd>H</kbd> asks for one deduction, <kbd>Esc</kbd> goes back.</p>
+    <div class="tabs" id="sizeTabs" role="tablist" aria-label="Plate size">
+      <button class="tab" type="button" role="tab" id="tab-small"  data-size="small"  aria-controls="plates" aria-selected="true"  tabindex="0">Small</button>
+      <button class="tab" type="button" role="tab" id="tab-medium" data-size="medium" aria-controls="plates" aria-selected="false" tabindex="-1">Medium</button>
+      <button class="tab" type="button" role="tab" id="tab-large"  data-size="large"  aria-controls="plates" aria-selected="false" tabindex="-1">Large</button>
     </div>
+
+    <p class="spec-line" id="indexSpec"></p>
+
+    <div class="plates" id="plates" role="tabpanel" aria-labelledby="tab-small" tabindex="-1"></div>
   </section>
 
-  <!-- ── choosing a plate ───────────────────────────────────────────── -->
-  <section id="screen-index" class="screen" hidden>
-    <div class="index-head">
-      <h2 id="indexTitle">Small plates</h2>
-      <p class="index-sub" id="indexSub"></p>
-    </div>
-    <div class="plates" id="plates"></div>
-    <div class="btn-row">
-      <button class="btn btn-ghost" id="indexBackBtn">Choose another size</button>
-    </div>
-  </section>
-
-  <!-- ── the plate ──────────────────────────────────────────────────── -->
+  <!-- ── the plate ────────────────────────────────────────────────────── -->
   <section id="screen-play" class="screen" hidden>
-    <div class="hud">
-      <span class="hud__no" id="playNo">Plate 1</span>
-      <span class="badge" id="playSize">5 x 5</span>
-      <span class="hud__clock" id="clock">0:00</span>
-    </div>
+    <p class="spec-line" id="playNo"></p>
 
-    <div class="press">
-      <div class="board" id="board"></div>
-    </div>
-
-    <p class="hint-line" id="hintLine" role="status" aria-live="polite"></p>
-
-    <div class="btn-row">
-      <button class="btn btn-ghost" id="hintBtn">One deduction</button>
-      <button class="btn btn-ghost" id="restartBtn">Start this plate over</button>
-      <button class="btn btn-ghost" id="playBackBtn">Back to the index</button>
-    </div>
-  </section>
-
-  <!-- ── finished ───────────────────────────────────────────────────── -->
-  <section id="screen-done" class="screen" hidden>
-    <div class="done-card">
-      <p class="done-card__label">Plate finished</p>
-      <h2 class="done-card__name" id="doneName">&nbsp;</h2>
-      <div class="done-card__proof" id="doneProof"></div>
-      <p class="done-card__stats" id="doneStats"></p>
-      <div class="btn-row">
-        <button class="btn btn-primary" id="nextBtn">Next plate</button>
-        <button class="btn btn-ghost" id="doneIndexBtn">Back to the index</button>
+    <div class="play">
+      <div class="press">
+        <div class="board" id="board"></div>
       </div>
+
+      <aside class="apparatus">
+        <div class="slip">
+          <span class="slip__label">Clock</span>
+          <span class="slip__value" id="clock">0:00</span>
+        </div>
+
+        <div class="key" id="playKey">
+          <span class="slip__label">Marks</span>
+          <ul class="key__list key__list--marks">
+            <li><i class="key__sq key__sq--ink" aria-hidden="true"></i>Inked</li>
+            <li><i class="key__sq key__sq--out" aria-hidden="true"></i>Blank</li>
+            <li><i class="key__sq" aria-hidden="true"></i>Open</li>
+          </ul>
+          <ul class="key__list key__list--keys">
+            <li><kbd>Arrows</kbd>Move</li>
+            <li><kbd>Space</kbd>Ink</li>
+            <li><kbd>X</kbd>Blank</li>
+            <li><kbd>H</kbd>Hint</li>
+            <li><kbd>Esc</kbd>Plates</li>
+          </ul>
+        </div>
+
+        <div class="finish" id="finish" hidden>
+          <span class="slip__label">Plate finished</span>
+          <h2 class="finish__name" id="doneName">&nbsp;</h2>
+          <p class="finish__stats" id="doneStats"></p>
+          <div class="btn-row btn-row--stack">
+            <button class="btn btn-primary" type="button" id="nextBtn">Next plate</button>
+            <button class="btn btn-ghost"   type="button" id="doneIndexBtn">Plates</button>
+          </div>
+        </div>
+      </aside>
+    </div>
+
+    <p class="note" id="hintLine" role="status" aria-live="polite"></p>
+
+    <div class="btn-row" id="playActions">
+      <button class="btn btn-ghost" type="button" id="hintBtn">Hint</button>
+      <button class="btn btn-ghost" type="button" id="restartBtn">Reset</button>
+      <button class="btn btn-ghost" type="button" id="playBackBtn">Plates</button>
     </div>
   </section>
 </main>

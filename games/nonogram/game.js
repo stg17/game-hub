@@ -21,13 +21,8 @@
      able to shrink it — and an inline custom property set here would
      out-specify every media query that tried. */
 
-  /* The finished plate is reprinted on the done card. A five-square picture
-     needs bigger squares than a fifteen-square one to read as a picture at
-     all, so the proof is sized per plate rather than fixed. */
-  var PROOF = { small: 26, medium: 15, large: 11 };
-
   var state = {
-    screen: 'menu',
+    screen: 'index',
     sizeId: null,
     plate: null,        /* the picture record */
     solution: null,     /* grid of 0/1 */
@@ -40,7 +35,8 @@
     since: 0,           /* Date.now() when the clock last started */
     hints: 0,
     paint: null,        /* the mark a drag is applying */
-    nextPlate: null     /* the next unfinished plate, offered when one is done */
+    nextPlate: null,    /* the next unfinished plate, offered when one is done */
+    done: false         /* the plate is finished and resolved in place */
   };
 
   var el = {};
@@ -48,34 +44,34 @@
 
   function cache() {
     el.screens = {
-      menu: document.getElementById('screen-menu'),
       index: document.getElementById('screen-index'),
-      play: document.getElementById('screen-play'),
-      done: document.getElementById('screen-done')
+      play: document.getElementById('screen-play')
     };
-    el.menuProgress = document.getElementById('menuProgress');
-    el.sizes = document.getElementById('sizes');
     el.resume = document.getElementById('resume');
     el.resumeWhat = document.getElementById('resumeWhat');
     el.resumeBtn = document.getElementById('resumeBtn');
     el.discardBtn = document.getElementById('discardBtn');
 
-    el.indexTitle = document.getElementById('indexTitle');
-    el.indexSub = document.getElementById('indexSub');
+    /* One tab per size, looked up through P.sizes() rather than named here,
+       so a fourth bucket would need no new code in this file. */
+    el.sizeTabs = document.getElementById('sizeTabs');
+    el.tabBtns = {};
+    P.sizes().forEach(function (sz) { el.tabBtns[sz.id] = document.getElementById('tab-' + sz.id); });
+    el.indexSpec = document.getElementById('indexSpec');
     el.plates = document.getElementById('plates');
-    el.indexBackBtn = document.getElementById('indexBackBtn');
 
     el.playNo = document.getElementById('playNo');
-    el.playSize = document.getElementById('playSize');
     el.clock = document.getElementById('clock');
     el.board = document.getElementById('board');
     el.hintLine = document.getElementById('hintLine');
+    el.playKey = document.getElementById('playKey');
+    el.playActions = document.getElementById('playActions');
     el.hintBtn = document.getElementById('hintBtn');
     el.restartBtn = document.getElementById('restartBtn');
     el.playBackBtn = document.getElementById('playBackBtn');
 
+    el.finish = document.getElementById('finish');
     el.doneName = document.getElementById('doneName');
-    el.doneProof = document.getElementById('doneProof');
     el.doneStats = document.getElementById('doneStats');
     el.nextBtn = document.getElementById('nextBtn');
     el.doneIndexBtn = document.getElementById('doneIndexBtn');
@@ -110,78 +106,45 @@
     return m + ':' + (s < 10 ? '0' : '') + s;
   }
   function syncClock() {
-    if (state.screen === 'play') el.clock.textContent = stamp(elapsed());
+    if (state.screen === 'play' && !state.done) el.clock.textContent = stamp(elapsed());
   }
 
-  /* ── the menu ───────────────────────────────────────────────────────── */
+  /* ── the index ──────────────────────────────────────────────────────── */
 
-  function drawMenu() {
-    var total = 0;
-    P.sizes().forEach(function (sz) { total += P.count(sz.id); });
-    var done = Store.totalSolved();
-    el.menuProgress.textContent = done === 0
-      ? 'No plates printed yet — ' + total + ' in the set.'
-      : done + ' of ' + total + ' plates printed.';
-
-    el.sizes.innerHTML = '';
-    P.sizes().forEach(function (sz) {
-      var n = P.count(sz.id);
-      var got = Store.solvedCount(sz.id);
-
-      var card = document.createElement('button');
-      card.type = 'button';
-      card.className = 'size-card';
-      card.setAttribute('data-size', sz.id);
-
-      var label = document.createElement('span');
-      label.className = 'size-card__label';
-      label.textContent = sz.label;
-
-      var dim = document.createElement('span');
-      dim.className = 'size-card__dim';
-      dim.textContent = sz.note;
-
-      /* a small filled-in tally, so progress reads as a collection */
-      var pips = document.createElement('span');
-      pips.className = 'size-card__pips';
-      pips.setAttribute('aria-hidden', 'true');
-      for (var i = 0; i < n; i++) {
-        var pip = document.createElement('i');
-        pip.className = 'pip' + (i < got ? ' pip--on' : '');
-        pips.appendChild(pip);
-      }
-
-      var count = document.createElement('span');
-      count.className = 'size-card__count';
-      count.textContent = got + ' of ' + n + ' printed';
-
-      card.appendChild(label);
-      card.appendChild(dim);
-      card.appendChild(pips);
-      card.appendChild(count);
-      el.sizes.appendChild(card);
-    });
-
+  /* The plate on the press, offered back. Redrawn on every return to the
+     index so putting one back, or finishing it, shows up straight away. */
+  function drawResume() {
     var open = Store.resumable();
     if (open && P.plate(open.size, open.plate)) {
-      var sz2 = P.size(open.size);
+      var sz = P.size(open.size);
       var pl = P.plate(open.size, open.plate);
       var idx = P.plates(open.size).indexOf(pl) + 1;
-      el.resumeWhat.textContent = sz2.label + ' plate ' + idx + ' of ' +
-        P.count(open.size) + ', ' + stamp(open.elapsed) + ' in.';
+      el.resumeWhat.textContent = sz.label + ' plate ' + idx + ' of ' +
+        P.count(open.size) + ' · ' + stamp(open.elapsed);
       el.resume.hidden = false;
     } else {
       el.resume.hidden = true;
     }
   }
 
-  /* ── the index ──────────────────────────────────────────────────────── */
+  /* Choosing a size no longer navigates anywhere — it swaps the panel under
+     the tabs, which is the whole reason the size screen could go. */
+  function selectSize(id) {
+    state.sizeId = id;
+    P.sizes().forEach(function (sz) {
+      var b = el.tabBtns[sz.id];
+      var on = sz.id === id;
+      b.setAttribute('aria-selected', on ? 'true' : 'false');
+      b.tabIndex = on ? 0 : -1;
+    });
+    el.plates.setAttribute('aria-labelledby', 'tab-' + id);
+    drawIndex();
+  }
 
   function drawIndex() {
     var sz = P.size(state.sizeId);
     var list = P.plates(state.sizeId);
-    el.indexTitle.textContent = sz.label + ' plates';
-    el.indexSub.textContent = sz.note + ' · ' + Store.solvedCount(sz.id) +
+    el.indexSpec.textContent = sz.note + ' · ' + Store.solvedCount(sz.id) +
       ' of ' + list.length + ' printed';
 
     el.plates.innerHTML = '';
@@ -198,9 +161,11 @@
       no.textContent = (i + 1 < 10 ? '0' : '') + (i + 1);
 
       var nm = document.createElement('span');
-      nm.className = 'plate-card__name';
-      /* the title is the reward, so it stays hidden until the plate is done */
-      nm.textContent = solved ? pl.name : 'Unprinted';
+      /* The title is the reward, so an unprinted plate prints a ruled blank
+         where its name will go — a gap in the collection, not greyed-out type. */
+      nm.className = 'plate-card__name' + (solved ? '' : ' plate-card__name--blank');
+      nm.textContent = solved ? pl.name : '';
+      nm.setAttribute('aria-hidden', solved ? 'false' : 'true');
 
       var t = document.createElement('span');
       t.className = 'plate-card__time';
@@ -214,6 +179,8 @@
       card.appendChild(t);
       el.plates.appendChild(card);
     });
+
+    drawResume();
   }
 
   /* ── starting a plate ───────────────────────────────────────────────── */
@@ -232,10 +199,15 @@
     state.hints = 0;
     state.paint = null;
 
+    state.done = false;
+
     var idx = P.plates(sizeId).indexOf(pl) + 1;
-    el.playNo.textContent = 'Plate ' + idx;
-    el.playSize.textContent = sz.note;
+    el.playNo.textContent = 'Plate ' + idx + ' of ' + P.count(sizeId) +
+      ' · ' + sz.label + ' · ' + sz.note;
     el.hintLine.textContent = '';
+    el.finish.hidden = true;
+    el.playKey.hidden = false;
+    el.playActions.hidden = false;
 
     buildBoard(sz.dim);
     syncMarks();
@@ -410,7 +382,7 @@
 
   function wireBoard() {
     el.board.addEventListener('pointerdown', function (e) {
-      if (state.screen !== 'play') return;
+      if (state.screen !== 'play' || state.done) return;
       var at = cellAt(e.target);
       if (!at) return;
       e.preventDefault();
@@ -431,7 +403,7 @@
     /* Pointer capture keeps the events on the board, so the square under the
        finger has to be looked up by position rather than read off the target. */
     el.board.addEventListener('pointermove', function (e) {
-      if (state.paint === null || state.screen !== 'play') return;
+      if (state.paint === null || state.screen !== 'play' || state.done) return;
       var over = document.elementFromPoint(e.clientX, e.clientY);
       var at = cellAt(over);
       if (!at) return;
@@ -458,7 +430,7 @@
      say. It never consults the picture, except to explain a contradiction.  */
 
   function hint() {
-    if (state.screen !== 'play') return;
+    if (state.screen !== 'play' || state.done) return;
     var res = N.solve(state.clues, state.marks);
 
     if (res.status === 'contradiction') {
@@ -472,10 +444,10 @@
       var spot = bad.length ? bad[0] : wrongCross;
       state.hints++;
       if (spot) {
-        el.hintLine.textContent = 'Something already on the plate cannot be right — ' +
-          'look again at row ' + (spot.y + 1) + ', column ' + (spot.x + 1) + '.';
+        el.hintLine.textContent = 'Something here cannot be right — row ' +
+          (spot.y + 1) + ', column ' + (spot.x + 1) + '.';
       } else {
-        el.hintLine.textContent = 'Something already on the plate cannot be right.';
+        el.hintLine.textContent = 'Something here cannot be right.';
       }
       return;
     }
@@ -488,7 +460,7 @@
         state.hints++;
         setMark(xx, yy, res.grid[yy][xx]);
         el.hintLine.textContent = 'Row ' + (yy + 1) + ' and column ' + (xx + 1) +
-          ' between them settle that square: ' +
+          ' settle it: ' +
           (res.grid[yy][xx] === N.FILLED ? 'ink.' : 'blank.');
         state.cursor = { x: xx, y: yy };
         focusCursor();
@@ -497,41 +469,34 @@
       }
     }
 
-    el.hintLine.textContent = 'Nothing more can be settled from the numbers alone — ' +
-      'everything left is already decided on the plate.';
+    el.hintLine.textContent = 'Nothing further follows from the numbers alone.';
   }
 
   /* ── finishing ──────────────────────────────────────────────────────── */
 
   function finish() {
     clockOff();
+    state.done = true;
     var ms = state.base;
     var res = Store.recordSolve(state.sizeId, state.plate.id, ms);
 
-    el.doneName.textContent = state.plate.name;
-
-    /* the plate, printed clean, as the thing you actually made */
-    el.doneProof.innerHTML = '';
-    var proof = document.createElement('div');
-    proof.className = 'proof';
-    proof.style.gridTemplateColumns = 'repeat(' + state.solution.length +
-      ', ' + PROOF[state.sizeId] + 'px)';
-    proof.setAttribute('role', 'img');
-    proof.setAttribute('aria-label', 'The finished plate: ' + state.plate.name);
-    for (var y = 0; y < state.solution.length; y++) {
-      for (var x = 0; x < state.solution[y].length; x++) {
-        var d = document.createElement('i');
-        d.className = state.solution[y][x] ? 'proof__ink' : 'proof__gap';
-        proof.appendChild(d);
-      }
+    /* The plate resolves where it was made. The crosses come off and the
+       squares go dead, but the ruling and the ink stay exactly as the player
+       left them — the finished board IS the picture, so reprinting it on a
+       separate card somewhere else would hand back a copy of the reward
+       instead of the reward. */
+    el.board.className += ' board--done';
+    for (var y = 0; y < state.cells.length; y++) {
+      for (var x = 0; x < state.cells[y].length; x++) state.cells[y][x].tabIndex = -1;
     }
-    el.doneProof.appendChild(proof);
+
+    el.doneName.textContent = state.plate.name;
 
     var bits = [stamp(ms)];
     if (res.previous === null) bits.push('first printing');
     else if (res.record) bits.push('a new best, was ' + stamp(res.previous));
     else bits.push('best stands at ' + stamp(res.previous));
-    if (state.hints) bits.push(state.hints + (state.hints === 1 ? ' deduction asked for' : ' deductions asked for'));
+    if (state.hints) bits.push(state.hints + (state.hints === 1 ? ' hint' : ' hints'));
     el.doneStats.textContent = bits.join(' · ');
 
     var list = P.plates(state.sizeId);
@@ -543,9 +508,11 @@
     }
     state.nextPlate = nextUp;
     el.nextBtn.hidden = !nextUp;
-    el.nextBtn.textContent = nextUp ? 'Next plate' : '';
 
-    show('done');
+    el.hintLine.textContent = '';
+    el.playKey.hidden = true;
+    el.playActions.hidden = true;
+    el.finish.hidden = false;
     (nextUp ? el.nextBtn : el.doneIndexBtn).focus();
   }
 
@@ -553,24 +520,35 @@
 
   function toIndex() {
     clockOff();
-    if (state.plate) Store.keep(state.sizeId, state.plate.id, pack(), state.base);
+    /* Only an unfinished plate goes back on the press. Without the guard a
+       finished one is re-saved as in progress the instant recordSolve has
+       cleared it, and the index then offers to resume a plate you just did. */
+    if (state.plate && !state.done) {
+      Store.keep(state.sizeId, state.plate.id, pack(), state.base);
+    }
     drawIndex();
     show('index');
-    el.indexBackBtn.focus();
-  }
-  function toMenu() {
-    clockOff();
-    drawMenu();
-    show('menu');
+    el.tabBtns[state.sizeId].focus();
   }
 
   function wire() {
-    el.sizes.addEventListener('click', function (e) {
-      var card = e.target.closest ? e.target.closest('.size-card') : null;
-      if (!card) return;
-      state.sizeId = card.getAttribute('data-size');
-      drawIndex();
-      show('index');
+    /* The tabs swap the panel; they never navigate. */
+    el.sizeTabs.addEventListener('click', function (e) {
+      var tab = e.target.closest ? e.target.closest('.tab') : null;
+      if (!tab) return;
+      selectSize(tab.getAttribute('data-size'));
+    });
+
+    /* Roving tabindex, so the strip is one stop and the arrows walk it. */
+    el.sizeTabs.addEventListener('keydown', function (e) {
+      if (e.key !== 'ArrowRight' && e.key !== 'ArrowLeft') return;
+      var ids = P.sizes().map(function (sz) { return sz.id; });
+      var at = ids.indexOf(state.sizeId);
+      if (at < 0) return;
+      e.preventDefault();
+      var to = ids[(at + (e.key === 'ArrowRight' ? 1 : ids.length - 1)) % ids.length];
+      selectSize(to);
+      el.tabBtns[to].focus();
     });
 
     el.plates.addEventListener('click', function (e) {
@@ -579,7 +557,6 @@
       begin(state.sizeId, card.getAttribute('data-plate'), null, 0);
     });
 
-    el.indexBackBtn.addEventListener('click', toMenu);
     el.playBackBtn.addEventListener('click', toIndex);
     el.doneIndexBtn.addEventListener('click', toIndex);
 
@@ -600,15 +577,15 @@
     });
     el.discardBtn.addEventListener('click', function () {
       Store.drop();
-      drawMenu();
+      drawResume();
     });
 
     document.addEventListener('keydown', function (e) {
-      if (state.screen !== 'play') {
-        if (e.key === 'Escape') {
-          if (state.screen === 'index') { e.preventDefault(); toMenu(); }
-          else if (state.screen === 'done') { e.preventDefault(); toIndex(); }
-        }
+      if (state.screen !== 'play' || state.done) {
+        /* On a finished plate Esc walks back to the index. On the index there
+           is nowhere further back but the box, and the tab at the top of the
+           page is that door. */
+        if (state.done && e.key === 'Escape') { e.preventDefault(); toIndex(); }
         return;
       }
 
@@ -640,11 +617,11 @@
     /* the clock should not run while nobody is looking at it */
     document.addEventListener('visibilitychange', function () {
       if (document.hidden) clockOff();
-      else if (state.screen === 'play') clockOn();
+      else if (state.screen === 'play' && !state.done) clockOn();
     });
     window.addEventListener('blur', clockOff);
     window.addEventListener('focus', function () {
-      if (state.screen === 'play') clockOn();
+      if (state.screen === 'play' && !state.done) clockOn();
     });
   }
 
@@ -653,8 +630,11 @@
   cache();
   wire();
   wireBoard();
-  drawMenu();
-  show('menu');
+  /* Open on the size of whatever plate is on the press, so carrying on is one
+     click from a cold start. */
+  var open = Store.resumable();
+  selectSize(open && P.size(open.size) ? open.size : P.sizes()[0].id);
+  show('index');
   /* A second is plenty for a readout in minutes and seconds, and the elapsed
      time is recomputed from the base every time rather than accumulated here. */
   tick = setInterval(syncClock, 1000);

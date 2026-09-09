@@ -92,11 +92,42 @@ El.prototype.has = function (cls) {
 
 var lastFocused = null;
 
-var IDS = ['screen-menu', 'screen-index', 'screen-play', 'screen-done',
-  'menuProgress', 'sizes', 'resume', 'resumeWhat', 'resumeBtn', 'discardBtn',
-  'indexTitle', 'indexSub', 'plates', 'indexBackBtn',
-  'playNo', 'playSize', 'clock', 'board', 'hintLine', 'hintBtn', 'restartBtn',
-  'playBackBtn', 'doneName', 'doneProof', 'doneStats', 'nextBtn', 'doneIndexBtn'];
+/* Read the id list out of index.html rather than keeping a copy here. A
+   hand-maintained list drifts: getElementById would hand the game a live
+   element for an id the markup no longer has, and the run would pass while
+   testing nothing. Deriving it means the harness cannot disagree with the
+   page it is meant to be driving. */
+var MARKUP = fs.readFileSync(path.join(__dirname, 'index.html'), 'utf8');
+var IDS = (MARKUP.match(/ id="[^"]+"/g) || []).map(function (m) {
+  return m.replace(/ id="/, '').replace(/"$/, '');
+});
+if (IDS.length < 20) { console.log('could not read the ids out of index.html'); process.exit(1); }
+
+/* Seed each element's class from the markup too. game.js routes clicks with
+   closest('.tab') / closest('.plate-card'), so an element the harness invents
+   with no class is unreachable — the click would land and quietly do nothing. */
+var CLASS_OF = {};
+var ATTRS_OF = {};
+(MARKUP.match(/<[a-zA-Z][^>]*>/g) || []).forEach(function (tag) {
+  var id = tag.match(/ id="([^"]+)"/);
+  if (!id) return;
+  var cls = tag.match(/ class="([^"]+)"/);
+  if (cls) CLASS_OF[id[1]] = cls[1];
+  var bag = {};
+  (tag.match(/ [a-zA-Z-]+="[^"]*"/g) || []).forEach(function (pair) {
+    var k = pair.slice(1, pair.indexOf('='));
+    var v = pair.slice(pair.indexOf('=') + 2, -1);
+    if (k !== 'class') bag[k] = v;
+  });
+  ATTRS_OF[id[1]] = bag;
+});
+
+/* The scripts run in the order index.html loads them, not an order copied
+   here — a reordered page would otherwise pass headlessly and throw in a
+   browser. */
+var SCRIPTS = (MARKUP.match(/<script src="([^"]+)"/g) || []).map(function (m) {
+  return m.replace(/.*src="/, '').replace(/"$/, '');
+});
 
 var byId = {};
 IDS.forEach(function (id) { byId[id] = new El('div'); });
@@ -139,10 +170,15 @@ function boot() {
   IDS.forEach(function (id) {
     var e = byId[id];
     e.children = [];
-    e.attrs = { id: id };
+    /* the element starts life carrying the attributes the markup gives it —
+       data-size, role, aria-*, the lot — so the game can route off them */
+    e.attrs = {};
+    var seed = ATTRS_OF[id] || {};
+    for (var k in seed) if (Object.prototype.hasOwnProperty.call(seed, k)) e.attrs[k] = seed[k];
+    e.attrs.id = id;
     e.listeners = {};
     e.hidden = false;
-    e.className = '';
+    e.className = CLASS_OF[id] || '';
     e._text = '';
     e._html = '';
     e.style = new Style();
@@ -153,7 +189,7 @@ function boot() {
 
   var sb = makeSandbox();
   var ctx = vm.createContext(sb);
-  ['nonogram.js', 'pictures.js', 'storage.js', 'game.js'].forEach(function (f) {
+  SCRIPTS.forEach(function (f) {
     try {
       vm.runInContext(fs.readFileSync(path.join(__dirname, f), 'utf8'), ctx, { filename: f });
     } catch (e) {
@@ -171,11 +207,20 @@ var P = sb.INK.Pictures;
 
 /* ── helpers over the fake DOM ─────────────────────────────────────────── */
 
+/* The finished plate is a state of the play screen, not a screen of its own:
+   the board stays up so the player can see the picture they made. So 'first
+   unhidden section wins' is not enough any more — play and finish are open
+   together, and a probe that just answered 'play' would leave every
+   done-screen assertion below passing while testing nothing. */
 function screen() {
-  if (!byId['screen-menu'].hidden) return 'menu';
-  if (!byId['screen-index'].hidden) return 'index';
-  if (!byId['screen-play'].hidden) return 'play';
-  if (!byId['screen-done'].hidden) return 'done';
+  var index = !byId['screen-index'].hidden;
+  var play = !byId['screen-play'].hidden;
+  if (index && play) {
+    console.log('FAIL: the index and the plate are on screen at the same time');
+    process.exit(1);
+  }
+  if (index) return 'index';
+  if (play) return byId.finish.hidden ? 'play' : 'done';
   return '(none)';
 }
 
@@ -220,39 +265,58 @@ function cluesFromDom(dim) {
   return { rows: rows, cols: cols };
 }
 
-/* ── the menu ──────────────────────────────────────────────────────────── */
-
-check(screen() === 'menu', 'the game did not open on the menu (opened on ' + screen() + ')');
-check(byId.resume.hidden === true, 'a fresh game offers something to carry on');
-check(/40 in the set/.test(byId.menuProgress.textContent),
-  'the menu does not count the set: "' + byId.menuProgress.textContent + '"');
-
-var sizeCards = byId.sizes.all().filter(function (e) { return e.has('size-card'); });
-check(sizeCards.length === 3, 'the menu shows ' + sizeCards.length + ' sizes, expected 3');
-
 /* ── the index ─────────────────────────────────────────────────────────── */
 
-byId.sizes.fire('click', { target: sizeCards[0] });
-check(screen() === 'index', 'choosing a size did not open the index (on ' + screen() + ')');
+/* One navigation helper per move, so the next screen change edits four
+   functions instead of every call site below. */
+function chooseSize(id) {
+  byId.sizeTabs.fire('click', { target: byId['tab-' + id] });
+}
+function plateCards() {
+  return byId.plates.all().filter(function (e) { return e.has('plate-card'); });
+}
+function openPlate(i) {
+  var cards = plateCards();
+  byId.plates.fire('click', { target: cards[i] });
+}
 
-var plateCards = byId.plates.all().filter(function (e) { return e.has('plate-card'); });
-check(plateCards.length === P.count('small'),
-  'the index lists ' + plateCards.length + ' plates, expected ' + P.count('small'));
+check(screen() === 'index', 'the game did not open on the index (opened on ' + screen() + ')');
+check(byId.resume.hidden === true, 'a fresh game offers something to carry on');
+
+/* the size tabs replace the old size screen: they swap the panel, not the screen */
+var tabs = ['small', 'medium', 'large'].map(function (id) { return byId['tab-' + id]; });
+check(tabs.every(function (t) { return t; }), 'the index is missing a size tab');
+check(byId['tab-small'].attrs['aria-selected'] === 'true',
+  'the index does not open with a size selected');
+
+P.sizes().forEach(function (sz) {
+  chooseSize(sz.id);
+  check(screen() === 'index', 'choosing a size navigated away from the index');
+  check(plateCards().length === P.count(sz.id),
+    'the ' + sz.id + ' tab lists ' + plateCards().length + ', expected ' + P.count(sz.id));
+  check(byId['tab-' + sz.id].attrs['aria-selected'] === 'true',
+    'the ' + sz.id + ' tab did not mark itself selected');
+});
+
+chooseSize('small');
 
 /* the title is the reward, so an unfinished plate must not print its name */
-var names = plateCards.map(function (c) {
+var names = plateCards().map(function (c) {
   var n = c.all().filter(function (e) { return e.has('plate-card__name'); })[0];
-  return n ? n.textContent : '';
+  return n ? n.textContent : '(no name node)';
 });
-check(names.every(function (n) { return n === 'Unprinted'; }),
-  'the index gives away a plate title before it is finished: ' + names.join(', '));
+check(names.every(function (n) { return n === ''; }),
+  'an unprinted plate printed something where its title goes: ' + names.join(', '));
+check(plateCards().every(function (c) {
+  return c.all().filter(function (e) { return e.has('plate-card__name--blank'); }).length === 1;
+}), 'an unprinted plate does not print the ruled blank where its title will go');
 P.plates('small').forEach(function (pl) {
   check(names.indexOf(pl.name) < 0, 'plate title "' + pl.name + '" leaked into the index');
 });
 
 /* ── playing one plate, from the printed numbers only ──────────────────── */
 
-byId.plates.fire('click', { target: plateCards[0] });
+openPlate(0);
 check(screen() === 'play', 'choosing a plate did not start it (on ' + screen() + ')');
 
 var firstPlate = P.plates('small')[0];
@@ -299,11 +363,8 @@ check(squares().length === dim * dim,
   var mid = P.plates('medium')[0];
   var d2 = mid.rows.length;
   byId.playBackBtn.fire('click');
-  byId.indexBackBtn.fire('click');
-  var cards2 = byId.sizes.all().filter(function (e) { return e.has('size-card'); });
-  byId.sizes.fire('click', { target: cards2[1] });
-  var pcards = byId.plates.all().filter(function (e) { return e.has('plate-card'); });
-  byId.plates.fire('click', { target: pcards[0] });
+  chooseSize('medium');
+  openPlate(0);
 
   check(sq(5, 0).has('sq--rule-l'), 'the sixth column does not carry a heavy rule');
   check(!sq(4, 0).has('sq--rule-l'), 'the fifth column carries a heavy rule it should not');
@@ -399,11 +460,21 @@ var solvedMs;
   check(/^1:0/.test(byId.doneStats.textContent),
     'the finish card reports "' + byId.doneStats.textContent + '", expected about 1:05');
 
-  var proof = byId.doneProof.all().filter(function (e) {
-    return e.has('proof__ink') || e.has('proof__gap');
-  });
-  check(proof.length === d2 * d2,
-    'the reprinted plate has ' + proof.length + ' squares, expected ' + d2 * d2);
+  /* The plate resolves in place rather than being reprinted somewhere else,
+     so the proof is the board itself: every inked square, and only those,
+     must match the picture. Counting cells would pass on a blank plate. */
+  check(byId.board.className.indexOf('board--done') >= 0,
+    'the finished board was not marked resolved: ' + byId.board.className);
+  var wrong = 0;
+  for (var py = 0; py < d2; py++) {
+    for (var px = 0; px < d2; px++) {
+      var inked = sq(px, py).has('sq--ink');
+      if (inked !== (res.grid[py][px] === N.FILLED)) wrong++;
+    }
+  }
+  check(wrong === 0, wrong + ' squares of the finished plate do not match the picture');
+  check(squares().length === d2 * d2,
+    'the finished plate has ' + squares().length + ' squares, expected ' + d2 * d2);
 
   var saved = JSON.parse(store['inkbynumbers_stats_v1'] || '{}');
   check(saved.solved && typeof saved.solved.medium[pl.id] === 'number',
@@ -525,20 +596,28 @@ var solvedMs;
 
 /* ── Escape walks back out ─────────────────────────────────────────────── */
 
+/* Written as the guarantee rather than as today's ladder: from the deepest
+   state, Escape reaches the top in a bounded number of presses and settles
+   there. That survives the next screen change; pinning the exact steps would
+   not, and this game has now changed shape twice. */
 (function () {
+  var seen = [screen()];
+  for (var i = 0; i < 6 && screen() !== 'index'; i++) {
+    key('Escape');
+    seen.push(screen());
+  }
+  check(screen() === 'index',
+    'Escape did not walk back to the index in six presses: ' + seen.join(' -> '));
   key('Escape');
-  check(screen() === 'index', 'Escape on the finish card did not go to the index');
-  key('Escape');
-  check(screen() === 'menu', 'Escape on the index did not go to the menu');
+  check(screen() === 'index',
+    'Escape on the index went somewhere: ' + screen() + ' (the back tab is the way out)');
 })();
 
 /* ── the plate in hand survives a reload ───────────────────────────────── */
 
 (function () {
-  var cards = byId.sizes.all().filter(function (e) { return e.has('size-card'); });
-  byId.sizes.fire('click', { target: cards[2] });                 /* large */
-  var pcards = byId.plates.all().filter(function (e) { return e.has('plate-card'); });
-  byId.plates.fire('click', { target: pcards[0] });
+  chooseSize('large');
+  openPlate(0);
 
   var pl = P.plates('large')[0];
   var sol = N.parse(pl.rows);
@@ -563,7 +642,7 @@ var solvedMs;
   N = sb.INK.Nonogram;
   P = sb.INK.Pictures;
 
-  check(screen() === 'menu', 'the reloaded game did not open on the menu');
+  check(screen() === 'index', 'the reloaded game did not open on the index');
   check(byId.resume.hidden === false, 'the reloaded game does not offer to carry on');
   check(/Large plate 1/.test(byId.resumeWhat.textContent),
     'the carry-on line reads "' + byId.resumeWhat.textContent + '"');
@@ -580,7 +659,6 @@ var solvedMs;
 
   /* and putting it back clears it */
   byId.playBackBtn.fire('click');
-  byId.indexBackBtn.fire('click');
   byId.discardBtn.fire('click');
   check(byId.resume.hidden === true, 'putting the plate back left it on the menu');
   check(JSON.parse(store['inkbynumbers_stats_v1']).current === null,
@@ -590,10 +668,8 @@ var solvedMs;
 /* ── the clock stops when nobody is watching ───────────────────────────── */
 
 (function () {
-  var cards = byId.sizes.all().filter(function (e) { return e.has('size-card'); });
-  byId.sizes.fire('click', { target: cards[0] });
-  var pcards = byId.plates.all().filter(function (e) { return e.has('plate-card'); });
-  byId.plates.fire('click', { target: pcards[3] });
+  chooseSize('small');
+  openPlate(3);
 
   now += 10000;
   timers.forEach(function (fn) { fn(); });

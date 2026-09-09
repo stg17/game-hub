@@ -19,10 +19,13 @@
   --ink-15:     rgba(23, 20, 16, .15);
   --paper:      #e6dcc4;
   --paper-dim:  #c3b696;
+  /* The two paper alphas the page needs. Ink has a documented tonal scale;
+     paper did not, so five one-off rgba() values had grown up instead. */
+  --paper-88:   rgba(230, 220, 196, .88);
+  --paper-70:   rgba(230, 220, 196, .70);
 
   --red:        #b32d17;
   --red-lit:    #e8542f;
-  --good:       #12503a;
 
   --field:      #6d4326;   /* this game's printed colour: press brown */
   --gold:       #e8c25a;
@@ -117,30 +120,34 @@ html { scrollbar-color: #6d5a41 var(--table-deep); }
 
 h1 {
   margin: 0;
-  font: 400 clamp(30px, 7vw, 46px)/0.98 Lid, Georgia, serif;
+  font: 400 clamp(38px, 9vw, 60px)/0.95 Lid, Georgia, serif;
   text-transform: uppercase;
   letter-spacing: .012em;
   color: var(--paper);
 }
 
-.tagline {
-  margin: 0 0 18px;
-  max-width: 62ch;
-  font-size: 15.5px;
-  color: rgba(230, 220, 196, .82);
+/* The one-sentence rule, on the plate where the system puts it, on the
+   system's own 46ch measure. */
+.head__rule {
+  margin: 12px 0 0;
+  max-width: 46ch;
+  font-size: 15px;
+  color: var(--paper-88);
 }
 
-.progress {
-  margin: 0 0 22px;
-  font-size: 11.5px;
-  font-weight: 700;
-  letter-spacing: .14em;
+/* A tracked-caps spec strip does the work the old paragraphs did. */
+.spec-line {
+  margin: 0 0 18px;
+  font: 700 11px/1.35 Slab, Georgia, serif;
+  letter-spacing: .15em;
   text-transform: uppercase;
   color: var(--paper);
   font-variant-numeric: tabular-nums;
 }
 
-.screen[hidden] { display: none; }
+/* .btn-row is a flex box, so it out-specifies the UA [hidden] rule. */
+.screen[hidden], .resume[hidden], .key[hidden],
+.finish[hidden], .btn-row[hidden] { display: none; }
 
 /* ── buttons ──────────────────────────────────────────────────────────── */
 
@@ -176,146 +183,71 @@ kbd {
 
 /* ── choosing a size ──────────────────────────────────────────────────── */
 
-.sizes {
-  display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(190px, 1fr));
-  gap: calc(14px + var(--edge)) calc(14px + var(--edge));
-  margin: 0 var(--edge) 28px 0;
+/* The segmented control the box already uses (math-puzzles .toggle-row), with
+   one edge under the whole strip rather than one per tab — lifting a single
+   tab out of a shared keyline would tear the strip. The selected tab takes the
+   set-stamp vocabulary (ink ground, paper caps) rather than the field colour,
+   because a finished plate card is already Press Brown and two brown things on
+   one screen blur the signal that matters. */
+.tabs {
+  display: flex;
+  width: fit-content;
+  max-width: 100%;
+  margin: 0 5px 16px 0;
+  box-shadow: 5px 5px 0 0 var(--ink);
 }
-
-.size-card {
+.tab {
   appearance: none;
   -webkit-appearance: none;
-  display: flex;
-  flex-direction: column;
-  align-items: flex-start;
-  gap: 4px;
-  text-align: left;
+  cursor: pointer;
+  font: 700 12px/1 Slab, Georgia, serif;
+  letter-spacing: .15em;
+  text-transform: uppercase;
+  padding: 13px 20px;
   background: var(--paper);
   color: var(--ink);
   border: 3px solid var(--ink);
-  box-shadow: var(--edge) var(--edge) 0 0 var(--ink);
-  padding: 18px 20px 16px;
-  cursor: pointer;
-  font: inherit;
-  transition: transform .12s cubic-bezier(.2, .9, .3, 1), box-shadow .12s cubic-bezier(.2, .9, .3, 1);
+  margin-left: -3px;
+  transition: background-color .12s linear, color .12s linear;
 }
-.size-card:hover, .size-card:focus-visible {
-  transform: translate(-2px, -2px);
-  box-shadow: calc(var(--edge) + 2px) calc(var(--edge) + 2px) 0 0 var(--ink);
-}
-.size-card:active { transform: translate(2px, 2px); box-shadow: 2px 2px 0 0 var(--ink); }
-
-.size-card__label {
-  font: 400 26px/1 Lid, Georgia, serif;
-  text-transform: uppercase;
-}
-.size-card__dim {
-  font-size: 11px;
-  font-weight: 700;
-  letter-spacing: .16em;
-  text-transform: uppercase;
-  color: var(--ink-70);
-  font-variant-numeric: tabular-nums;
-}
-
-/* the tally of finished plates, printed as a row of squares */
-.size-card__pips {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 3px;
-  margin: 8px 0 6px;
-}
-.pip {
-  width: 9px;
-  height: 9px;
-  border: 2px solid var(--ink);
-  background: transparent;
-}
-.pip--on { background: var(--ink); }
-
-.size-card__count {
-  font-size: 11.5px;
-  color: var(--ink-70);
-  font-variant-numeric: tabular-nums;
+.tab:first-child { margin-left: 0; }
+.tab:hover { background: var(--paper-dim); }
+.tab[aria-selected="true"] {
+  background: var(--ink);
+  color: var(--paper);
+  position: relative;
+  z-index: 1;
 }
 
 /* ── carrying on ──────────────────────────────────────────────────────── */
 
+/* A paper slip with a gold status badge, not a gold plate. Gold marks state in
+   this system; it never fills a surface this size. */
 .resume {
-  background: var(--gold);
-  color: var(--ink);
-  border: 3px solid var(--ink);
-  box-shadow: var(--edge) var(--edge) 0 0 var(--ink);
-  margin: 0 var(--edge) 28px 0;
-  padding: 18px 22px 20px;
-  max-width: 480px;
-}
-.resume[hidden] { display: none; }
-.resume__label {
-  margin: 0 0 8px;
-  font-size: 11px;
-  font-weight: 700;
-  letter-spacing: .18em;
-  text-transform: uppercase;
-  color: var(--ink-70);
-}
-.resume__what {
-  margin: 0 0 16px;
-  font: 400 21px/1.25 Lid, Georgia, serif;
-}
-
-/* ── how to read a plate ──────────────────────────────────────────────── */
-
-.howto {
   background: var(--paper);
   color: var(--ink);
   border: 3px solid var(--ink);
   box-shadow: var(--edge) var(--edge) 0 0 var(--ink);
-  margin: 0 var(--edge) 0 0;
-  padding: 20px 24px 22px;
+  margin: 0 var(--edge) 26px 0;
+  padding: 16px 20px 18px;
+  max-width: 460px;
 }
-.howto__label {
-  margin: 0 0 12px;
-  font-size: 11px;
-  font-weight: 700;
-  letter-spacing: .18em;
+.badge {
+  display: inline-block;
+  margin: 0 0 10px;
+  background: var(--gold);
+  color: var(--ink);
+  border: 3px solid var(--ink);
+  padding: 3px 8px 2px;
+  font: 700 11px/1.35 Slab, Georgia, serif;
+  letter-spacing: .15em;
   text-transform: uppercase;
-  color: var(--ink-70);
 }
-.howto__list {
-  margin: 0;
-  padding-left: 22px;
-  font-size: 14.5px;
-  line-height: 1.6;
-  max-width: 62ch;
-}
-.howto__list li + li { margin-top: 8px; }
-.howto__note {
-  margin: 16px 0 0;
-  padding-top: 14px;
-  border-top: 2px solid var(--ink-15);
-  font-size: 13.5px;
-  line-height: 1.7;
-  color: var(--ink-70);
-}
-
-/* ── the index of plates ──────────────────────────────────────────────── */
-
-.index-head { margin-bottom: 20px; }
-.index-head h2 {
-  margin: 0;
-  font: 400 clamp(24px, 4.4vw, 34px)/1 Lid, Georgia, serif;
+.resume__what {
+  margin: 0 0 16px;
+  font: 700 12px/1.35 Slab, Georgia, serif;
+  letter-spacing: .09em;
   text-transform: uppercase;
-  color: var(--paper);
-}
-.index-sub {
-  margin: 8px 0 0;
-  font-size: 11.5px;
-  font-weight: 700;
-  letter-spacing: .14em;
-  text-transform: uppercase;
-  color: rgba(230, 220, 196, .7);
   font-variant-numeric: tabular-nums;
 }
 
@@ -357,63 +289,125 @@ kbd {
   color: var(--ink-45);
   font-variant-numeric: tabular-nums;
 }
-.plate-card--done .plate-card__no { color: rgba(230, 220, 196, .6); }
+.plate-card--done .plate-card__no { color: var(--paper-70); }
 
 .plate-card__name {
   font: 400 19px/1.1 Lid, Georgia, serif;
   text-transform: uppercase;
 }
-.plate-card:not(.plate-card--done) .plate-card__name { color: var(--ink-45); }
+/* An unprinted plate prints a ruled blank where its name will go. The title is
+   the reward, so it is withheld — but as a gap in the collection, not as
+   greyed-out type. The card's aria-label still says "not yet printed". */
+.plate-card__name--blank {
+  display: block;
+  width: 4.4em;
+  height: 1.1em;
+  border-bottom: 3px solid var(--ink);
+}
 
 .plate-card__time {
-  font-size: 11.5px;
+  font-size: 12px;
+  font-weight: 700;
   letter-spacing: .06em;
-  color: var(--ink-70);
   font-variant-numeric: tabular-nums;
+  color: var(--ink-70);
 }
-.plate-card--done .plate-card__time { color: rgba(230, 220, 196, .78); }
+.plate-card--done .plate-card__time { color: var(--paper-70); }
 
-/* ── the running head, while playing ──────────────────────────────────── */
+/* ── the play surface ─────────────────────────────────────────────────── */
 
-.hud {
+/* The plate and its apparatus sit side by side. The screen is NOT sized to its
+   contents — an inline-block play screen made the page a different width on
+   every plate size, which is what made the set feel unsettled. */
+.play {
   display: flex;
   flex-wrap: wrap;
-  align-items: center;
-  gap: 9px 14px;
+  align-items: flex-start;
+  gap: 18px;
   margin-bottom: 18px;
-  padding-bottom: 14px;
-  border-bottom: 2px solid rgba(230, 220, 196, .2);
-  font-size: 11.5px;
-  font-weight: 700;
+}
+
+.apparatus {
+  flex: 0 1 220px;
+  min-width: 190px;
+  display: flex;
+  flex-direction: column;
+  gap: calc(12px + var(--edge));
+}
+
+.slip, .key, .finish {
+  background: var(--paper);
+  color: var(--ink);
+  border: 3px solid var(--ink);
+  box-shadow: var(--edge) var(--edge) 0 0 var(--ink);
+  margin-right: var(--edge);
+  padding: 11px 14px 12px;
+}
+.slip__label {
+  display: block;
+  font: 700 11px/1.35 Slab, Georgia, serif;
+  letter-spacing: .18em;
+  text-transform: uppercase;
+  color: var(--ink-70);
+}
+.slip__value {
+  display: block;
+  font: 700 27px/1.1 Slab, Georgia, serif;
+  font-variant-numeric: tabular-nums;
+}
+
+/* The three marks and the keys, printed as apparatus. This is the whole of the
+   instructions now — there is no how-to panel and no prose. */
+.key__list {
+  list-style: none;
+  margin: 9px 0 0;
+  padding: 0;
+  font: 700 11px/1 Slab, Georgia, serif;
   letter-spacing: .14em;
   text-transform: uppercase;
+}
+.key__list li { display: flex; align-items: center; gap: 8px; margin-top: 7px; }
+.key__sq {
+  width: 18px;
+  height: 18px;
+  flex: none;
+  position: relative;
+  border: 3px solid var(--ink);
+  background: transparent;
+}
+.key__sq--ink { background: var(--ink); }
+.key__sq--out::before,
+.key__sq--out::after {
+  content: "";
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  width: 58%;
+  height: 3px;
+  background: var(--ink-45);
+}
+.key__sq--out::before { transform: translate(-50%, -50%) rotate(45deg); }
+.key__sq--out::after  { transform: translate(-50%, -50%) rotate(-45deg); }
+
+.key__list--keys {
+  margin-top: 13px;
+  padding-top: 11px;
+  border-top: 2px solid var(--ink-15);
+}
+kbd {
+  font: 700 11px/1 Slab, Georgia, serif;
+  background: var(--ink);
   color: var(--paper);
-  font-variant-numeric: tabular-nums;
-}
-.badge {
-  background: var(--gold);
-  color: var(--ink);
-  border: 2px solid var(--ink);
-  padding: 3px 8px 2px;
-  font-variant-numeric: tabular-nums;
-}
-.hud__clock {
-  margin-left: auto;
-  font-size: 17px;
-  letter-spacing: .08em;
+  padding: 4px 6px 3px;
+  letter-spacing: .06em;
+  min-width: 2.4em;
+  text-align: center;
 }
 
 /* ── the plate itself ─────────────────────────────────────────────────── */
 
 /* The press is the pulpboard the grid is ruled on. It only ever needs to be as
    wide as the grid, so it shrink-wraps rather than stretching. */
-/* The play screen is only as wide as what is on it, so the running rule and
-   the plate share an edge. Left-aligned, like every other plate in the box. */
-#screen-play:not([hidden]) {
-  display: inline-block;
-  max-width: 100%;
-}
-
 .press {
   display: block;
   /* Hug the plate. Left to stretch, the gutter track is `auto` and would
@@ -493,9 +487,17 @@ kbd {
 .sq--edge-r { border-right: 3px solid var(--ink); }
 .sq--edge-b { border-bottom: 3px solid var(--ink); }
 
-.sq:hover { background: var(--ink-15); }
+/* No hover state: a square cannot lift without tearing the ruling, and a tonal
+   wash is out of world. The affordance is the cursor — pointerdown focuses the
+   square, so the lit ring follows the mouse too. */
 .sq--ink { background: var(--ink); }
-.sq--ink:hover { background: var(--ink); }
+
+/* The cursor, and the one lit thing on the plate. Deliberately :focus and not
+   :focus-visible — browsers suppress :focus-visible on a pointer-focused
+   button, which would make the keyboard cursor vanish the moment you clicked.
+   Exactly one square is tabbable at a time, so :focus IS the cursor. */
+.sq:focus { outline: none; box-shadow: inset 0 0 0 3px var(--red-lit); }
+.sq:focus-visible { outline: none; }
 
 /* A crossed-off square is a printed cross, not a greyed-out cell: it is
    something the player asserted, so it reads as a mark. */
@@ -513,60 +515,43 @@ kbd {
 .sq--out::before { transform: translate(-50%, -50%) rotate(45deg); }
 .sq--out::after  { transform: translate(-50%, -50%) rotate(-45deg); }
 
-.hint-line {
-  margin: 0 0 18px;
-  min-height: 1.55em;
-  max-width: 62ch;
-  font-size: 14.5px;
-  color: var(--gold);
-}
-.hint-line:empty { margin-bottom: 0; }
+/* ── the resolved plate ───────────────────────────────────────────────── */
 
-/* ── finished ─────────────────────────────────────────────────────────── */
+/* Finishing resolves the plate in place: the crosses come off and the ink
+   stays. The finished board IS the picture, so reprinting it on a separate
+   card would hand back a copy of the reward instead of the reward. Border
+   widths are untouched, so nothing reflows at the moment of completion. */
+.board--done { pointer-events: none; }
+.board--done .sq--out::before,
+.board--done .sq--out::after { display: none; }
+.board--done .sq:focus { box-shadow: none; }
 
-.done-card {
-  background: var(--paper);
-  color: var(--ink);
-  border: 3px solid var(--ink);
-  box-shadow: var(--edge) var(--edge) 0 0 var(--ink);
-  margin: 0 var(--edge) 0 0;
-  padding: 22px 24px 24px;
-  max-width: 560px;
-}
-.done-card__label {
-  margin: 0 0 6px;
-  font-size: 11px;
-  font-weight: 700;
-  letter-spacing: .18em;
+.finish__name {
+  margin: 8px 0 0;
+  font: 400 clamp(24px, 4.6vw, 30px)/1 Lid, Georgia, serif;
   text-transform: uppercase;
-  color: var(--ink-70);
+  color: var(--field);
 }
-.done-card__name {
-  margin: 0 0 18px;
-  font: 400 clamp(30px, 6vw, 44px)/1 Lid, Georgia, serif;
-  text-transform: uppercase;
-  color: var(--red);
-}
-
-/* the plate, printed clean */
-.proof {
-  display: grid;
-  width: fit-content;
-  border: 3px solid var(--ink);
-  background: var(--paper);
-}
-/* the square size comes from game.js, per plate size */
-.proof__ink, .proof__gap { display: block; aspect-ratio: 1; }
-.proof__ink { background: var(--ink); }
-.proof__gap { background: transparent; }
-
-.done-card__stats {
-  margin: 18px 0 20px;
-  padding-top: 14px;
+.finish__stats {
+  margin: 13px 0 16px;
+  padding-top: 11px;
   border-top: 2px solid var(--ink-15);
-  font-size: 13.5px;
+  font: 700 12px/1.4 Slab, Georgia, serif;
+  letter-spacing: .09em;
+  text-transform: uppercase;
   color: var(--ink-70);
   font-variant-numeric: tabular-nums;
+}
+.btn-row--stack { flex-direction: column; align-items: stretch; }
+
+/* The hint, on the system's measure and in ink rather than gold — gold marks
+   state in this box, it does not carry sentences. */
+.note {
+  margin: 0 0 18px;
+  min-height: 1.55em;
+  max-width: 46ch;
+  font-size: 14.5px;
+  color: var(--paper);
 }
 
 /* ── narrow ───────────────────────────────────────────────────────────── */
@@ -577,14 +562,18 @@ kbd {
   .head { padding: 18px 84px 20px 18px; }
   .press { padding: 8px; }
   .board--small { --cell: 30px; }
-  /* A fifteen-square plate plus its gutters has to fit 390px without the
-     press needing to scroll, and the gutter is the part that cannot shrink. */
+  /* A fifteen-square plate plus its gutters has to fit 390px without the press
+     needing to scroll, and the gutter is the part that cannot shrink. */
   .board--large { --cell: 18px; }
   .board--medium { --cell: 24px; }
   .gut { font-size: 11px; }
   .gut--row { padding-right: 5px; gap: 4px; }
   .plates { grid-template-columns: repeat(auto-fill, minmax(128px, 1fr)); }
-  .hud__clock { margin-left: 0; flex-basis: 100%; }
+  .apparatus { flex: 1 1 100%; }
+  /* the keys run as one wrapped row rather than a tall column */
+  .key__list--keys li { display: inline-flex; margin-right: 12px; }
+  .tabs { width: 100%; }
+  .tab { flex: 1 1 0; padding: 13px 8px; }
 }
 
 @media (max-width: 380px) {
@@ -594,5 +583,5 @@ kbd {
 }
 
 @media (prefers-reduced-motion: reduce) {
-  .btn, .hub-link, .size-card, .plate-card { transition: none; }
+  .btn, .hub-link, .plate-card, .tab { transition: none; }
 }
