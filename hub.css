@@ -210,6 +210,8 @@ html { scrollbar-color: var(--tray) var(--table-deep); }
 
 /* the glued-on label strip along the bottom of the board */
 .board__foot {
+  /* Cover the field's lower shadow at rest as well as during hover. */
+  position: relative;
   display: block;
   background: var(--paper);
   color: var(--ink);

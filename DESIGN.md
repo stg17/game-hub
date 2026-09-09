@@ -319,7 +319,7 @@ All iconography is inline SVG drawn from these same primitives with `currentColo
 - **Canvas equivalent:** `Game.UI.button()` draws an unselected chip as a paper plate at edge 5 and a selected/hovered chip as a red plate at `+2, +2` with edge 3, plus a punched paper square in a reserved 24px gutter so the label never shifts between states.
 
 ### Cards / Containers
-- **Board (hub):** two stacked plates — a coloured `field` carrying the drawn components and the corner set stamp, and a pulpboard `foot` strip glued under it (`border-top: 0`) carrying title, rule line, spec strip and record strip. Both share the board edge and both lift together on hover, when the title also turns red.
+- **Board (hub):** two stacked plates — a coloured `field` carrying the drawn components and the corner set stamp, and a pulpboard `foot` strip glued under it (`border-top: 0`) carrying title, rule line, spec strip and record strip. The label strip covers the field's lower shadow in every state, leaving no extra shadow line above the title. Both share the board edge and both lift together on hover, when the title also turns red.
 - **Head plate (game page):** `width: fit-content`, that game's field at full strength, page title in Lid, a 46ch rule line at 88% pulpboard, and the set stamp in the corner. Padded `22px 104px 24px 24px` — the wide right inset is the stamp's reserved space.
 - **Slip / panel:** pulpboard, 3px keyline, board or slip edge, `9px 10px 10px` to `13px 16px 14px`. Carries a tracked-caps label at 70% ink over a Slab 700 tabular numeral at 25–27px.
 - **Overlay sheet:** a full pulpboard plate laid over the playfield (`inset: 0` / `inset: -3px`), centred, heading in Lid coloured with the game's field. It covers the board; it never tints or blurs it.
