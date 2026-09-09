@@ -1,6 +1,8 @@
 # CLAUDE.md
 
-This file provides guidance to Claude Code (claude.ai/code) when working with code in this repository.
+@AGENTS.md
+
+Project architecture and game implementation notes for Game Hub. Shared workflow, cooperation, and Git rules live in `AGENTS.md`; update those rules there. Claude Code loads them through the import above. Other assistants should read the relevant project sections below.
 
 ## Project
 
