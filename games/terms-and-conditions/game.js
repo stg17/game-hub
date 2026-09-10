@@ -81,6 +81,11 @@
     el.overTitle = document.getElementById('overTitle');
     el.overWhy = document.getElementById('overWhy');
     el.overDetail = document.getElementById('overDetail');
+    el.overRecap = document.getElementById('overRecap');
+    el.recapSheet = document.getElementById('recapSheet');
+    el.recapStamp = document.getElementById('recapStamp');
+    el.recapHeadline = document.getElementById('recapHeadline');
+    el.recapShapes = document.getElementById('recapShapes');
     el.againBtn = document.getElementById('againBtn');
   }
 
@@ -103,6 +108,25 @@
   }
 
   /* ── drawing a round ────────────────────────────────────────────────── */
+
+  /* The shape's own art, drawn the same way wherever it appears. The recap
+     calls this too, so what the player is shown afterwards is literally the
+     thing they were looking at rather than a redrawing of it. */
+  function shapeArt(s, box) {
+    var ink = C.ink(s.ink);
+    return '<svg viewBox="0 0 100 100" width="' + box + '" height="' + box + '" aria-hidden="true" focusable="false">' +
+      '<g fill="' + ink.hex + '" stroke="#171410" stroke-width="2.5" vector-effect="non-scaling-stroke">' +
+      C.glyphMarkup(s.kind) +
+      '</g></svg>';
+  }
+
+  /* The X goes down twice — a broad pulpboard stroke under a chrome red one —
+     so it reads over a dark silhouette as well as a pale one. */
+  var CROSS = '<svg class="recap__x" viewBox="0 0 100 100" aria-hidden="true" focusable="false">' +
+    '<g fill="none" stroke-linecap="square">' +
+    '<path d="M16 16 84 84M84 16 16 84" stroke="#e6dcc4" stroke-width="17"/>' +
+    '<path d="M16 16 84 84M84 16 16 84" stroke="#b32d17" stroke-width="9"/>' +
+    '</g></svg>';
 
   function drawRound() {
     var round = state.round;
@@ -144,11 +168,7 @@
       var art = document.createElement('span');
       art.className = 'tc-shape__art';
       art.style.setProperty('--box', box);
-      art.innerHTML =
-        '<svg viewBox="0 0 100 100" width="' + box + '" height="' + box + '" aria-hidden="true" focusable="false">' +
-        '<g fill="' + ink.hex + '" stroke="#171410" stroke-width="2.5" vector-effect="non-scaling-stroke">' +
-        C.glyphMarkup(s.kind) +
-        '</g></svg>';
+      art.innerHTML = shapeArt(s, box);
 
       var label = document.createElement('span');
       label.className = 'tc-shape__label';
@@ -232,6 +252,60 @@
     }
   }
 
+  /* The round printed back, with the shape that was clicked crossed out and
+     the one the small print named ringed. Both marks carry a printed word as
+     well as a colour, because nothing in this game is allowed to depend on
+     colour vision alone. On a timeout there is no pick, so only the answer is
+     marked. */
+  function drawRecap(why) {
+    var round = state.round, res = state.resolved;
+    if (!round || !res) { el.overRecap.hidden = true; return; }
+
+    var backdrop = C.backdrop(round.backdrop);
+    el.recapSheet.style.background = backdrop.hex;
+    el.recapStamp.textContent = 'Backdrop: ' + backdrop.label;
+    el.recapHeadline.textContent = C.HEADLINE.text;
+
+    var picked = (why === 'wrong' && state.lastPick !== null) ? state.lastPick : -1;
+
+    el.recapShapes.innerHTML = '';
+    round.shapes.forEach(function (s, idx) {
+      var isPick = idx === picked;
+      var isAnswer = idx === res.answer;
+      var ink = C.ink(s.ink);
+
+      var cell = document.createElement('div');
+      cell.className = 'recap__cell' +
+        (isPick ? ' recap__cell--picked' : '') +
+        (isAnswer ? ' recap__cell--answer' : '');
+      cell.setAttribute('data-i', String(idx));
+
+      /* The recap is a reminder, not a second sheet, so the shapes print at
+         about two thirds — still in proportion to each other, which is the
+         only thing the round was ever asking about. */
+      var box = Math.round(C.drawnBox(s) * 0.62);
+      var art = document.createElement('span');
+      art.className = 'recap__art';
+      art.style.setProperty('--box', box);
+      art.innerHTML = shapeArt(s, box) + (isPick ? CROSS : '');
+      cell.appendChild(art);
+
+      var tag = document.createElement('span');
+      tag.className = 'recap__tag';
+      tag.textContent = isPick ? 'You picked' : (isAnswer ? 'The answer' : '');
+      cell.appendChild(tag);
+
+      cell.setAttribute('aria-label', 'Shape ' + (idx + 1) + ': ' +
+        ink.label.toLowerCase() + ' ' + s.kind +
+        (isPick ? ', the one you picked' : '') +
+        (isAnswer ? ', the answer' : ''));
+
+      el.recapShapes.appendChild(cell);
+    });
+
+    el.overRecap.hidden = false;
+  }
+
   function endRun(why) {
     state.running = false;
     var record = Store.recordRun(state.streak, state.active.length);
@@ -270,6 +344,8 @@
     }
     parts.push('Streak: ' + state.streak + (record ? ' — a new best.' : ' · best ' + stats.bestStreak + '.'));
     el.overDetail.textContent = parts.join(' ');
+
+    drawRecap(why);
 
     syncHud();
     show('over');

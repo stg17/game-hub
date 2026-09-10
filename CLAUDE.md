@@ -68,9 +68,9 @@ A cartoon-shaded side-scrolling platformer built on HTML5 Canvas 2D and vanilla 
 
 **State machine**: `js/game.js` is the hub. `Game.state` is a string (`MENU`, `HOWTO`, `LEVEL_SELECT`, `PLAYING`, `PAUSED`, `LEVEL_COMPLETE`, `GAME_OVER`, `WIN`), and both `Game.update` and `Game.render` are `switch` statements over it. Adding a screen means adding a case to both plus a draw function in `js/ui.js`. Deliberate split: all input handling and state transitions live in `game.js`; `ui.js` only draws — UI functions take the values they render as arguments.
 
-**Pausing mid-level**: `PAUSED` is itself a small menu (`Game.PauseOptions`: Resume / Restart Level / Quit to Menu), navigated with the same up/down-arrow + Enter or mouse-click pattern as the main menu, plus Escape/P as a one-key resume shortcut. Restart Level calls `Game.loadLevel(Game.levelIndex)` again with `Game.lives` reset to 3 and `Game.score` rolled back to `Game.levelStartScore` (snapshotted in `Game.loadLevel` the moment a level begins) — so a restart is a clean redo of just the current level, not a full new run.
+**Pausing mid-level**: `PAUSED` is itself a small menu (`Game.PauseOptions`: Resume / Restart Level / Quit to Menu), navigated with the same up/down-arrow + Enter or mouse-click pattern as the main menu, plus Escape/P as a one-key resume shortcut. The way in with a mouse is the `Pause` chip `ui.js` prints on the HUD rail beside the score (`hud-pause`, drawn only while `showPause` — under the pause sheet it would be a control you cannot press); `updatePlaying` treats that click exactly as it treats Escape. Restart Level calls `Game.loadLevel(Game.levelIndex)` again with `Game.lives` reset to 3 and `Game.score` rolled back to `Game.levelStartScore` (snapshotted in `Game.loadLevel` the moment a level begins) — so a restart is a clean redo of just the current level, not a full new run.
 
-**Mouse menu support**: every clickable UI element is drawn via `ui.js`'s `button()` helper, which both renders it and calls `registerHit(x, y, w, h, id)` to record its rect for that frame under a semantic `id` string (e.g. `'menu-0'`, `'level-3'`, `'pause-resume'`). `Game.render` calls `Game.UI.clearHits()` before drawing each frame, so `Game.UI.hitRegions` always reflects exactly what's on screen. `game.js`'s `getClickedId()` hit-tests the mouse position (via `Game.Input.getMousePos()`/`mouseClicked()`, wired up in `Game.Input.attachMouse(canvas)` from `main.js`) against those regions once per update, and each state's update function treats a matching `clickedId` exactly like the equivalent key press (`Enter` on a menu item, `Escape` on a back button, etc). Keyboard and mouse are two input paths into the same transition logic — never add a mouse-only or keyboard-only action.
+**Mouse menu support**: every clickable UI element is drawn via `ui.js`'s `button()` helper — or `hudButton()`, the same chip without the lamp gutter, for the HUD, where nothing is keyboard-selected — which both renders it and calls `registerHit(x, y, w, h, id)` to record its rect for that frame under a semantic `id` string (e.g. `'menu-0'`, `'level-3'`, `'pause-0'`, `'hud-pause'`). `Game.render` calls `Game.UI.clearHits()` before drawing each frame, so `Game.UI.hitRegions` always reflects exactly what's on screen. `game.js`'s `getClickedId()` hit-tests the mouse position (via `Game.Input.getMousePos()`/`mouseClicked()`, wired up in `Game.Input.attachMouse(canvas)` from `main.js`) against those regions once per update, and each state's update function treats a matching `clickedId` exactly like the equivalent key press (`Enter` on a menu item, `Escape` on a back button, etc). Keyboard and mouse are two input paths into the same transition logic — never add a mouse-only or keyboard-only action.
 
 **Physics/collision split** (least obvious convention): `player.update(dt)` sets **velocities only** and never moves the player. `Game.Collision.resolvePlayer` does the actual `x += vx * dt` / `y += vy * dt`, per-axis and in that order, so wall and floor contact resolve independently. It relies on `player.prevX`/`prevY` (snapshotted at the top of `player.update`) to distinguish landing on a platform top from hitting its underside. Enemies and projectiles, by contrast, move themselves in their own `update`. Moving platforms record `lastDx` and `lastDy` as actual travel **after** clamping at their endpoints. Before resolving contact, the resolver carries an existing grounded rider on both axes (horizontal carry is included in the wall check); jumping or knockback releases the rider. Side checks exclude contacts that began above/below the platform's previous position, and vertical checks use relative player/platform movement, so rising platforms cannot shove riders sideways and descending platforms keep riders grounded.
 
@@ -171,6 +171,20 @@ build printed the whole agreement there: precedence, the ramp, the lot. That is
 the one explanation this game must not give, because working out that the small
 print overrides the headline *is* the game. The clauses arrive one at a time on
 their own screen, which is teaching enough.
+
+**The loss screen prints the round back.** Saying "the answer was shape 2" in
+words asks the player to take the verdict on trust, which is a poor way to end
+a game whose whole promise is that the answer was there to be read. `drawRecap`
+redraws the sheet as it stood — same stock, same headline, the shapes at about
+two thirds and still in proportion to each other — with an X struck through the
+one that was clicked and a gold ring round the one the small print named. Both
+marks carry a printed word as well as a colour (`You picked`, `The answer`),
+because nothing here may depend on colour vision; the X is drawn twice, a broad
+pulpboard stroke under a chrome red one, so it reads over a dark silhouette as
+well as a pale one, and it has a 42px floor so striking out the smallest shape
+in a round still leaves a visible mark. `shapeArt()` draws the shapes for both
+the sheet and the recap, so the recap cannot drift from what was on screen. A
+timeout marks the answer and crosses out nothing.
 
 Script order in `index.html` is the dependency graph: `clauses.js` → `round.js`
 → `storage.js` → `game.js`. `clauses.js` and `round.js` are **pure** — no DOM,
@@ -301,9 +315,11 @@ always there in the small print, and that promise is checkable:
   independently. A passing run is therefore evidence that everything needed to
   answer is actually printed. It also covers the ramp, the amendment beat, focus
   handling, the drain of the time bar, both suspend paths, the loss and timeout
-  screens and their wording, the stored record, a keyboard-only run, and — by
-  restarting fourteen times and reading the amendment screens — that two runs
-  are dealt different small print.
+  screens and their wording, the recap drawing on both of them, the stored
+  record, a keyboard-only run, and — by restarting fourteen times and reading
+  the amendment screens — that two runs are dealt different small print. It
+  derives its element ids by scanning `index.html` rather than keeping a copy,
+  so markup that gains an element cannot silently hand the game a `null`.
 
 Neither covers pixels. For those, drive the game in headless Chrome through a
 sized iframe with `--allow-file-access-from-files` (headless clamps a real

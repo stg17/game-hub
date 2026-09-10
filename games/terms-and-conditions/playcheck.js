@@ -87,14 +87,21 @@ El.prototype.all = function () {
   this.children.forEach(function (c) { out.push(c); out = out.concat(c.all()); });
   return out;
 };
+/* padded, so recap__cell never matches recap__cell--picked */
+El.prototype.has = function (cls) {
+  return (' ' + this.className + ' ').indexOf(' ' + cls + ' ') >= 0;
+};
 
 var lastFocused = null;
 
-var IDS = ['screen-menu', 'screen-amendment', 'screen-play', 'screen-over',
-  'hud', 'hudStreak', 'hudClauses', 'hudBest', 'menuBest', 'startBtn',
-  'amendNo', 'amendText', 'amendBtn', 'sheet', 'backdropStamp', 'headline',
-  'shapes', 'clauseList', 'barFill', 'overTitle', 'overWhy', 'overDetail',
-  'againBtn'];
+/* Read the id list out of index.html rather than keeping a copy here. A
+   hand-maintained list drifts the moment the markup gains an element, and
+   getElementById then hands the game a null it did not expect. */
+var MARKUP = fs.readFileSync(path.join(__dirname, 'index.html'), 'utf8');
+var IDS = (MARKUP.match(/ id="[^"]+"/g) || []).map(function (m) {
+  return m.replace(/ id="/, '').replace(/"$/, '');
+});
+if (IDS.length < 20) { console.log('could not read the ids out of index.html'); process.exit(1); }
 
 var byId = {};
 IDS.forEach(function (id) { byId[id] = new El('div'); });
@@ -350,6 +357,7 @@ check(byId.hud.hidden === false, 'the HUD is hidden mid-run');
     if (i !== solved.answer) { wrong = i; break; }
   }
   var streakAt = parseInt(byId.hudStreak.textContent, 10);
+  var shapeCount = byId.shapes.children.length;
   clickShape(wrong);
 
   check(screen() === 'over', 'a wrong answer did not end the run');
@@ -365,6 +373,36 @@ check(byId.hud.hidden === false, 'the HUD is hidden mid-run');
     'the loss screen does not say what was clicked: "' + detail + '"');
   check(detail.indexOf('Streak: ' + streakAt) > 0,
     'the loss screen reports the wrong streak: "' + detail + '"');
+  /* The recap has to agree with the words above it, or the picture is
+     lying about the round the player just lost. */
+  check(byId.overRecap.hidden === false, 'the loss screen printed no recap of the round');
+  var cells = byId.recapShapes.children;
+  check(cells.length === shapeCount,
+    'the recap shows ' + cells.length + ' shapes, the round had ' + shapeCount);
+  var crossed = [], ringed = [];
+  cells.forEach(function (c, i) {
+    if (c.has('recap__cell--picked')) crossed.push(i);
+    if (c.has('recap__cell--answer')) ringed.push(i);
+  });
+  check(crossed.length === 1 && crossed[0] === wrong,
+    'the recap crosses out ' + JSON.stringify(crossed) + ', the click was ' + wrong);
+  check(ringed.length === 1 && ringed[0] === solved.answer,
+    'the recap rings ' + JSON.stringify(ringed) + ', the answer was ' + solved.answer);
+  /* the mark is printed as a word too, not colour alone */
+  var tagOf = function (c) {
+    var t = c.all().filter(function (e) { return e.has('recap__tag'); })[0];
+    return t ? t.textContent : '';
+  };
+  check(tagOf(cells[wrong]) === 'You picked',
+    'the crossed-out shape is labelled "' + tagOf(cells[wrong]) + '"');
+  check(tagOf(cells[solved.answer]) === 'The answer',
+    'the ringed shape is labelled "' + tagOf(cells[solved.answer]) + '"');
+  /* and the X is actually drawn over it */
+  var art = cells[wrong].all().filter(function (e) { return e.has('recap__art'); })[0];
+  check(art && /recap__x/.test(art.innerHTML), 'no X was drawn over the shape that was clicked');
+  var clean = cells[solved.answer].all().filter(function (e) { return e.has('recap__art'); })[0];
+  check(clean && !/recap__x/.test(clean.innerHTML), 'the answer was crossed out as well');
+
   check(lastFocused === byId.againBtn, 'focus did not land on the restart button');
 
   /* the record is written, and read back */
@@ -386,6 +424,14 @@ check(byId.hud.hidden === false, 'the HUD is hidden mid-run');
   for (var i = 0; i < 800 && screen() === 'play'; i++) advance(60);
   check(screen() === 'over', 'the clock never ran out');
   check(byId.overTitle.textContent === 'Time', 'a timeout is titled "' + byId.overTitle.textContent + '"');
+  /* Nothing was clicked, so nothing is crossed out — but the answer is still
+     shown, which is the whole reason the recap is there. */
+  check(byId.overRecap.hidden === false, 'a timeout printed no recap');
+  var tcells = byId.recapShapes.children;
+  check(tcells.filter(function (c) { return c.has('recap__cell--picked'); }).length === 0,
+    'a timeout crossed a shape out even though nothing was clicked');
+  check(tcells.filter(function (c) { return c.has('recap__cell--answer'); }).length === 1,
+    'a timeout did not ring the answer');
   var saved = JSON.parse(store['terms_stats_v1'] || '{}');
   check(saved.runs === 2, 'a timeout did not count as a run (' + saved.runs + ')');
 })();

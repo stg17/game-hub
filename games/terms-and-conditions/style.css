@@ -475,6 +475,111 @@ kbd {
   font-variant-numeric: tabular-nums;
 }
 
+/* ── the round, printed back ──────────────────────────────────────────── */
+
+/* A small sheet in the stock the round was printed on, so the recap is
+   recognisably the thing that was on screen a second ago. */
+.recap { margin: 0 0 18px; }
+.recap[hidden] { display: none; }
+
+.recap__sheet {
+  border: 3px solid var(--ink);
+  box-shadow: 4px 4px 0 0 var(--ink);
+  margin-right: 4px;
+  padding: 12px 14px 14px;
+}
+.recap__stamp {
+  margin: 0 0 6px;
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: .16em;
+  text-transform: uppercase;
+  color: var(--ink-70);
+}
+.recap__headline {
+  margin: 0 0 12px;
+  font-size: 13px;
+  font-weight: 700;
+  letter-spacing: .04em;
+  text-transform: uppercase;
+  color: var(--ink);
+}
+
+.recap__row {
+  display: flex;
+  flex-wrap: nowrap;
+  align-items: stretch;
+  gap: 8px;
+}
+
+.recap__cell {
+  flex: 0 1 auto;
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 4px;
+  padding: 6px 6px 0;
+  background: rgba(255, 255, 255, .34);
+  border: 3px solid var(--ink);
+}
+
+/* Gold rings the shape the small print actually named. Gold marks state in
+   this box and never fills a control, which is exactly what this is. */
+.recap__cell--answer { box-shadow: inset 0 0 0 3px var(--gold); }
+
+.recap__art {
+  position: relative;
+  display: flex;
+  flex: 1 1 auto;
+  align-items: flex-end;
+  justify-content: center;
+  min-width: 0;
+  min-height: 56px;
+}
+.recap__art svg {
+  display: block;
+  width: calc(var(--box, 40) * 1px);
+  height: auto;
+  max-width: 100%;
+}
+/* The X sits over the shape it strikes out, at the shape's own size — but
+   never smaller than 42px, or striking out the smallest shape in the round
+   leaves a mark too faint to notice. */
+.recap__x {
+  position: absolute;
+  left: 50%;
+  bottom: 0;
+  transform: translateX(-50%);
+  width: max(calc(var(--box, 40) * 1px), 42px);
+  max-width: 100%;
+}
+
+/* Both marks are printed as words as well as drawn, so the recap is readable
+   without colour vision. */
+.recap__tag {
+  align-self: stretch;
+  min-height: 1.35em;
+  text-align: center;
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: .08em;
+  text-transform: uppercase;
+  padding: 3px 2px 2px;
+  margin: 4px -6px 0;
+  color: var(--ink-70);
+}
+.recap__cell--picked .recap__tag {
+  background: var(--red);
+  color: var(--paper);
+  border-top: 3px solid var(--ink);
+}
+.recap__cell--answer .recap__tag {
+  background: var(--gold);
+  color: var(--ink);
+  border-top: 3px solid var(--ink);
+}
+
 /* ── narrow ───────────────────────────────────────────────────────────── */
 
 @media (max-width: 560px) {
