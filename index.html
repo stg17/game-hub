@@ -30,58 +30,18 @@
   <!-- ── NO. 01 ─────────────────────────────────────────────── -->
   <a class="board board--tetris" href="games/tetris/index.html">
     <span class="board__field">
-      <svg class="board__art" viewBox="0 0 380 250" role="img" aria-label="A printed Tetris well with four tetromino pieces set beside it">
-        <g class="art-well">
-          <rect x="126" y="18" width="128" height="214" class="ink-fill-8"/>
-          <g class="ink-line-15" stroke-width="1">
-            <path d="M158 18v214M190 18v214M222 18v214"/>
-            <path d="M126 50h128M126 82h128M126 114h128M126 146h128M126 178h128M126 210h128"/>
-          </g>
-          <rect x="126" y="18" width="128" height="214" fill="none" stroke="currentColor" stroke-width="2.5"/>
-        </g>
+      <svg class="board__art" viewBox="0 0 380 250" role="img" aria-label="A printed Tetris well part filled, with a four-square bar falling toward the gap that completes the bottom row">
+        <rect x="70" y="20" width="240" height="216" class="ink-fill-8"/>
+        <g class="ink-line-15" stroke-width="1"><path d="M94 20v216M118 20v216M142 20v216M166 20v216M190 20v216M214 20v216M238 20v216M262 20v216M286 20v216M70 44h240M70 68h240M70 92h240M70 116h240M70 140h240M70 164h240M70 188h240M70 212h240"/></g>
         <g class="art-piece">
-          <rect x="158" y="178" width="32" height="32" fill="#d8912a"/>
-          <rect x="190" y="178" width="32" height="32" fill="#d8912a"/>
-          <rect x="126" y="210" width="32" height="32" fill="#7fb5e0"/>
-          <rect x="158" y="210" width="32" height="32" fill="#7fb5e0"/>
-          <rect x="190" y="210" width="32" height="32" fill="#7fb5e0"/>
-          <rect x="222" y="210" width="32" height="32" fill="#7fb5e0"/>
-          <rect x="190" y="82" width="32" height="32" fill="#cf6b4a"/>
-          <rect x="190" y="114" width="32" height="32" fill="#cf6b4a"/>
-          <rect x="222" y="114" width="32" height="32" fill="#cf6b4a"/>
-          <g fill="none" stroke="#171410" stroke-width="2">
-            <rect x="158" y="178" width="32" height="32"/><rect x="190" y="178" width="32" height="32"/>
-            <rect x="126" y="210" width="32" height="32"/><rect x="158" y="210" width="32" height="32"/>
-            <rect x="190" y="210" width="32" height="32"/><rect x="222" y="210" width="32" height="32"/>
-            <rect x="190" y="82" width="32" height="32"/><rect x="190" y="114" width="32" height="32"/>
-            <rect x="222" y="114" width="32" height="32"/>
-          </g>
+          <rect x="262" y="140" width="24" height="24" fill="#cf6b4a"/><rect x="70" y="164" width="24" height="24" fill="#e0c341"/><rect x="262" y="164" width="24" height="24" fill="#cf6b4a"/><rect x="286" y="164" width="24" height="24" fill="#cf6b4a"/><rect x="70" y="188" width="24" height="24" fill="#e0c341"/><rect x="94" y="188" width="24" height="24" fill="#e0c341"/><rect x="238" y="188" width="24" height="24" fill="#a87fc0"/><rect x="262" y="188" width="24" height="24" fill="#a87fc0"/><rect x="286" y="188" width="24" height="24" fill="#cf6b4a"/><rect x="70" y="212" width="24" height="24" fill="#8fbf6a"/><rect x="94" y="212" width="24" height="24" fill="#8fbf6a"/><rect x="118" y="212" width="24" height="24" fill="#8fbf6a"/><rect x="238" y="212" width="24" height="24" fill="#a87fc0"/><rect x="262" y="212" width="24" height="24" fill="#d8912a"/><rect x="286" y="212" width="24" height="24" fill="#d8912a"/><rect x="142" y="44" width="24" height="24" fill="#7fb5e0"/><rect x="166" y="44" width="24" height="24" fill="#7fb5e0"/><rect x="190" y="44" width="24" height="24" fill="#7fb5e0"/><rect x="214" y="44" width="24" height="24" fill="#7fb5e0"/>
+          <g fill="none" stroke="#171410" stroke-width="2"><rect x="262" y="140" width="24" height="24"/><rect x="70" y="164" width="24" height="24"/><rect x="262" y="164" width="24" height="24"/><rect x="286" y="164" width="24" height="24"/><rect x="70" y="188" width="24" height="24"/><rect x="94" y="188" width="24" height="24"/><rect x="238" y="188" width="24" height="24"/><rect x="262" y="188" width="24" height="24"/><rect x="286" y="188" width="24" height="24"/><rect x="70" y="212" width="24" height="24"/><rect x="94" y="212" width="24" height="24"/><rect x="118" y="212" width="24" height="24"/><rect x="238" y="212" width="24" height="24"/><rect x="262" y="212" width="24" height="24"/><rect x="286" y="212" width="24" height="24"/><rect x="142" y="44" width="24" height="24"/><rect x="166" y="44" width="24" height="24"/><rect x="190" y="44" width="24" height="24"/><rect x="214" y="44" width="24" height="24"/></g>
         </g>
-        <!-- loose pieces, laid beside the well like components in a tray -->
-        <g class="art-loose">
-          <g transform="translate(38 40)">
-            <rect x="0" y="0" width="24" height="24" fill="#8fbf6a"/><rect x="24" y="0" width="24" height="24" fill="#8fbf6a"/>
-            <rect x="24" y="24" width="24" height="24" fill="#8fbf6a"/><rect x="48" y="24" width="24" height="24" fill="#8fbf6a"/>
-            <g fill="none" stroke="#171410" stroke-width="2"><rect x="0" y="0" width="24" height="24"/><rect x="24" y="0" width="24" height="24"/><rect x="24" y="24" width="24" height="24"/><rect x="48" y="24" width="24" height="24"/></g>
-          </g>
-          <g transform="translate(38 118)">
-            <rect x="0" y="0" width="24" height="24" fill="#e0c341"/><rect x="24" y="0" width="24" height="24" fill="#e0c341"/>
-            <rect x="0" y="24" width="24" height="24" fill="#e0c341"/><rect x="24" y="24" width="24" height="24" fill="#e0c341"/>
-            <g fill="none" stroke="#171410" stroke-width="2"><rect x="0" y="0" width="24" height="24"/><rect x="24" y="0" width="24" height="24"/><rect x="0" y="24" width="24" height="24"/><rect x="24" y="24" width="24" height="24"/></g>
-          </g>
-          <g transform="translate(38 190)">
-            <rect x="0" y="0" width="24" height="24" fill="#a87fc0"/><rect x="24" y="0" width="24" height="24" fill="#a87fc0"/>
-            <rect x="48" y="0" width="24" height="24" fill="#a87fc0"/><rect x="24" y="24" width="24" height="24" fill="#a87fc0"/>
-            <g fill="none" stroke="#171410" stroke-width="2"><rect x="0" y="0" width="24" height="24"/><rect x="24" y="0" width="24" height="24"/><rect x="48" y="0" width="24" height="24"/><rect x="24" y="24" width="24" height="24"/></g>
-          </g>
+        <g fill="none" stroke="currentColor" stroke-width="2" opacity=".55">
+          <path d="M154 74V206M226 74V206" stroke-dasharray="5 6"/>
         </g>
-        <g class="art-caption art-caption--left">
-          <text x="272" y="52">WELL</text>
-          <text x="272" y="72">10 × 20</text>
-          <text x="272" y="162">PIECES</text>
-          <text x="272" y="182">7 SHAPES</text>
-          <path d="M272 32h68M272 142h68" stroke="currentColor" stroke-width="1.5"/>
-        </g>
+        <rect x="142" y="212" width="96" height="24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-dasharray="6 5"/>
+        <rect x="70" y="20" width="240" height="216" fill="none" stroke="currentColor" stroke-width="2.5"/>
       </svg>
       <span class="board__no">No.&nbsp;01</span>
     </span>
@@ -108,11 +68,6 @@
           <g transform="translate(70 122)"><rect width="39" height="39" fill="#c2652a"/><rect width="39" height="39" fill="none" stroke="#171410" stroke-width="2"/><text x="19.5" y="26" class="sm">32</text></g>
           <g transform="translate(117 169)"><rect width="39" height="39" fill="#b13f1f"/><rect width="39" height="39" fill="none" stroke="#171410" stroke-width="2"/><text x="19.5" y="26" class="sm rev">64</text></g>
           <g transform="translate(164 169)"><rect width="39" height="39" fill="#8f2e18"/><rect width="39" height="39" fill="none" stroke="#171410" stroke-width="2"/><text x="19.5" y="26" class="sm rev">128</text></g>
-        </g>
-        <g class="art-caption">
-          <text x="30" y="120" text-anchor="start">JOIN</text>
-          <text x="30" y="140" text-anchor="start">EQUALS</text>
-          <path d="M30 148h30" stroke="currentColor" stroke-width="1.5"/>
         </g>
         <g class="arrows" stroke="currentColor" stroke-width="2.5" fill="none" stroke-linecap="square">
           <path d="M272 104h26m-9-9 9 9-9 9"/>
@@ -160,39 +115,9 @@
   <!-- ── NO. 04 ─────────────────────────────────────────────── -->
   <a class="board board--math" href="games/math-puzzles/index.html">
     <span class="board__field">
-      <svg class="board__art" viewBox="0 0 320 250" role="img" aria-label="Three printed puzzle emblems: number tiles making 24, a caged grid, and a number pyramid">
-        <!-- make 24 -->
-        <g transform="translate(10 24)">
-          <g class="pz-tile">
-            <rect x="0" y="0" width="42" height="42"/><rect x="48" y="0" width="42" height="42"/>
-            <rect x="0" y="48" width="42" height="42"/><rect x="48" y="48" width="42" height="42"/>
-          </g>
-          <g class="pz-num"><text x="21" y="30">8</text><text x="69" y="30">3</text><text x="21" y="78">8</text><text x="69" y="78">3</text></g>
-          <text class="pz-eq" x="45" y="122">= 24</text>
-        </g>
-        <!-- calcudoku -->
-        <g transform="translate(115 24)">
-          <rect x="0" y="0" width="90" height="90" class="ink-fill-8"/>
-          <g class="ink-line-15" stroke-width="1.2"><path d="M22.5 0v90M45 0v90M67.5 0v90M0 22.5h90M0 45h90M0 67.5h90"/></g>
-          <g class="pz-cage" fill="none" stroke-width="2.5" stroke-dasharray="5 3.5">
-            <path d="M3 3h42v19.5H25V45H3z"/><path d="M48 3h39v42H48z"/><path d="M3 48h19.5v39H3z"/>
-          </g>
-          <g class="pz-clue"><text x="5" y="13">12×</text><text x="50" y="13">3−</text><text x="5" y="58">7+</text></g>
-          <rect x="0" y="0" width="90" height="90" fill="none" stroke="currentColor" stroke-width="2.5"/>
-          <text class="pz-eq" x="45" y="122">4 × 4</text>
-        </g>
-        <!-- pyramid -->
-        <g transform="translate(215 24)">
-          <g class="pz-tile">
-            <rect x="30" y="0" width="36" height="24"/>
-            <rect x="11" y="30" width="36" height="24"/><rect x="49" y="30" width="36" height="24"/>
-            <rect x="-8" y="60" width="36" height="24"/><rect x="30" y="60" width="36" height="24"/><rect x="68" y="60" width="36" height="24"/>
-          </g>
-          <g class="pz-num sm"><text x="48" y="17">34</text><text x="29" y="47">15</text><text x="67" y="47">19</text><text x="10" y="77">7</text><text x="48" y="77">8</text><text x="86" y="77">11</text></g>
-          <text class="pz-eq" x="48" y="122">SUM UP</text>
-        </g>
-        <path d="M28 168h264" stroke="currentColor" stroke-width="1.5"/>
-        <g class="art-caption"><text x="160" y="196" text-anchor="middle">THREE PUZZLES · ONE BOARD</text></g>
+      <svg class="board__art" viewBox="0 0 320 250" role="img" aria-label="A printed number pyramid: stacked cells narrowing to a single cell at the top, a few of them already filled in">
+        <g fill="currentColor"><rect x="137" y="30" width="46" height="38"/><rect x="45" y="182" width="46" height="38"/><rect x="137" y="182" width="46" height="38"/><rect x="229" y="182" width="46" height="38"/></g>
+        <g fill="none" stroke="currentColor" stroke-width="4"><rect x="114" y="68" width="46" height="38"/><rect x="160" y="68" width="46" height="38"/><rect x="91" y="106" width="46" height="38"/><rect x="137" y="106" width="46" height="38"/><rect x="183" y="106" width="46" height="38"/><rect x="68" y="144" width="46" height="38"/><rect x="114" y="144" width="46" height="38"/><rect x="160" y="144" width="46" height="38"/><rect x="206" y="144" width="46" height="38"/><rect x="91" y="182" width="46" height="38"/><rect x="183" y="182" width="46" height="38"/></g>
       </svg>
       <span class="board__no">No.&nbsp;04</span>
     </span>
@@ -235,10 +160,6 @@
         <g class="flag" transform="translate(330 96)">
           <path d="M0 0v58" stroke-width="4" stroke-linecap="round" fill="none"/>
           <path d="M2 2h34l-9 12 9 12H2z"/>
-        </g>
-        <g class="art-caption">
-          <text x="90" y="30">LEVEL 1 OF 5</text>
-          <path d="M60 38h72" stroke="currentColor" stroke-width="1.5"/>
         </g>
       </svg>
       <span class="board__no">No.&nbsp;05</span>
@@ -283,110 +204,15 @@
 
   <a class="board board--ink" href="games/nonogram/index.html">
     <span class="board__field">
-      <svg class="board__art" viewBox="0 0 380 250" role="img" aria-label="A printed logic plate half-worked: run-length numbers ruled in the gutters, squares inked or crossed off">
-        <rect x="24" y="18" width="240" height="214" fill="#e6dcc4"/>
-        <rect x="24" y="18" width="240" height="214" fill="none" stroke="#171410" stroke-width="2.5"/>
-        <g fill="#171410">
-          <rect x="156" y="56" width="15" height="15"/>
-          <rect x="171" y="56" width="15" height="15"/>
-          <rect x="156" y="71" width="15" height="15"/>
-          <rect x="171" y="71" width="15" height="15"/>
-          <rect x="96" y="86" width="15" height="15"/>
-          <rect x="156" y="86" width="15" height="15"/>
-          <rect x="171" y="86" width="15" height="15"/>
-          <rect x="231" y="86" width="15" height="15"/>
-          <rect x="96" y="101" width="15" height="15"/>
-          <rect x="156" y="101" width="15" height="15"/>
-          <rect x="171" y="101" width="15" height="15"/>
-          <rect x="231" y="101" width="15" height="15"/>
-          <rect x="96" y="116" width="15" height="15"/>
-          <rect x="156" y="116" width="15" height="15"/>
-          <rect x="171" y="116" width="15" height="15"/>
-          <rect x="231" y="116" width="15" height="15"/>
-        </g>
-        <g fill="none" stroke="#171410" stroke-width="1" opacity=".38">
-          <path d="M96 56H246M96 56V206M96 71H246M111 56V206M96 86H246M126 56V206M96 101H246M141 56V206M96 116H246M156 56V206M96 131H246M171 56V206M96 146H246M186 56V206M96 161H246M201 56V206M96 176H246M216 56V206M96 191H246M231 56V206M96 206H246M246 56V206"/>
-        </g>
-        <g fill="none" stroke="#171410" stroke-width="2">
-          <path d="M96 56H246M96 56V206M96 131H246M171 56V206M96 206H246M246 56V206"/>
-        </g>
-        <g fill="none" stroke="#171410" stroke-width="2.2" stroke-linecap="square" opacity=".5">
-          <path d="M100 60L107 67M107 60L100 67"/>
-          <path d="M115 60L122 67M122 60L115 67"/>
-          <path d="M130 60L137 67M137 60L130 67"/>
-          <path d="M145 60L152 67M152 60L145 67"/>
-          <path d="M190 60L197 67M197 60L190 67"/>
-          <path d="M205 60L212 67M212 60L205 67"/>
-          <path d="M220 60L227 67M227 60L220 67"/>
-          <path d="M235 60L242 67M242 60L235 67"/>
-          <path d="M100 75L107 82M107 75L100 82"/>
-          <path d="M115 75L122 82M122 75L115 82"/>
-          <path d="M130 75L137 82M137 75L130 82"/>
-          <path d="M145 75L152 82M152 75L145 82"/>
-          <path d="M190 75L197 82M197 75L190 82"/>
-          <path d="M205 75L212 82M212 75L205 82"/>
-          <path d="M220 75L227 82M227 75L220 82"/>
-          <path d="M235 75L242 82M242 75L235 82"/>
-          <path d="M115 90L122 97M122 90L115 97"/>
-          <path d="M130 90L137 97M137 90L130 97"/>
-          <path d="M145 90L152 97M152 90L145 97"/>
-          <path d="M190 90L197 97M197 90L190 97"/>
-          <path d="M205 90L212 97M212 90L205 97"/>
-          <path d="M220 90L227 97M227 90L220 97"/>
-          <path d="M115 105L122 112M122 105L115 112"/>
-          <path d="M130 105L137 112M137 105L130 112"/>
-          <path d="M145 105L152 112M152 105L145 112"/>
-          <path d="M190 105L197 112M197 105L190 112"/>
-          <path d="M205 105L212 112M212 105L205 112"/>
-          <path d="M220 105L227 112M227 105L220 112"/>
-          <path d="M115 120L122 127M122 120L115 127"/>
-          <path d="M130 120L137 127M137 120L130 127"/>
-          <path d="M145 120L152 127M152 120L145 127"/>
-          <path d="M190 120L197 127M197 120L190 127"/>
-          <path d="M205 120L212 127M212 120L205 127"/>
-          <path d="M220 120L227 127M227 120L220 127"/>
-        </g>
-        <g fill="#171410">
-          <rect x="98" y="44" width="11" height="4"/>
-          <rect x="113" y="44" width="11" height="4"/>
-          <rect x="128" y="44" width="11" height="4"/>
-          <rect x="128" y="33" width="11" height="4"/>
-          <rect x="143" y="44" width="11" height="4"/>
-          <rect x="143" y="33" width="11" height="4"/>
-          <rect x="158" y="44" width="11" height="4"/>
-          <rect x="173" y="44" width="11" height="4"/>
-          <rect x="173" y="33" width="11" height="4"/>
-          <rect x="188" y="44" width="11" height="4"/>
-          <rect x="188" y="33" width="11" height="4"/>
-          <rect x="203" y="44" width="11" height="4"/>
-          <rect x="203" y="33" width="11" height="4"/>
-          <rect x="218" y="44" width="11" height="4"/>
-          <rect x="233" y="44" width="11" height="4"/>
-          <rect x="79" y="61" width="12" height="4"/>
-          <rect x="79" y="76" width="12" height="4"/>
-          <rect x="79" y="91" width="12" height="4"/>
-          <rect x="63" y="91" width="12" height="4"/>
-          <rect x="47" y="91" width="12" height="4"/>
-          <rect x="79" y="106" width="12" height="4"/>
-          <rect x="63" y="106" width="12" height="4"/>
-          <rect x="47" y="106" width="12" height="4"/>
-          <rect x="79" y="121" width="12" height="4"/>
-          <rect x="63" y="121" width="12" height="4"/>
-          <rect x="47" y="121" width="12" height="4"/>
-          <rect x="79" y="136" width="12" height="4"/>
-          <rect x="63" y="136" width="12" height="4"/>
-          <rect x="79" y="151" width="12" height="4"/>
-          <rect x="79" y="166" width="12" height="4"/>
-          <rect x="79" y="181" width="12" height="4"/>
-          <rect x="79" y="196" width="12" height="4"/>
-        </g>
-        <g class="art-caption art-caption--left">
-          <text x="292" y="52">PLATES</text>
-          <text x="292" y="72">40 IN ALL</text>
-          <text x="292" y="162">GUESSING</text>
-          <text x="292" y="182">NEVER</text>
-          <path d="M292 32h60M292 142h60" stroke="currentColor" stroke-width="1.5"/>
-        </g>
+      <svg class="board__art" viewBox="0 0 380 250" role="img" aria-label="A printed logic plate: run-length marks ruled down the two gutters, and the inked squares resolving into a mushroom">
+        <rect x="64" y="9" width="252" height="233" fill="#e6dcc4"/>
+        <rect x="64" y="9" width="252" height="233" fill="none" stroke="#171410" stroke-width="2.5"/>
+        <g fill="#171410"><rect x="112" y="69.5" width="20" height="5"/><rect x="92" y="85.5" width="40" height="5"/><rect x="82" y="101.5" width="50" height="5"/><rect x="82" y="117.5" width="50" height="5"/><rect x="102" y="133.5" width="30" height="5"/><rect x="122" y="149.5" width="10" height="5"/><rect x="122" y="165.5" width="10" height="5"/><rect x="122" y="181.5" width="10" height="5"/><rect x="112" y="197.5" width="20" height="5"/><rect x="143.5" y="51.2" width="5" height="6.8"/><rect x="159.5" y="47.8" width="5" height="10.2"/><rect x="175.5" y="44.4" width="5" height="13.6"/><rect x="191.5" y="54.6" width="5" height="3.4"/><rect x="191.5" y="33.6" width="5" height="17"/><rect x="207.5" y="27.4" width="5" height="30.6"/><rect x="223.5" y="27.4" width="5" height="30.6"/><rect x="239.5" y="54.6" width="5" height="3.4"/><rect x="239.5" y="33.6" width="5" height="17"/><rect x="255.5" y="44.4" width="5" height="13.6"/><rect x="271.5" y="47.8" width="5" height="10.2"/><rect x="287.5" y="51.2" width="5" height="6.8"/></g>
+        <g fill="#171410"><rect x="186" y="64" width="16" height="16"/><rect x="202" y="64" width="16" height="16"/><rect x="218" y="64" width="16" height="16"/><rect x="234" y="64" width="16" height="16"/><rect x="154" y="80" width="16" height="16"/><rect x="170" y="80" width="16" height="16"/><rect x="186" y="80" width="16" height="16"/><rect x="202" y="80" width="16" height="16"/><rect x="218" y="80" width="16" height="16"/><rect x="234" y="80" width="16" height="16"/><rect x="250" y="80" width="16" height="16"/><rect x="266" y="80" width="16" height="16"/><rect x="138" y="96" width="16" height="16"/><rect x="154" y="96" width="16" height="16"/><rect x="170" y="96" width="16" height="16"/><rect x="186" y="96" width="16" height="16"/><rect x="202" y="96" width="16" height="16"/><rect x="218" y="96" width="16" height="16"/><rect x="234" y="96" width="16" height="16"/><rect x="250" y="96" width="16" height="16"/><rect x="266" y="96" width="16" height="16"/><rect x="282" y="96" width="16" height="16"/><rect x="138" y="112" width="16" height="16"/><rect x="154" y="112" width="16" height="16"/><rect x="170" y="112" width="16" height="16"/><rect x="186" y="112" width="16" height="16"/><rect x="202" y="112" width="16" height="16"/><rect x="218" y="112" width="16" height="16"/><rect x="234" y="112" width="16" height="16"/><rect x="250" y="112" width="16" height="16"/><rect x="266" y="112" width="16" height="16"/><rect x="282" y="112" width="16" height="16"/><rect x="170" y="128" width="16" height="16"/><rect x="186" y="128" width="16" height="16"/><rect x="202" y="128" width="16" height="16"/><rect x="218" y="128" width="16" height="16"/><rect x="234" y="128" width="16" height="16"/><rect x="250" y="128" width="16" height="16"/><rect x="202" y="144" width="16" height="16"/><rect x="218" y="144" width="16" height="16"/><rect x="202" y="160" width="16" height="16"/><rect x="218" y="160" width="16" height="16"/><rect x="202" y="176" width="16" height="16"/><rect x="218" y="176" width="16" height="16"/><rect x="186" y="192" width="16" height="16"/><rect x="202" y="192" width="16" height="16"/><rect x="218" y="192" width="16" height="16"/><rect x="234" y="192" width="16" height="16"/></g>
+        <path d="M142 68l8 8M150 68l-8 8M158 68l8 8M166 68l-8 8M270 68l8 8M278 68l-8 8M286 68l8 8M294 68l-8 8M142 84l8 8M150 84l-8 8M286 84l8 8M294 84l-8 8M142 196l8 8M150 196l-8 8M286 196l8 8M294 196l-8 8" fill="none" stroke="#171410" stroke-width="2" opacity=".45"/>
+        <path d="M138 80h160M154 64v160M138 96h160M170 64v160M138 112h160M186 64v160M138 128h160M202 64v160M138 160h160M234 64v160M138 176h160M250 64v160M138 192h160M266 64v160M138 208h160M282 64v160" fill="none" stroke="#171410" stroke-width="1" opacity=".38"/>
+        <path d="M138 144h160M218 64v160" fill="none" stroke="#171410" stroke-width="2"/>
+        <rect x="138" y="64" width="160" height="160" fill="none" stroke="#171410" stroke-width="2.5"/>
       </svg>
       <span class="board__no">No.&nbsp;07</span>
     </span>

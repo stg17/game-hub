@@ -307,6 +307,8 @@ Recurring silhouettes:
 
 All iconography is inline SVG drawn from these same primitives with `currentColor` strokes. There are no icon fonts, no emoji, and no raster assets anywhere in the build.
 
+**Board art carries no words.** A board’s drawing is a picture of the game — its pieces, its grid, its shapes — and never a caption, label or spec block set inside the SVG. The foot strip under the field already prints the title, the rule line and the spec, so a caption inside the art repeats it in worse type. Digits appear only where they are the object being drawn (2048’s tile values), never as a label.
+
 ## Components
 
 ### Buttons

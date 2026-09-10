@@ -300,17 +300,6 @@ html { scrollbar-color: var(--tray) var(--table-deep); }
 .ink-fill-8  { fill: var(--ink-08); }
 .ink-line-15 { stroke: currentColor; opacity: .28; fill: none; }
 
-.art-caption text {
-  font-size: 11px;
-  font-weight: 700;
-  letter-spacing: .16em;
-  fill: currentColor;
-  text-transform: uppercase;
-  text-anchor: middle;
-  font-family: Slab, Georgia, serif;
-}
-.art-caption--left text { text-anchor: start; }
-
 .tiles text {
   font: 700 19px/1 Slab, Georgia, serif;
   fill: var(--ink);
@@ -329,13 +318,6 @@ html { scrollbar-color: var(--tray) var(--table-deep); }
    the sheet is reporting, not a control. */
 .mark-clause { stroke: #e8c25a; }
 .mark-clause-lit { fill: #e8c25a; }
-
-.pz-tile rect { fill: var(--paper); stroke: var(--ink); stroke-width: 2.5; }
-.pz-num text { font: 700 21px/1 Slab, Georgia, serif; fill: var(--ink); text-anchor: middle; font-variant-numeric: tabular-nums; }
-.pz-num.sm text { font-size: 16px; }
-.pz-eq { font: 700 12.5px/1 Slab, Georgia, serif; fill: currentColor; text-anchor: middle; letter-spacing: .14em; }
-.pz-cage { stroke: #e8c25a; }
-.pz-clue text { font: 700 10px/1 Slab, Georgia, serif; fill: currentColor; }
 
 .pf rect { fill: #2e7d3a; stroke: var(--ink); stroke-width: 2.5; }
 .runner  { fill: var(--ink); stroke: var(--ink); }
