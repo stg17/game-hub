@@ -37,9 +37,9 @@
 
     <div class="stage">
       <canvas id="board" width="300" height="600"></canvas>
-      <div class="overlay" id="overlay">
-        <h2 id="overlayTitle">Tetris</h2>
-        <p id="overlayText">Press Enter to start</p>
+      <div class="overlay" id="overlay" hidden>
+        <h2 id="overlayTitle"></h2>
+        <p id="overlayText"></p>
       </div>
     </div>
 
@@ -75,7 +75,7 @@
       <div><dt>Z / Ctrl</dt><dd>Turn anticlockwise</dd></div>
       <div><dt>C / Shift</dt><dd>Set the piece aside &mdash; once per piece</dd></div>
       <div><dt>Esc / P</dt><dd>Pause</dd></div>
-      <div><dt>Enter</dt><dd>Start, or start over</dd></div>
+      <div><dt>Enter</dt><dd>Start over</dd></div>
     </dl>
     <p class="help-note">
       Scoring follows the standard guideline: 100 / 300 / 500 / 800 for one to four lines,

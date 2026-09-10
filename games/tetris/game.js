@@ -29,8 +29,9 @@
   var pauseBtn = document.getElementById('pauseBtn');
   var soundBtn = document.getElementById('soundBtn');
 
-  // 'READY' | 'PLAYING' | 'PAUSED' | 'OVER'
-  var state = 'READY';
+  // 'PLAYING' | 'PAUSED' | 'OVER' — the well deals a piece the moment the
+  // page opens, so there is no idle state to sit in.
+  var state = 'PLAYING';
   var grid = Board.create();
   var bag = Tetromino.bag();
   var piece = null;
@@ -55,6 +56,7 @@
   var heldDir = 0;
   var dasTimer = 0;
   var softDropping = false;
+  var audioWoken = false;
 
   function loadBest() {
     try {
@@ -242,7 +244,6 @@
     heldDir = 0;
     softDropping = false;
     state = 'PLAYING';
-    Sfx.init();
     hideOverlay();
     spawnPiece();
     syncPanel();
@@ -263,6 +264,14 @@
     syncPanel();
   }
 
+  // The AudioContext cannot be built before a gesture, and the game now deals
+  // its first piece on load, so the wake-up waits for the first key or click.
+  function wakeAudio() {
+    if (audioWoken) return;
+    audioWoken = true;
+    Sfx.init();
+  }
+
   function showOverlay(title, text) {
     overlayTitleEl.textContent = title;
     overlayTextEl.textContent = text;
@@ -279,7 +288,7 @@
     linesEl.textContent = lines;
     levelEl.textContent = level;
     pauseBtn.textContent = state === 'PAUSED' ? 'Resume' : 'Pause';
-    pauseBtn.disabled = state === 'READY' || state === 'OVER';
+    pauseBtn.disabled = state === 'OVER';
   }
 
   function update(dt) {
@@ -339,7 +348,7 @@
       }
     }
     Render.playfield(boardCtx, view);
-    Render.preview(nextCtx, state === 'READY' ? [] : bag.peek(NEXT_COUNT));
+    Render.preview(nextCtx, bag.peek(NEXT_COUNT));
     Render.hold(holdCtx, holdType, holdUsed);
   }
 
@@ -363,8 +372,9 @@
   window.addEventListener('keydown', function (e) {
     var key = e.key;
     if (SCROLL_KEYS.indexOf(key) !== -1 || key === ' ') e.preventDefault();
+    wakeAudio();
 
-    if (state === 'READY' || state === 'OVER') {
+    if (state === 'OVER') {
       if (key === 'Enter') startGame();
       return;
     }
@@ -434,10 +444,12 @@
   });
 
   newGameBtn.addEventListener('click', function () {
+    wakeAudio();
     startGame();
   });
 
   pauseBtn.addEventListener('click', function () {
+    wakeAudio();
     togglePause();
   });
 
@@ -445,11 +457,10 @@
     var muted = Sfx.setMuted(!Sfx.isMuted());
     soundBtn.textContent = muted ? 'Sound: Off' : 'Sound: On';
     soundBtn.setAttribute('aria-pressed', muted ? 'false' : 'true');
-    if (!muted) Sfx.init();
+    if (!muted) wakeAudio();
   });
 
-  showOverlay('Tetris', 'Press Enter to start');
-  syncPanel();
+  startGame();
   requestAnimationFrame(function (t) {
     lastTime = t;
     requestAnimationFrame(frame);
