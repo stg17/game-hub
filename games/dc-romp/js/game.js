@@ -108,8 +108,8 @@
     }
   }
 
-  function updatePlaying(dt) {
-    if (Input.wasPressed('Escape') || Input.wasPressed('p') || Input.wasPressed('P')) {
+  function updatePlaying(dt, clickedId) {
+    if (clickedId === 'hud-pause' || Input.wasPressed('Escape') || Input.wasPressed('p') || Input.wasPressed('P')) {
       Game.state = 'PAUSED';
       Game.pauseIndex = 0;
       return;
@@ -236,7 +236,7 @@
       case 'MENU': updateMenu(clickedId); break;
       case 'HOWTO': updateHowTo(clickedId); break;
       case 'LEVEL_SELECT': updateLevelSelect(clickedId); break;
-      case 'PLAYING': updatePlaying(dt); break;
+      case 'PLAYING': updatePlaying(dt, clickedId); break;
       case 'PAUSED': updatePaused(clickedId); break;
       case 'LEVEL_COMPLETE': updateLevelComplete(clickedId); break;
       case 'GAME_OVER': updateGameOver(clickedId); break;
@@ -251,7 +251,7 @@
       case 'MENU': Game.UI.drawMenu(ctx, Game.menuIndex); break;
       case 'HOWTO': Game.UI.drawHowTo(ctx); break;
       case 'LEVEL_SELECT': Game.UI.drawLevelSelect(ctx, Game.unlockedLevel, Game.levelSelectIndex, Game.LEVEL_COUNT); break;
-      case 'PLAYING': renderWorld(ctx); Game.UI.drawHUD(ctx, Game.LEVEL_COUNT); break;
+      case 'PLAYING': renderWorld(ctx); Game.UI.drawHUD(ctx, Game.LEVEL_COUNT, true); break;
       case 'PAUSED': renderWorld(ctx); Game.UI.drawHUD(ctx, Game.LEVEL_COUNT); Game.UI.drawPauseOverlay(ctx, Game.pauseIndex); break;
       case 'LEVEL_COMPLETE': renderWorld(ctx); Game.UI.drawHUD(ctx, Game.LEVEL_COUNT); Game.UI.drawLevelComplete(ctx); break;
       case 'GAME_OVER': renderWorld(ctx); Game.UI.drawGameOver(ctx); break;

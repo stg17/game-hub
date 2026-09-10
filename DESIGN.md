@@ -350,7 +350,7 @@ Every surface in the box carries its number. `hub.js` numbers the boards from th
 - **Do** duplicate `type.css` and the `:root` token block into each new game folder. Per-folder independence is a product constraint, and Chrome cannot fetch `@font-face` files over `file://`, so the fonts must stay base64 data URIs.
 - **Do** keep every numeral in Slab 700 with `font-variant-numeric: tabular-nums`.
 - **Do** draw texture with hard-stop repeating rules — the 1px baize weave, the 9px die-cut hatch — and nothing softer.
-- **Do** mirror the CSS vocabulary on canvas through `Game.UI.plate/sheet/regMark/setStamp/button/tracked` and `Render.block`'s flat cut lip.
+- **Do** mirror the CSS vocabulary on canvas through `Game.UI.plate/sheet/regMark/setStamp/button/hudButton/tracked` and `Render.block`'s flat cut lip.
 - **Do** treat an empty or unplayed state as printed content: the numbered open slot, the "No score set yet" strip.
 
 ### Don't:

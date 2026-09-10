@@ -162,6 +162,25 @@ Game.UI = (function () {
     return hovered;
   }
 
+  // A compact printed control for the HUD rail: the menu chip without its lamp
+  // gutter, since nothing on the HUD is keyboard-selected — the mouse is the
+  // only thing that can be on it.
+  function hudButton(ctx, x, y, w, h, label, id) {
+    var hovered = isHovered(x, y, w, h);
+    if (hovered) {
+      plate(ctx, x + 2, y + 2, w, h, RED, 3);
+    } else {
+      plate(ctx, x, y, w, h, PAPER, 4);
+    }
+    ctx.save();
+    ctx.font = slab(12, true);
+    ctx.fillStyle = hovered ? PAPER : INK;
+    ctx.textBaseline = 'middle';
+    tracked(ctx, label.toUpperCase(), x + w / 2 + (hovered ? 2 : 0), y + h / 2 + 1 + (hovered ? 2 : 0), 1.6);
+    ctx.restore();
+    registerHit(x, y, w, h, id);
+  }
+
   // The stamped set number every surface in the box carries.
   function setStamp(ctx, x, y, text) {
     ctx.save();
@@ -308,9 +327,14 @@ Game.UI = (function () {
     button(ctx, W / 2 - 92, 428, 184, 40, 'Back', false, 'levelselect-back');
   }
 
-  function drawHUD(ctx, levelCount) {
+  function drawHUD(ctx, levelCount, showPause) {
     // score plate, top left
     plate(ctx, 14, 14, 158, 40, PAPER, 4);
+
+    // Pause, on the same rail as the score — the mouse's way to the pause menu,
+    // which Escape and P already reach. Only while the level is actually
+    // running: under the pause sheet it would be a control you cannot press.
+    if (showPause) hudButton(ctx, 182, 14, 92, 40, 'Pause', 'hud-pause');
 
     ctx.save();
     ctx.textBaseline = 'middle';
