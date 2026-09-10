@@ -394,11 +394,15 @@
     boot.appendChild(skip);
     document.body.appendChild(boot);
 
-    /* Unseated, not gone: raised just enough to break the seal and tilted the
-       way a lid skews when it is picked up. Level at both ends of the flight
-       and only ever tilted in between, so nothing on the finished page sits
-       askew. */
-    var lifted = 'translateY(' + -Math.round(startH * 0.05) + 'px) rotate(-1.6deg)';
+    /* Lifted off, and properly: the cover hides the whole face now, so a
+       polite nudge leaves nothing but a sliver of tray showing. It swings up
+       and skews the way a lid does when you take it off with one hand, far
+       enough to uncover most of the box. Running off the top of the screen on
+       the way is fine — that is where a lid goes.
+
+       Level at both ends of the flight and only ever tilted in between, so
+       nothing on the finished page sits askew. */
+    var lifted = 'translateY(' + -Math.round(startH * 0.42) + 'px) rotate(-8.5deg)';
 
     /* Read at every keyframe; the shape of the cover at rest is the plate. */
     function geom(l, t, w, h, transform, offset, easing) {
@@ -418,14 +422,16 @@
 
     var span = { duration: TOTAL, fill: 'both' };
 
-    /* The cloth goes while the lid is still over the box, so that the moment
-       the cover starts shrinking there is a full tray underneath it. The
-       cover now hides the whole face, so this fade is not the reveal any
-       more — the shrink is. */
+    /* The cloth goes early, while the box is still shut and the cover hides
+       every pixel of it — so the fade itself is never seen, and the tray is
+       already full by the time the lid moves. That ordering is the whole
+       point: lifting the cover has to reveal the games, not reveal an empty
+       box that fills in a second later. It must finish before CLOSED_UNTIL,
+       when the lift begins. */
     play(cloth, [
       { opacity: 1, offset: 0 },
-      { opacity: 1, offset: at(LIFTED_AT), easing: 'linear' },
-      { opacity: 0, offset: at(FLY_FROM) },
+      { opacity: 1, offset: at(250), easing: 'linear' },
+      { opacity: 0, offset: at(850) },
       { opacity: 0, offset: 1 }
     ], span);
 
