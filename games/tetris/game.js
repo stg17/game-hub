@@ -3,9 +3,12 @@
 (function () {
   var STORAGE_KEY = 'tetris_best_v1';
 
-  var LOCK_DELAY = 0.5;        // seconds a grounded piece waits before locking
+  // Short enough that a landing reads as instant, long enough that a slide or
+  // rotate you are already making still lands. A deliberate late adjustment
+  // does not, which is the trade.
+  var LOCK_DELAY = 0.15;       // seconds a grounded piece waits before locking
   var MAX_LOCK_RESETS = 15;    // cap on move/rotate lock-delay resets per piece
-  var CLEAR_FLASH = 0.3;       // seconds the completed rows flash before collapsing
+  var CLEAR_FLASH = 0.18;      // seconds the afterimage of a cleared line fades over
   var SOFT_DROP_INTERVAL = 0.03;
   var DAS_DELAY = 0.16;        // hold-to-repeat: initial pause
   var DAS_REPEAT = 0.04;       // hold-to-repeat: cadence after that
@@ -26,7 +29,7 @@
   var pauseBtn = document.getElementById('pauseBtn');
   var soundBtn = document.getElementById('soundBtn');
 
-  // 'READY' | 'PLAYING' | 'PAUSED' | 'CLEARING' | 'OVER'
+  // 'READY' | 'PLAYING' | 'PAUSED' | 'OVER'
   var state = 'READY';
   var grid = Board.create();
   var bag = Tetromino.bag();
@@ -44,9 +47,8 @@
   var lockTimer = 0;
   var lockResets = 0;
   var grounded = false;
-  var clearingRows = [];
-  var clearTimer = 0;
-  var flashTimer = 0;
+  var flashRows = [];
+  var flashLeft = 0;
 
   var leftDown = false;
   var rightDown = false;
@@ -157,12 +159,23 @@
       lines += result.full.length;
       level = Math.floor(lines / 10) + 1;
 
-      clearingRows = result.full;
-      clearTimer = CLEAR_FLASH;
-      flashTimer = 0;
-      state = 'CLEARING';
+      // Collapse the rows and spawn the next piece on this same frame. A
+      // clear used to park the game in a CLEARING state for CLEAR_FLASH
+      // seconds, which is the one place the board ever stopped answering —
+      // now it costs exactly what a landing that clears nothing costs, which
+      // is nothing. What is left of the flash is an afterimage the renderer
+      // fades over a board that has already moved on; `flashLeft` is only
+      // ever read by `draw`, and nothing waits on it.
+      Board.clearRows(grid, result.full);
+      flashRows = result.full;
+      flashLeft = CLEAR_FLASH;
       Sfx.clear(result.full.length);
       if (level > previousLevel) Sfx.levelUp();
+      // Top-out is not checked here for the same reason it never was: the
+      // rows that just went may well have taken the offending cells with
+      // them, so the honest test is whether the next piece fits, which
+      // spawnPiece does.
+      spawnPiece();
       syncPanel();
       return;
     }
@@ -175,14 +188,6 @@
       gameOver();
       return;
     }
-    spawnPiece();
-    syncPanel();
-  }
-
-  function finishClear() {
-    Board.clearRows(grid, clearingRows);
-    clearingRows = [];
-    state = 'PLAYING';
     spawnPiece();
     syncPanel();
   }
@@ -226,7 +231,8 @@
     lines = 0;
     level = 1;
     combo = -1;
-    clearingRows = [];
+    flashRows = [];
+    flashLeft = 0;
     gravityTimer = 0;
     lockTimer = 0;
     lockResets = 0;
@@ -243,7 +249,7 @@
   }
 
   function togglePause() {
-    if (state === 'PLAYING' || state === 'CLEARING') {
+    if (state === 'PLAYING') {
       state = 'PAUSED';
       heldDir = 0;
       leftDown = false;
@@ -251,9 +257,7 @@
       softDropping = false;
       showOverlay('Paused', 'Press Escape or P to resume');
     } else if (state === 'PAUSED') {
-      // A pause during the line-clear flash resumes back into it, not into a
-      // PLAYING state with no piece.
-      state = piece ? 'PLAYING' : 'CLEARING';
+      state = 'PLAYING';
       hideOverlay();
     }
     syncPanel();
@@ -279,13 +283,10 @@
   }
 
   function update(dt) {
-    if (state === 'CLEARING') {
-      flashTimer += dt;
-      clearTimer -= dt;
-      if (clearTimer <= 0) finishClear();
-      return;
-    }
     if (state !== 'PLAYING' || !piece) return;
+    /* Purely cosmetic, and deliberately ticked here rather than in draw() so a
+       paused game does not quietly burn the fade off behind the overlay. */
+    if (flashLeft > 0) flashLeft = Math.max(0, flashLeft - dt);
 
     if (heldDir !== 0) {
       dasTimer -= dt;
@@ -326,10 +327,9 @@
       grid: grid,
       piece: null,
       ghost: null,
-      clearingRows: clearingRows,
-      flashOn: Math.floor(flashTimer * 22) % 2 === 0,
+      flash: flashLeft > 0 ? { rows: flashRows, alpha: flashLeft / CLEAR_FLASH } : null,
     };
-    if (piece && state !== 'CLEARING') {
+    if (piece) {
       view.piece = piece;
       if (state === 'PLAYING') {
         var dist = Board.dropDistance(grid, piece);

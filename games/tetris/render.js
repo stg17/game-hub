@@ -75,26 +75,18 @@ var Render = (function () {
     ctx.restore();
   }
 
-  // view: {grid, piece, ghost, clearingRows, flashOn}
+  // view: {grid, piece, ghost, flash}
   function playfield(ctx, view) {
     var w = ctx.canvas.width;
     var h = ctx.canvas.height;
     ctx.clearRect(0, 0, w, h);
     gridLines(ctx, w, h);
 
-    var clearing = view.clearingRows || [];
     for (var r = 0; r < Board.ROWS; r++) {
-      var isClearing = clearing.indexOf(r) !== -1;
       for (var c = 0; c < Board.COLS; c++) {
         var type = view.grid[r][c];
         if (!type) continue;
-        if (isClearing && view.flashOn) {
-          block(ctx, c * CELL, r * CELL, CELL, '#e6dcc4', 1);
-        } else if (isClearing) {
-          block(ctx, c * CELL, r * CELL, CELL, Tetromino.colorOf(type), 0.55);
-        } else {
-          block(ctx, c * CELL, r * CELL, CELL, Tetromino.colorOf(type), 1);
-        }
+        block(ctx, c * CELL, r * CELL, CELL, Tetromino.colorOf(type), 1);
       }
     }
 
@@ -112,6 +104,21 @@ var Render = (function () {
         if (pcells[p].y < 0) continue;
         block(ctx, pcells[p].x * CELL, pcells[p].y * CELL, CELL, Tetromino.colorOf(view.piece.type), 1);
       }
+    }
+
+    /* The afterimage of a line that has already gone. By the time this draws,
+       the rows have collapsed and the next piece is already falling — the band
+       marks where the line was and fades, and it gates nothing. It goes on
+       last, over the piece, because it is light on the plate rather than
+       another thing printed on it. */
+    if (view.flash && view.flash.alpha > 0) {
+      ctx.save();
+      ctx.globalAlpha = Math.min(1, view.flash.alpha);
+      ctx.fillStyle = '#e6dcc4';
+      for (var f = 0; f < view.flash.rows.length; f++) {
+        ctx.fillRect(0, view.flash.rows[f] * CELL, w, CELL);
+      }
+      ctx.restore();
     }
   }
 
