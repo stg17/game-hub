@@ -123,13 +123,6 @@ h1 {
   color: var(--paper);
 }
 
-.tagline {
-  margin: 0 0 26px;
-  max-width: 60ch;
-  font-size: 15.5px;
-  color: rgba(230, 220, 196, .82);
-}
-
 /* ── the running head, once a puzzle is out ───────────────────────────── */
 
 .hud {
