@@ -89,7 +89,6 @@ html { scrollbar-color: var(--tray) var(--table-deep); }
   border: 3px solid var(--ink);
   box-shadow: inset 0 0 0 3px var(--table-deep), inset 0 0 0 6px #b98f3e;
   padding: clamp(20px, 3.4vw, 32px) clamp(24px, 4.4vw, 46px) clamp(18px, 2.8vw, 26px);
-  transform: rotate(-1.1deg);
 }
 
 .lid__word {
@@ -140,7 +139,9 @@ html { scrollbar-color: var(--tray) var(--table-deep); }
 .tray {
   display: grid;
   grid-template-columns: repeat(12, 1fr);
-  align-items: start;
+  /* Cards in a row share a height, so every top and every bottom lines up.
+     Widths still differ — that is the plan — but the row reads as one band. */
+  align-items: stretch;
   gap: var(--gap);
   max-width: 1320px;
   margin: 0 auto;
@@ -160,18 +161,21 @@ html { scrollbar-color: var(--tray) var(--table-deep); }
   color: var(--ink);
 }
 
-/* Width and height ceiling travel together. The ceiling is what keeps the
-   hierarchy the plan promises: a wide board reads large, a narrow one small,
-   whatever aspect its drawing happens to have. Without it a square emblem in
-   a narrow board grows taller than the Tetris well beside it. */
-.tray a.board:nth-of-type(3n + 1) { grid-column: span 5; --art-cap: 300px; }
-.tray a.board:nth-of-type(3n + 2) { grid-column: span 4; --art-cap: 268px; }
-.tray a.board:nth-of-type(3n + 3) { grid-column: span 3; --art-cap: 228px; }
+/* The tray is a hand-composed plan rather than a repeating cycle: each board
+   is given its width and its drawing ceiling on its own line, below, next to
+   its field colour. Rows add up to 12 and every row shares one height, so a
+   tall narrow board sits beside a wide short one with both edges level.
+   Adding a game means giving it a span there and re-checking the row sums. */
 
 /* the printed face of the board */
 .board__field {
   position: relative;
-  display: block;
+  /* Grows into the height the row hands down, with the drawing centred in
+     it rather than pinned to the top. */
+  flex: 1 1 auto;
+  display: flex;
+  align-items: center;
+  justify-content: center;
   background: var(--field);
   color: var(--on-field);
   border: 3px solid var(--ink);
@@ -287,13 +291,22 @@ html { scrollbar-color: var(--tray) var(--table-deep); }
 .board:focus-visible .board__field { outline: 3px solid var(--red-lit); outline-offset: 4px; }
 
 /* the fields, one per game */
-.board--tetris { --field: var(--f-tetris); --on-field: var(--paper); }
-.board--2048   { --field: var(--f-2048);   --on-field: var(--ink); }
-.board--ttt    { --field: var(--f-ttt);    --on-field: var(--paper); }
-.board--math   { --field: var(--f-math);   --on-field: var(--paper); }
-.board--romp   { --field: var(--f-romp);   --on-field: var(--ink); }
-.board--terms  { --field: var(--f-terms);  --on-field: var(--paper); }
-.board--ink    { --field: var(--f-ink);    --on-field: var(--paper); }
+/* colour, width and drawing ceiling, one line each. Row 1 is 3+6+3,
+   row 2 is 6+3+3, row 3 is 8 with the open slot closing it at 4. */
+.board--tetris { --field: var(--f-tetris); --on-field: var(--paper); grid-column: span 3; --art-cap: 250px; }
+.board--romp   { --field: var(--f-romp);   --on-field: var(--ink);   grid-column: span 6; --art-cap: 240px; }
+.board--terms  { --field: var(--f-terms);  --on-field: var(--paper); grid-column: span 3; --art-cap: 210px; }
+.board--math   { --field: var(--f-math);   --on-field: var(--paper); grid-column: span 5; --art-cap: 188px; }
+.board--2048   { --field: var(--f-2048);   --on-field: var(--ink);   grid-column: span 4; --art-cap: 200px; }
+.board--ttt    { --field: var(--f-ttt);    --on-field: var(--paper); grid-column: span 3; --art-cap: 178px; }
+.board--ink    { --field: var(--f-ink);    --on-field: var(--paper); grid-column: span 7; --art-cap: 300px; }
+
+/* 2048 is a perfect square. It takes its height from its own width rather
+   than from the row, which only works because it is the tallest thing in
+   its row and therefore sets that height for everyone else. align-self is
+   start so a stretched height can never win and squash the ratio — if the
+   row ever grows past it, the square survives and its foot sits high. */
+.board--2048 { aspect-ratio: 1; align-self: start; }
 
 /* ── drawn components inside the boards ──────────────────────────────── */
 
@@ -327,12 +340,10 @@ html { scrollbar-color: var(--tray) var(--table-deep); }
 
 /* ── the open space in the tray ──────────────────────────────────────── */
 
-/* The slot closes whatever the last row of boards left open. Because the board
-   widths cycle 5-4-3, how much is left depends only on where the last board
-   falls in that cycle, so the tray reads its own board count and sizes the
-   slot to match: 3 columns after a 5+4, 7 after a lone 5, the full width when
-   the last row came out even. A browser without :has() gets the full-width
-   well every time — wider than needed, never broken. */
+/* The slot closes the last row. The plan is composed by hand now, so its
+   width is stated rather than derived: Nonogram takes 7 of the last row and
+   the slot takes the 5 that are left. Move a board and this is the other
+   number to re-check. */
 .slot {
   grid-column: span 12;
   min-height: 246px;
@@ -368,8 +379,7 @@ html { scrollbar-color: var(--tray) var(--table-deep); }
 
 .slot__cut { width: 34px; height: 34px; color: rgba(230, 220, 196, .4); }
 
-.tray:has(a.board:last-of-type:nth-of-type(3n + 1)) .slot { grid-column: span 7; }
-.tray:has(a.board:last-of-type:nth-of-type(3n + 2)) .slot { grid-column: span 3; }
+.slot { grid-column: span 5; }
 
 /* ── colophon ─────────────────────────────────────────────────────────── */
 
@@ -473,10 +483,27 @@ html.booting .lid { opacity: 0; }
     repeating-linear-gradient(0deg,  var(--table-weft) 0 1px, transparent 1px 4px);
 }
 
-/* carries the flight from the middle of the table to the top-left corner;
-   the plate inside it keeps its own -1.1deg the whole way */
-.boot__cover { position: fixed; transform-origin: 0 0; }
-.boot__cover .lid__plate { width: 100%; height: 100%; }
+/* Carries the flight from the whole face of the closed box to the tag in the
+   top-left corner. The size is animated as width/height rather than as a
+   scale, so the 3px keyline and the gold rule stay printed weight at every
+   size instead of growing with the plate — a bigger lid, not a photograph of
+   a smaller one. The transform is left free for the tilt of the lift, so its
+   origin is the middle rather than the corner. */
+.boot__cover { position: fixed; transform-origin: 50% 50%; }
+.boot__cover .lid__plate {
+  width: 100%;
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+}
+
+/* The wordmark, wrapped so it can be scaled and centred independently of the
+   plate around it. At the resting size the plate is exactly its content plus
+   padding, so centring a fit-content block moves nothing and the scale is 1 —
+   which is what keeps the last frame identical to the resting page. */
+.boot__cover-mark { transform-origin: 50% 50%; }
 
 .boot__skip {
   position: fixed;
@@ -519,33 +546,26 @@ html.booting .lid { opacity: 0; }
 /* Two boards to a row, still unequal — 7 and 5, never a pair of matching
    halves. The slot keeps closing the row on its own. */
 @media (max-width: 1080px) {
-  .tray a.board:nth-of-type(3n + 1),
-  .tray a.board:nth-of-type(3n + 2),
-  .tray a.board:nth-of-type(3n + 3) { grid-column: span 5; --art-cap: 268px; }
-  .tray a.board:nth-of-type(2n + 1) { grid-column: span 7; --art-cap: 300px; }
+  /* the perfect square belongs to the composed wide plan only */
+  .board--2048 { aspect-ratio: auto; }
+  /* Two to a row, still unequal, and the pairs keep their character: the
+     tall one next to the wide one. */
+  .board--tetris { grid-column: span 5; --art-cap: 300px; }
+  .board--romp   { grid-column: span 7; --art-cap: 280px; }
+  .board--terms  { grid-column: span 5; --art-cap: 220px; }
+  .board--math   { grid-column: span 7; --art-cap: 260px; }
+  .board--2048   { grid-column: span 7; --art-cap: 240px; }
+  .board--ttt    { grid-column: span 5; --art-cap: 200px; }
+  .board--ink    { grid-column: span 12; --art-cap: 280px; }
   .slot { grid-column: span 12; }
-  .tray:has(a.board:last-of-type:nth-of-type(3n + 1)) .slot,
-  .tray:has(a.board:last-of-type:nth-of-type(3n + 2)) .slot { grid-column: span 12; }
-  .tray:has(a.board:last-of-type:nth-of-type(2n + 1)) .slot { grid-column: span 5; }
 }
 
 @media (max-width: 700px) {
   :root { --edge: 5px; --gap: 20px; }
   .lid { flex-direction: column; align-items: flex-start; gap: 18px; }
   .lid__stamp { padding-bottom: 0; }
-  .tray a.board:nth-of-type(3n + 1),
-  .tray a.board:nth-of-type(3n + 2),
-  .tray a.board:nth-of-type(3n + 3),
-  .tray a.board:nth-of-type(2n + 1) { grid-column: 1 / -1; --art-cap: 220px; }
-  /* one column, so the slot is always the full width — these have to beat the
-     :has() spans, which are more specific than a bare .slot rule */
-  .slot,
-  .tray:has(a.board:last-of-type:nth-of-type(3n + 1)) .slot,
-  .tray:has(a.board:last-of-type:nth-of-type(3n + 2)) .slot,
-  .tray:has(a.board:last-of-type:nth-of-type(2n + 1)) .slot {
-    grid-column: 1 / -1;
-    min-height: 150px;
-  }
+  .tray a.board { grid-column: 1 / -1; --art-cap: 220px; }
+  .slot { grid-column: 1 / -1; min-height: 150px; }
   .board__field { padding: 14px; }
 }
 

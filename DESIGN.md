@@ -172,7 +172,7 @@ The page is the inside of a boxed set of games. A bottle-green baize table fills
 
 The material rules are absolute and they are what make the world hold together across eight independently-built folders. Depth is never light: no gradient, no blur, no glass, no soft shadow, no tonal lift anywhere in the shipped build. One flat plate overlaps another, the way die-cut board actually stacks, and the plate's thickness is drawn as a hard black offset with no falloff. Colour is unmixed and printed at full strength. Every keyline is 3px of warm printed black. Where the box needs texture — the baize weave, the empty slot's hatch — it is hard-stop 1px repeating rules, never soft noise or blended fill.
 
-Density is composed rather than uniform. The hub's tray is a drawn twelve-column plan whose board widths cycle 5-4-3 by position, so a dense Tetris well is answered by a small quiet Tic Tac Toe plate on the same row, and adding a sixth game requires no CSS at all. Inside each game the same vocabulary reappears: a full-strength head plate in that game's own colour, paper slips for numbers, ink-stamped set numbers, and one reserved red for the thing you press.
+Density is composed rather than uniform. The hub's tray is a drawn twelve-column plan composed row by row: each board is given its width by hand, rows add up to twelve, and every board in a row shares one height so the tops and bottoms line up. A tall narrow Tetris well is answered by a wide short D.C. Romp beside it, both level. Inside each game the same vocabulary reappears: a full-strength head plate in that game's own colour, paper slips for numbers, ink-stamped set numbers, and one reserved red for the thing you press.
 
 **Key Characteristics:**
 - Flat unmixed printed colour; no gradient, blur, glass, or soft shadow anywhere
@@ -198,11 +198,11 @@ Printed inks on board stock: one deep bottle-green ground, warm black keylines, 
 ### Tertiary — the printed fields, one per game
 Each game owns exactly one colour, used at full strength on its hub board and again as that game's page head plate. They are identity, not decoration, and they are never tinted, mixed or gradiated.
 - **Cobalt** (`{colors.field-tetris}`) — Tetris, No. 01
-- **Ochre** (`{colors.field-2048}`) — 2048, No. 02
-- **Teal** (`{colors.field-ttt}`) — Tic Tac Toe, No. 03
+- **Ochre** (`{colors.field-2048}`) — 2048, No. 05
+- **Teal** (`{colors.field-ttt}`) — Tic Tac Toe, No. 06
 - **Plum** (`{colors.field-math}`) — Math Puzzles, No. 04
-- **Sky** (`{colors.field-romp}`) — D.C. Romp, No. 05
-- **Document Slate** (`{colors.field-terms}`) — Terms & Conditions, No. 06
+- **Sky** (`{colors.field-romp}`) — D.C. Romp, No. 02
+- **Document Slate** (`{colors.field-terms}`) — Terms & Conditions, No. 03
 - **Press Brown** (`{colors.field-ink}`) — Nonogram, No. 07
 
 ### Neutral
@@ -245,16 +245,16 @@ Both faces ship as base64 `@font-face` data URIs in `type.css`, byte-identical i
 
 ## Layout
 
-**The hub tray is a drawn twelve-column plan**, `repeat(12, 1fr)` at `gap: 26px`, max-width 1320px, `align-items: start`. Board widths come from position in the source order, not from a class: `nth-of-type(3n+1)` spans 5, `3n+2` spans 4, `3n+3` spans 3. Each width carries a matching art height ceiling in `--art-cap` (300px / 268px / 228px) so a narrow board can never out-grow a wide one whatever its drawing's aspect. The empty slot ends at `grid-column-end: -1` and reads the board count with `:has()` to size itself — 7 columns after a lone 5, 3 after a 5+4, full width when the row came out even. A browser without `:has()` gets a full-width well: wider than needed, never broken.
+**The hub tray is a drawn twelve-column plan**, `repeat(12, 1fr)` at `gap: 26px`, max-width 1320px, `align-items: stretch`. The plan is composed by hand rather than cycled: each board states its own `grid-column: span n` and its own `--art-cap` on the same line as its field colour. Rows are 3+6+3, then 6(5)+4+3, then 7 with the slot closing on 5. Because the row stretches, every card in it ends on the same line top and bottom while the widths stay deliberately unequal; the coloured field takes up the slack, with the drawing centred in it. 2048 is the one card with a stated `aspect-ratio: 1` — it is the tallest thing in its row, so its perfect square is what sets that row's height, and `align-self: start` keeps a stretched height from ever squashing the ratio.
 
 **Consequence, and the point of the plan:** adding a game is one `<a class="board">` element in `index.html` plus a `--field` line. No CSS edit, no renumbering, no slot maths.
 
-**Responsive.** At `≤1080px` the cycle collapses to two per row and stays deliberately unequal — 7 and 5, never matching halves — with caps 300/268. At `≤700px` every board goes full width (`--art-cap: 220px`), `--edge` drops 6px → 5px, `--gap` 26px → 20px, and the slot's minimum height drops to 150px. Game pages centre a `.wrap` (560–720px depending on the game) with `padding-top: clamp(74px, 12vw, 104px)` to clear the fixed back tab. Tetris's narrow rule reorders both component trays *above* the well so score, hold, next, lines and level stay on screen with the playfield.
+**Responsive.** At `≤1080px` the plan collapses to two per row and stays deliberately unequal — 7 and 5, never matching halves — and 2048 drops its square, which belongs to the composed wide plan only. At `≤700px` every board goes full width (`--art-cap: 220px`), `--edge` drops 6px → 5px, `--gap` 26px → 20px, and the slot's minimum height drops to 150px. Game pages centre a `.wrap` (560–720px depending on the game) with `padding-top: clamp(74px, 12vw, 104px)` to clear the fixed back tab. Tetris's narrow rule reorders both component trays *above* the well so score, hold, next, lines and level stay on screen with the playfield.
 
 **Rhythm.** Page padding `0 clamp(16px, 4vw, 56px) 72px`. Internal padding runs on a coarse scale: 9–10px inside small slips and stamps, 12–18px inside controls and board fields, 22–26px inside head plates and the lid. Gaps are 10px (control rows), 12px (panels, scoreboards), 26px (the tray).
 
 ### Named Rules
-**The Composed Plan Rule.** Boards on the table are deliberately different sizes on one plan. A dense board is answered by quiet table. Never render the collection as a uniform grid of equal plates.
+**The Composed Plan Rule.** Boards on the table are deliberately different sizes on one plan. A dense board is answered by quiet table. Never render the collection as a uniform grid of equal plates — but do keep a row level: within one row every card starts and ends on the same line, so unequal widths read as composition rather than as drift.
 
 **The Open Slot Rule.** The set is open-ended, and the next space is printed with its number rather than hidden. The slot is an invitation — a dashed die-cut outline with a hatch — not a disabled card.
 
@@ -346,7 +346,7 @@ Every surface in the box carries its number. `hub.js` numbers the boards from th
 ### Do:
 - **Do** build depth as one flat plate over another: a 0-blur ink offset (`var(--edge)`, 6px desktop / 5px narrow) plus a matching `margin-right: var(--edge)` so the plate reserves its own thickness.
 - **Do** give a new game exactly one printed field colour, used at full strength on its hub board and again as its page head plate.
-- **Do** add a game as one `<a class="board">` in the tray and let the 5-4-3 cycle, the matching `--art-cap`, the `:has()` slot and `hub.js`'s numbering handle width, height ceiling, layout and set number.
+- **Do** add a game as one `<a class="board">` in the tray plus one line in `hub.css` giving it a field colour, a `grid-column: span n` and an `--art-cap` — then re-check that its row still adds up to twelve and that the slot still closes the last one. `hub.js` handles the set number on its own.
 - **Do** duplicate `type.css` and the `:root` token block into each new game folder. Per-folder independence is a product constraint, and Chrome cannot fetch `@font-face` files over `file://`, so the fonts must stay base64 data URIs.
 - **Do** keep every numeral in Slab 700 with `font-variant-numeric: tabular-nums`.
 - **Do** draw texture with hard-stop repeating rules — the 1px baize weave, the 9px die-cut hatch — and nothing softer.

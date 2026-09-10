@@ -89,13 +89,13 @@
       },
       "field-2048": {
         "role": "tertiary",
-        "displayName": "Ochre (2048, No. 02)",
+        "displayName": "Ochre (2048, No. 05)",
         "canonical": "#d8912a",
         "tonalRamp": ["#332006", "#54360c", "#764c13", "#9c661a", "#bd7c21", "#d8912a", "#eab967", "#f7e3bd"]
       },
       "field-ttt": {
         "role": "tertiary",
-        "displayName": "Teal (Tic Tac Toe, No. 03)",
+        "displayName": "Teal (Tic Tac Toe, No. 06)",
         "canonical": "#155e58",
         "tonalRamp": ["#051d1b", "#0a332f", "#0f4642", "#155e58", "#1b7a72", "#28a89d", "#63cdc3", "#c3ebe7"]
       },
@@ -107,13 +107,13 @@
       },
       "field-romp": {
         "role": "tertiary",
-        "displayName": "Sky (D.C. Romp, No. 05)",
+        "displayName": "Sky (D.C. Romp, No. 02)",
         "canonical": "#4aa3d8",
         "tonalRamp": ["#0b2231", "#123a53", "#1a5478", "#25719e", "#3389c1", "#4aa3d8", "#8ac5e8", "#d2e9f7"]
       },
       "field-terms": {
         "role": "tertiary",
-        "displayName": "Document Slate (Terms & Conditions, No. 06)",
+        "displayName": "Document Slate (Terms & Conditions, No. 03)",
         "canonical": "#3a4356",
         "tonalRamp": ["#0c0e12", "#171a22", "#212631", "#2b3240", "#333b4c", "#3a4356", "#677798", "#bfc6d4"]
       },
