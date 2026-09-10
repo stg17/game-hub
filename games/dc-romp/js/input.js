@@ -38,13 +38,15 @@ Game.Input = (function () {
     wasReleased: function (key) {
       return !!justReleased[key];
     },
-    // Menu/UI mouse support: translates client coordinates to the canvas's
-    // internal resolution so hit-testing works regardless of CSS scaling.
+    // Menu/UI mouse support: translates client coordinates to the authored
+    // 960x540 field, so hit-testing works whatever size the board is drawn at.
+    // Not to the backing store — main.js sizes that in device pixels, while
+    // every hit region Game.UI registers is in field coordinates.
     attachMouse: function (canvas) {
       function toCanvasCoords(e) {
         var rect = canvas.getBoundingClientRect();
-        var scaleX = canvas.width / rect.width;
-        var scaleY = canvas.height / rect.height;
+        var scaleX = Game.Canvas.WIDTH / rect.width;
+        var scaleY = Game.Canvas.HEIGHT / rect.height;
         return { x: (e.clientX - rect.left) * scaleX, y: (e.clientY - rect.top) * scaleY };
       }
       canvas.addEventListener('mousemove', function (e) {

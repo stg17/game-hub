@@ -73,14 +73,21 @@ body {
 
 /* ── the board itself ─────────────────────────────────────────────────── */
 
+/* The board takes as much of the table as it can get, in the authored 16:9,
+   leaving the tab its strip at the top and stopping before it stops looking
+   like a board on a table. content-box keeps the drawing surface itself 16:9,
+   with the printed edge outside it; js/main.js gives the backing store the
+   device pixels the box actually occupies, so a bigger board is drawn at a
+   higher resolution rather than blown up. */
 #game {
+  box-sizing: content-box;
   display: block;
   background: #7ec8e3;
   border: 3px solid var(--ink);
   box-shadow: var(--edge) var(--edge) 0 0 var(--ink);
-  image-rendering: -webkit-optimize-contrast;
-  max-width: calc(100vw - 34px);
-  max-height: calc(100vh - 34px);
+  width: min(1440px, calc(100vw - 34px), calc((100vh - 100px) * 16 / 9));
+  height: auto;
+  aspect-ratio: 16 / 9;
 }
 
 noscript {
