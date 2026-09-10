@@ -259,14 +259,11 @@
     html.className = html.className.replace(/\s*\bbooting\b/, '');
   }
 
-  /* The lid plate is rotated, so its bounding box is not its layout box.
-     Measure it square, then put the rotation back. */
+  /* The plate sits level and untransformed at rest, so its bounding box is
+     its layout box and can be read straight off. (It used to carry a
+     -1.1deg rotation, which had to be stripped before measuring.) */
   function plateBox() {
-    var prev = plate.style.transform;
-    plate.style.transform = 'none';
-    var r = plate.getBoundingClientRect();
-    plate.style.transform = prev;
-    return r;
+    return plate.getBoundingClientRect();
   }
 
   function openTheBox() {
@@ -353,25 +350,40 @@
     var ty = vh / 2 - sr.top - s0 * (boxCY - sr.top);
     var closed = 'translate(' + tx + 'px, ' + ty + 'px) scale(' + s0 + ')';
 
-    /* the cover lies across the top of the box, at that same scale. Where the
-       box's outer top-left lands on screen, under the same transform. */
-    var cx = sr.left + tx + s0 * (winX - WALL_TOTAL);
-    var cy = sr.top + ty + s0 * (-WALL_TOTAL);
-    var coverW = s0 * outerW;
-    var scale = coverW / target.width;
-    var coverH = target.height * scale;
+    /* The cover is the whole face of the closed box, level: the lid you are
+       looking at before anything opens. It is the window rect and not the
+       outer one, so the chipboard walls stay visible around it — the same
+       reason the cloth is sized to the window. Take the walls in too and the
+       first frame stops reading as a closed box and becomes a sign on a
+       table. Where that rect lands on screen, under the same transform. */
+    var startL = sr.left + tx + s0 * winX;
+    var startT = sr.top + ty;
+    var startW = s0 * winW;
+    var startH = s0 * winH;
 
     boot = document.createElement("div");
     boot.className = 'boot';
     boot.setAttribute('aria-hidden', 'true');
 
+    /* The cover's base geometry is the plate's own resting rect, and the
+       animation ends on exactly these values — so the last frame of the
+       opening is the resting page rather than a copy of it. */
     var cover = document.createElement('div');
     cover.className = 'boot__cover';
     cover.style.left = target.left + 'px';
     cover.style.top = target.top + 'px';
     cover.style.width = target.width + 'px';
     cover.style.height = target.height + 'px';
-    cover.appendChild(plate.cloneNode(true));
+
+    /* The wordmark is wrapped so the plate and the words can move on their
+       own terms: the plate shrinks by geometry, keeping its keyline printed
+       weight, while the words scale with it and stay centred. */
+    var coverPlate = plate.cloneNode(true);
+    var mark = document.createElement('div');
+    mark.className = 'boot__cover-mark';
+    while (coverPlate.firstChild) mark.appendChild(coverPlate.firstChild);
+    coverPlate.appendChild(mark);
+    cover.appendChild(coverPlate);
 
     var skip = document.createElement('button');
     skip.type = 'button';
@@ -382,15 +394,21 @@
     boot.appendChild(skip);
     document.body.appendChild(boot);
 
-    /* the cover starts big and centred over the box, and ends exactly on the
-       real plate's own box — one object, two resting places */
-    var dx = cx - target.left;
-    var dy = cy - target.top;
-    var from = 'translate(' + dx + 'px, ' + dy + 'px) scale(' + scale + ')';
-    /* Off, but not gone: lifted just clear of the cards and held there, so
-       the look-inside beat has the lid hanging over the open box rather than
-       an empty screen with the lid parked off the top of it. */
-    var off = 'translate(' + dx + 'px, ' + (dy - coverH * 0.34) + 'px) scale(' + (scale * 1.03) + ') rotate(-1.9deg)';
+    /* Unseated, not gone: raised just enough to break the seal and tilted the
+       way a lid skews when it is picked up. Level at both ends of the flight
+       and only ever tilted in between, so nothing on the finished page sits
+       askew. */
+    var lifted = 'translateY(' + -Math.round(startH * 0.05) + 'px) rotate(-1.6deg)';
+
+    /* Read at every keyframe; the shape of the cover at rest is the plate. */
+    function geom(l, t, w, h, transform, offset, easing) {
+      var f = {
+        left: l + 'px', top: t + 'px', width: w + 'px', height: h + 'px',
+        transform: transform, offset: offset
+      };
+      if (easing) f.easing = easing;
+      return f;
+    }
 
     function play(el, frames, opts) {
       var a = el.animate(frames, opts);
@@ -400,22 +418,37 @@
 
     var span = { duration: TOTAL, fill: 'both' };
 
-    /* the cloth goes as the cover clears it: this is the moment you can see
-       into the box, and what you see is a tray already full */
+    /* The cloth goes while the lid is still over the box, so that the moment
+       the cover starts shrinking there is a full tray underneath it. The
+       cover now hides the whole face, so this fade is not the reveal any
+       more — the shrink is. */
     play(cloth, [
       { opacity: 1, offset: 0 },
-      { opacity: 1, offset: at(CLOSED_UNTIL + 280), easing: 'linear' },
-      { opacity: 0, offset: at(CLOSED_UNTIL + 830) },
+      { opacity: 1, offset: at(LIFTED_AT), easing: 'linear' },
+      { opacity: 0, offset: at(FLY_FROM) },
       { opacity: 0, offset: 1 }
     ], span);
 
-    /* closed, then off, then held there long enough to be looked at, then
-       away to the corner across the flight */
+    /* Covering the whole box, then unseated and held there long enough to be
+       looked at, then shrinking to the tag in the corner across the flight.
+       The size is animated, not scaled — see the note in hub.css. */
     play(cover, [
-      { transform: from, offset: 0 },
-      { transform: from, offset: at(CLOSED_UNTIL), easing: EASE_LIFT },
-      { transform: off, offset: at(LIFTED_AT) },
-      { transform: off, offset: at(FLY_FROM), easing: EASE_PUSH },
+      geom(startL, startT, startW, startH, 'none', 0),
+      geom(startL, startT, startW, startH, 'none', at(CLOSED_UNTIL), EASE_LIFT),
+      geom(startL, startT, startW, startH, lifted, at(LIFTED_AT)),
+      geom(startL, startT, startW, startH, lifted, at(FLY_FROM), EASE_PUSH),
+      geom(target.left, target.top, target.width, target.height, 'none', at(FLY_TO)),
+      geom(target.left, target.top, target.width, target.height, 'none', 1)
+    ], span);
+
+    /* The words ride the shrink. They are scaled to the box at the start and
+       their own size when they land, and because the plate's width and this
+       scale share both endpoints and the easing, the wordmark stays exactly
+       centred at every frame in between rather than drifting across it. */
+    var markScale = startW / target.width;
+    play(mark, [
+      { transform: 'scale(' + markScale + ')', offset: 0 },
+      { transform: 'scale(' + markScale + ')', offset: at(FLY_FROM), easing: EASE_PUSH },
       { transform: 'none', offset: at(FLY_TO) },
       { transform: 'none', offset: 1 }
     ], span);
