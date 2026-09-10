@@ -296,7 +296,7 @@ html { scrollbar-color: var(--tray) var(--table-deep); }
 .board--tetris { --field: var(--f-tetris); --on-field: var(--paper); grid-column: span 3; --art-cap: 215px; }
 .board--romp   { --field: var(--f-romp);   --on-field: var(--ink);   grid-column: span 6; --art-cap: 240px; }
 .board--terms  { --field: var(--f-terms);  --on-field: var(--paper); grid-column: span 3; --art-cap: 210px; }
-.board--math   { --field: var(--f-math);   --on-field: var(--paper); grid-column: span 5; --art-cap: 188px; }
+.board--math   { --field: var(--f-math);   --on-field: var(--paper); grid-column: span 5; --art-cap: 192px; }
 .board--2048   { --field: var(--f-2048);   --on-field: var(--ink);   grid-column: span 4; --art-cap: 214px; }
 .board--ttt    { --field: var(--f-ttt);    --on-field: var(--paper); grid-column: span 3; --art-cap: 178px; }
 .board--ink    { --field: var(--f-ink);    --on-field: var(--paper); grid-column: span 7; --art-cap: 300px; }
