@@ -120,13 +120,6 @@ h1 {
   color: var(--paper);
 }
 
-.head__rule {
-  margin: 12px 0 0;
-  max-width: 46ch;
-  font-size: 15px;
-  color: rgba(230, 220, 196, .88);
-}
-
 /* ── the well, flanked by its component trays ─────────────────────────── */
 
 .layout {
@@ -337,7 +330,6 @@ h1 {
   /* the head plate gives up its height on a phone; the playfield needs it */
   .head { padding: 16px 18px 18px; margin-bottom: calc(14px + var(--edge)); }
   h1 { font-size: clamp(30px, 8vw, 40px); }
-  .head__rule { margin-top: 8px; font-size: 14px; }
   /* three controls, so the odd one out fills its row rather than orphaning */
   .controls .btn { flex: 1 1 auto; }
   .help dl > div { flex-direction: column; gap: 2px; }
