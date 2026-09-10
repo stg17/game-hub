@@ -454,6 +454,41 @@ Neither has a test runner, but both split their logic out of the DOM specificall
 
 Both games' `game.js` can also be driven end-to-end against a small fake DOM (stub `getElementById`/`createElement`, a no-op canvas 2D context, `localStorage`, and a manually-pumped `requestAnimationFrame`/`setTimeout` clock). Two things to know when doing that: pin `Tetromino.bag` to a single piece type to make a line clear deterministic, since random Tetris play leaves unfillable holes and effectively never completes a row; and advance the clock in frame-sized steps, because of the `dt` clamp noted above. Pin it to `O` rather than `I` if you want a clear at all — four-wide pieces cannot fill a ten-wide row, and five O pieces across take out two rows at once. A line clear now needs no clock: hard-drop the last piece and the next one is already live on the same frame, which is the property worth asserting.
 
+### Verifying the hub opening
+
+The opening in `hub.js` cannot be screenshotted the obvious way. Headless
+Chrome runs virtual time as fast as it can, so `--virtual-time-budget=1500`
+does not stop at 1500ms — the animation finishes and every capture comes back
+as the resting page. Five identical screenshots of "nothing happening" is the
+symptom, and it is not that the intro failed to run.
+
+Copy `index.html`, `hub.css`, `hub.js` and `type.css` to a scratch folder and
+inject a `<script>` **before** `<script src="hub.js">` that does three things:
+
+- **Freeze the clock.** Patch `Element.prototype.animate` to call the real one,
+  then `pause()` and set `currentTime` to the moment you want. Every beat of
+  the opening goes through `play()`, so this catches all of them.
+- **Block `resize` and `orientationchange`.** The intro tears itself down on
+  either, by design — the window rect is baked in pixels, so a reflow mid-flight
+  would unstick the box from its contents. `--window-size` fires a resize after
+  load, so without this the intro is already gone before the capture.
+- **Drop long `setTimeout`s** (ignore any delay over ~120ms). Otherwise the
+  ordinary `finish()` at `TOTAL` and the backstop at `TOTAL + 2500` both fire
+  under virtual time and tear the intro down anyway.
+
+For anything viewport-specific, go through a **size-matched iframe** rather than
+`--window-size`: headless clamps small viewports, and any mismatch between the
+viewport at `openTheBox()` time and at capture time leaves the baked geometry
+wrong — the box overflows and page content leaks past the frame's shadow. Both
+look like real bugs and are not.
+
+The load-bearing invariant is worth asserting rather than eyeballing: freeze at
+`TOTAL`, then compare `getBoundingClientRect()` on `.boot__cover` against the
+real `.boot-stage .lid__plate`, and check `transform` is `none` on the cover,
+on `.boot__cover-mark` and on the plate. Equal rects and three identity
+transforms is what "the last frame is the resting page" actually means. Write
+the result into `document.title` and read it back with `--dump-dom`.
+
 ## Notes
 
 An OpenAI Codex config exists at `~/.codex/config.toml`. To pull anything importable from it (MCP servers, slash commands, subagents, skills, instructions) into Claude Code, reply `/import` to see a scan of what's available, then `/import --yes=<digest>` to apply. If `/import` isn't available on this surface, run `claude import` from a terminal.
