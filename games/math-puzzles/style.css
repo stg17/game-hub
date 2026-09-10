@@ -83,7 +83,7 @@ html { scrollbar-color: #6d5a41 var(--table-deep); }
 /* ── page ─────────────────────────────────────────────────────────────── */
 
 .wrap {
-  max-width: 760px;
+  max-width: 900px;
   margin: 0 auto;
   padding-top: clamp(74px, 12vw, 104px);
 }
@@ -168,10 +168,13 @@ h1 {
 /* Three boards of three different shapes, on the same twelve-column plan the
    hub uses — not three equal cards. Each icon keeps its own aspect, so the
    boards come out at different heights as well as different widths. */
+/* Stretched, not start-aligned: the three cards end on the same line top and
+   bottom while their widths stay deliberately unequal — the same plan the hub
+   tray uses, for the same reason. The printed field takes up the slack. */
 .type-grid {
   display: grid;
   grid-template-columns: repeat(12, 1fr);
-  align-items: start;
+  align-items: stretch;
   gap: 18px;
   padding: 0 var(--edge) var(--edge) 0;
 }
@@ -201,8 +204,13 @@ h1 {
 }
 .type-card:active { transform: translate(2px, 2px); box-shadow: 3px 3px 0 0 var(--ink); }
 
+/* flex: 1 grows the field to whatever height the row settles on, and the SVG
+   keeps its own aspect inside it — so the drawing stays centred in the colour
+   rather than stretching with the card. The row height is set by whichever
+   card has the most text in the least width, which is the narrowest one. */
 .type-icon {
   display: block;
+  flex: 1 1 auto;
   width: 100%;
   height: auto;
   background: var(--field);
