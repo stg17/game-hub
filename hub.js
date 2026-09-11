@@ -42,7 +42,7 @@
   var readers = {
     tetris: function () {
       var best = num(read('tetris_best_v1'));
-      return best > 0 ? 'Best ' + group(best) : null;
+      return best > 0 ? 'Best score ' + group(best) : null;
     },
 
     '2048': function () {
@@ -51,7 +51,7 @@
       var best = num(s.best);
       var score = num(s.score);
       if (!best && !score) return null;
-      var line = 'Best ' + group(best);
+      var line = 'Best score ' + group(best);
       if (score > 0) line += ' · game in progress';
       return line;
     },
@@ -109,8 +109,8 @@
         if (clauses > 0) line += ' · ' + plural(clauses, 'clause', 'clauses');
         return line;
       }
-      /* Played and never scored is its own small joke, and worth printing. */
-      return runs > 0 ? plural(runs, 'run voided', 'runs voided') : null;
+      /* Show completed attempts when no streak has been recorded. */
+      return runs > 0 ? plural(runs, 'game played', 'games played') : null;
     },
 
     /* Nonogram (No. 07). The slug and the storage key predate the rename and
@@ -129,8 +129,8 @@
         if (!got) continue;
         for (var id in got) if (Object.prototype.hasOwnProperty.call(got, id)) done++;
       }
-      if (done > 0) return plural(done, 'plate printed', 'plates printed');
-      return s.current ? 'One plate on the press' : null;
+      if (done > 0) return plural(done, 'puzzle solved', 'puzzles solved');
+      return s.current ? 'Puzzle in progress' : null;
     }
   };
 
@@ -141,9 +141,9 @@
     '2048': 'No score set yet',
     ttt: 'No games played yet',
     math: 'No puzzles solved yet',
-    romp: 'Level 1 of 5 · unopened',
-    terms: 'Unread · no streak yet',
-    ink: 'No plates printed yet'
+    romp: 'Level 1 of 5 unlocked',
+    terms: 'No streak set yet',
+    ink: 'No puzzles solved yet'
   };
 
   var strips = document.querySelectorAll('[data-record]');
