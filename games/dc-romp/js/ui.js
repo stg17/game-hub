@@ -241,8 +241,6 @@ Game.UI = (function () {
     for (var i = 0; i < options.length; i++) {
       button(ctx, W / 2 - bw / 2, startY + i * (bh + gap), bw, bh, options[i], i === selectedIndex, 'menu-' + i);
     }
-
-    caption(ctx, 'Arrow keys or mouse · Enter or click to choose', H - 78);
   }
 
   function drawHowTo(ctx) {
@@ -295,14 +293,14 @@ Game.UI = (function () {
 
   function drawLevelSelect(ctx, unlockedLevel, selectedLevel, levelCount) {
     backdrop(ctx);
-    sheet(ctx, 40, 56, W - 80, 344);
-    setStamp(ctx, 92, 86, 'No. 05 · Levels');
-    title(ctx, 'PICK A LEVEL', 126, 32);
+    sheet(ctx, 40, 104, W - 80, 264);
+    setStamp(ctx, 92, 134, 'No. 05 · Levels');
+    title(ctx, 'PICK A LEVEL', 174, 32);
 
     var bw = 158, bh = 96, gap = 14;
     var totalW = bw * levelCount + gap * (levelCount - 1);
     var startX = W / 2 - totalW / 2;
-    var y = 170;
+    var y = 218;
 
     for (var i = 1; i <= levelCount; i++) {
       var x = startX + (i - 1) * (bw + gap);
@@ -333,8 +331,7 @@ Game.UI = (function () {
       if (!locked) registerHit(x, y, bw, bh, 'level-' + i);
     }
 
-    caption(ctx, 'Left / Right or mouse · Enter or click to start', y + bh + 46);
-    button(ctx, W / 2 - 92, 428, 184, 40, 'Back', false, 'levelselect-back');
+    button(ctx, W / 2 - 92, 396, 184, 40, 'Back', false, 'levelselect-back');
   }
 
   function drawHUD(ctx, levelCount, showPause) {
