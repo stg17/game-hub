@@ -235,7 +235,7 @@ Game.UI = (function () {
     ctx.restore();
 
     var options = Game.MenuOptions.slice();
-    options[3] = Game.muted ? 'Volume: Off' : 'Volume: On';
+    options[3] = Game.muted ? 'Sound: Off' : 'Sound: On';
     var startY = 226;
     var bw = 250, bh = 42, gap = 13;
     for (var i = 0; i < options.length; i++) {
