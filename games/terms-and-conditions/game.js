@@ -72,6 +72,7 @@
     el.amendExcept = document.getElementById('amendExcept');
     el.recall = document.getElementById('recall');
     el.recallList = document.getElementById('recallList');
+    el.recallHeadline = document.getElementById('recallHeadline');
     el.amendBtn = document.getElementById('amendBtn');
 
     el.sheet = document.getElementById('sheet');
@@ -241,8 +242,14 @@
         li.textContent = c.text;
         el.recallList.appendChild(li);
       });
+      /* The headline heads the review because it is the thing at the bottom of
+         the pile: every clause listed under it outranks it, and so does the one
+         being announced. That also makes the drawer worth opening on the first
+         amendment, when there are no clauses above yet but there is still
+         something for the new one to override. */
+      el.recallHeadline.textContent = C.HEADLINE.text;
       el.recall.open = false;
-      el.recall.hidden = !earlier.length;
+      el.recall.hidden = false;
       syncHud();
       show('amendment');
       el.amendBtn.focus();

@@ -283,9 +283,14 @@ while (answered < TARGET && guard++ < 400) {
        must list every clause already in force, in the order the sheet numbers
        them, and it must come back shut rather than remembering being opened. */
     var above = amendments - 1;
-    check(byId.recall.hidden === (above === 0),
-      'the clause-review drawer is ' + (byId.recall.hidden ? 'hidden' : 'shown') +
-      ' on amendment ' + amendments);
+    /* Always offered now that it heads with the instruction: even the first
+       amendment has something to show, because the headline is what that
+       clause overrides. */
+    check(byId.recall.hidden === false,
+      'the clause-review drawer is hidden on amendment ' + amendments);
+    check(byId.recallHeadline.textContent === byId.headline.textContent,
+      'the review heads with "' + byId.recallHeadline.textContent +
+      '", the sheet says "' + byId.headline.textContent + '"');
     check(byId.recall.open !== true, 'the clause-review drawer came back open');
     if (above > 0) {
       var listed = byId.recallList.children.map(function (li) { return li.textContent; });

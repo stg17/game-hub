@@ -241,11 +241,14 @@ to say different things. On the sheet itself the clause stays inline, where it
 has to read as one line of small print in a numbered list. A clause that ever
 opened differently falls back to printing whole, with the lifted word hidden.
 
-The card also carries a **Clause review** drawer listing the small print the
-new clause has to outrank, numbered as the sheet numbers it. It is hidden
-outright on the first amendment, when there is nothing above it, and it is
-forced shut on every one after — a `<details>` remembers being opened, so
-without that reset the card would come back already talking. It shares the
+The card also carries a **Clause review** drawer: the headline first, then the
+small print the new clause has to outrank, numbered as the sheet numbers it.
+The headline heads it because it is the bottom of the pile — every clause
+listed under it outranks it, and so does the one being announced — which is
+also why the drawer is offered on the first amendment, when there are no
+clauses above yet but there is still something being overridden. It is forced
+shut every time: a `<details>` remembers being opened, so without that reset
+the card would come back already talking. It shares the
 `drawer__*` classes with the menu's How to play; both use a drawn plus that
 loses its upright when open, because the UA disclosure triangle is a font
 glyph and every mark in this box is drawn.

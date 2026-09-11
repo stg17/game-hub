@@ -315,13 +315,22 @@ kbd {
 .recall[hidden] { display: none; }
 .recall__summary:hover { background: rgba(23, 20, 16, .08); }
 
-.recall__list {
+/* The headline heads the review, set the way it is set on the sheet so it is
+   recognisable, then the clauses that outrank it underneath. */
+.recall__headline {
   margin: 0;
-  padding: 12px 14px 14px 34px;
+  font: 400 16px/1.2 Lid, Georgia, serif;
+  text-transform: uppercase;
+  letter-spacing: .01em;
+}
+.recall__list {
+  margin: 10px 0 0;
+  padding: 10px 0 0 20px;
   border-top: 2px solid var(--ink-30);
   font-size: 14px;
   line-height: 1.45;
 }
+.recall__list:empty { display: none; }
 .recall__list li + li { margin-top: 6px; }
 .recall__list li::marker { font-weight: 700; }
 
