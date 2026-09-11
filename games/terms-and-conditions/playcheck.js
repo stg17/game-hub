@@ -241,6 +241,20 @@ check(screen() === 'menu', 'the game did not open on the menu (opened on ' + scr
 check(byId.hud.hidden === true, 'the HUD is showing on the menu');
 check(byId.menuBest.textContent === '0', 'a fresh menu shows best streak "' + byId.menuBest.textContent + '"');
 
+/* The how-to drawer is plain markup, so it is checked in the markup. What
+   matters is that it ships SHUT: the menu is supposed to explain nothing to a
+   player who has not asked, and an open drawer would hand over the one thing
+   the game wants you to work out. */
+(function () {
+  var tag = (MARKUP.match(/<details class="howto"[^>]*>/) || [])[0];
+  check(!!tag, 'the menu has no how-to-play drawer');
+  check(tag && tag.indexOf('open') < 0, 'the how-to-play drawer ships open: ' + tag);
+  check(MARKUP.indexOf('class="howto__summary"') > 0 && MARKUP.indexOf('How to play') > 0,
+    'the drawer is not labelled "How to play"');
+  var items = (MARKUP.match(/<li>/g) || []).length;
+  check(items >= 5, 'the how-to-play drawer explains only ' + items + ' things');
+})();
+
 var TARGET = 40;          /* correct answers to play through */
 var maxClauses = 0;
 var amendments = 0;

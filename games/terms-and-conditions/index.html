@@ -43,6 +43,41 @@
     </div>
 
     <p class="menu-keys">Every shape is labelled, and keys <kbd>1</kbd>&hairsp;&ndash;&hairsp;<kbd>6</kbd> pick one.</p>
+
+    <!-- Shut by default, and that is the point: the menu still explains
+         nothing to a player who does not ask, so working out that the small
+         print outranks the headline is still there to be discovered. It is
+         here for the player who has been voided three times and wants to be
+         told why. A real <details>, so it needs no script and answers the
+         keyboard on its own. -->
+    <details class="howto">
+      <summary class="howto__summary">
+        <svg class="howto__mark" viewBox="0 0 20 20" aria-hidden="true" focusable="false">
+          <g stroke="currentColor" stroke-width="2.6" stroke-linecap="square">
+            <path class="howto__mark-v" d="M10 4v12"/>
+            <path d="M4 10h12"/>
+          </g>
+        </svg>
+        How to play
+      </summary>
+      <div class="howto__body">
+        <ul class="howto__list">
+          <li><b>The big line names the shape to click.</b> It is the instruction,
+            and on a sheet with no small print it is the whole of the answer.</li>
+          <li><b>The numbered clauses can overrule it.</b> Work down the list: every
+            clause whose condition is met replaces the target, so the lowest one
+            that applies is the one that counts.</li>
+          <li><b>A new clause arrives every third correct answer</b>, added to the
+            bottom of the page &mdash; which makes it the most powerful line on it.</li>
+          <li><b>The clock runs down each round</b>, and the further you get the
+            less of it you are given.</li>
+          <li><b>One wrong answer, or one timeout, voids the run.</b> Your longest
+            streak is the score.</li>
+          <li><b>Nothing depends on seeing colour.</b> Every shape prints its number
+            and its colour as a word, and the stock is named in the corner.</li>
+        </ul>
+      </div>
+    </details>
   </section>
 
   <!-- ── a new clause ───────────────────────────────────────────────── -->

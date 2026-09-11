@@ -184,6 +184,15 @@ the one explanation this game must not give, because working out that the small
 print overrides the headline *is* the game. The clauses arrive one at a time on
 their own screen, which is teaching enough.
 
+The one concession is a **How to play** drawer at the foot of the menu: a plain
+`<details>`, so it needs no script and answers the keyboard itself. It ships
+**shut**, which is what keeps the rule above intact — the menu still explains
+nothing to anyone who has not asked, and the drawer is there for the player who
+has been voided three times and wants to be told why. `playcheck.js` asserts it
+stays shut, because an open one would hand over the thing the game wants you to
+work out. Its summary marker is drawn, not a UA disclosure triangle: the plus
+loses its upright and becomes a minus when the drawer opens.
+
 **The amendment card lifts the override word.** Every clause in the catalogue
 opens `Except `, and on the card announcing a new one that word is the whole
 point, so `nextRound` splits it off and sets it large in Lid over the

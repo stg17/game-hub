@@ -235,6 +235,57 @@ kbd {
   color: rgba(230, 220, 196, .88);
 }
 
+/* ── how to play ──────────────────────────────────────────────────────── */
+
+/* A printed tab that opens into a slip. Closed it is one line, so the menu
+   still says almost nothing until it is asked to. */
+.howto {
+  margin: 26px 4px 0 0;
+  max-width: 52ch;
+  background: var(--paper);
+  color: var(--ink);
+  border: 3px solid var(--ink);
+  box-shadow: 4px 4px 0 0 var(--ink);
+}
+
+.howto__summary {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  cursor: pointer;
+  padding: 11px 14px 10px;
+  font: 700 12px/1 Slab, Georgia, serif;
+  letter-spacing: .15em;
+  text-transform: uppercase;
+  /* the UA's disclosure triangle is a font glyph; every mark in this box is
+     drawn, so it goes and the plus below takes over */
+  list-style: none;
+}
+.howto__summary::-webkit-details-marker { display: none; }
+.howto__summary::marker { content: ''; }
+.howto__summary:hover { background: var(--paper-dim); }
+.howto__summary:focus-visible { outline: 3px solid var(--red-lit); outline-offset: -6px; }
+
+.howto__mark { width: 16px; height: 16px; flex: none; }
+/* the plus loses its upright and becomes a minus once the drawer is open */
+.howto[open] .howto__mark-v { display: none; }
+
+.howto__body {
+  padding: 12px 14px 14px;
+  border-top: 2px solid var(--ink-15);
+}
+
+.howto__list {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+  font-size: 14px;
+  line-height: 1.5;
+  color: var(--ink-70);
+}
+.howto__list li + li { margin-top: 10px; }
+.howto__list b { color: var(--ink); }
+
 /* ── an amendment ─────────────────────────────────────────────────────── */
 
 .amend-card {
