@@ -164,21 +164,28 @@ Game.UI = (function () {
 
   // A compact printed control for the HUD rail: the menu chip without its lamp
   // gutter, since nothing on the HUD is keyboard-selected — the mouse is the
-  // only thing that can be on it.
-  function hudButton(ctx, x, y, w, h, label, id) {
+  // only thing that can be on it. It carries a drawn mark rather than a word,
+  // so `paint` is handed the chip's centre and the colour the mark reads in.
+  function hudButton(ctx, x, y, w, h, id, paint) {
     var hovered = isHovered(x, y, w, h);
+    var nudge = hovered ? 2 : 0;
     if (hovered) {
       plate(ctx, x + 2, y + 2, w, h, RED, 3);
     } else {
       plate(ctx, x, y, w, h, PAPER, 4);
     }
-    ctx.save();
-    ctx.font = slab(12, true);
-    ctx.fillStyle = hovered ? PAPER : INK;
-    ctx.textBaseline = 'middle';
-    tracked(ctx, label.toUpperCase(), x + w / 2 + (hovered ? 2 : 0), y + h / 2 + 1 + (hovered ? 2 : 0), 1.6);
-    ctx.restore();
+    paint(ctx, x + w / 2 + nudge, y + h / 2 + nudge, hovered ? PAPER : INK);
     registerHit(x, y, w, h, id);
+  }
+
+  // The pause mark: two struck bars, flat ink like the rest of the apparatus.
+  function pauseMark(ctx, cx, cy, colour) {
+    var bw = 6, bh = 18, gap = 6;
+    ctx.save();
+    ctx.fillStyle = colour;
+    ctx.fillRect(cx - gap / 2 - bw, cy - bh / 2, bw, bh);
+    ctx.fillRect(cx + gap / 2, cy - bh / 2, bw, bh);
+    ctx.restore();
   }
 
   // The stamped set number every surface in the box carries.
@@ -334,7 +341,7 @@ Game.UI = (function () {
     // Pause, on the same rail as the score — the mouse's way to the pause menu,
     // which Escape and P already reach. Only while the level is actually
     // running: under the pause sheet it would be a control you cannot press.
-    if (showPause) hudButton(ctx, 182, 14, 92, 40, 'Pause', 'hud-pause');
+    if (showPause) hudButton(ctx, 182, 14, 44, 40, 'hud-pause', pauseMark);
 
     ctx.save();
     ctx.textBaseline = 'middle';
