@@ -244,11 +244,12 @@
     Game.entities.platforms.forEach(function (p) { p.draw(ctx, cam); });
     Game.entities.collectibles.forEach(function (c) { c.draw(ctx, cam); });
     Game.entities.goal.draw(ctx, cam);
+    // behind everyone: a prompt is scenery, and must never cover a character
+    // or the catchphrase bubble
+    Game.entities.hints.forEach(function (hn) { hn.draw(ctx, cam); });
     Game.entities.enemies.forEach(function (e) { e.draw(ctx, cam); });
     Game.entities.projectiles.forEach(function (pr) { pr.draw(ctx, cam); });
     Game.player.draw(ctx, cam);
-    // last, so the player's own sprite can never stand in front of a prompt
-    Game.entities.hints.forEach(function (hn) { hn.draw(ctx, cam); });
   }
 
   Game.update = function (dt) {
