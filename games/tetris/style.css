@@ -244,6 +244,40 @@ h1 {
 .btn-primary { background: var(--red); color: var(--paper); }
 .btn-ghost   { background: var(--paper); color: var(--ink); }
 
+/* The three controls print their mark rather than their name — a replay arrow,
+   the pause bars, a speaker. Each keeps its word in the title and aria-label,
+   which game.js rewrites along with the mark, so nothing is named only by a
+   shape. Drawn as inline SVG in the house hand: no glyphs, no icon font. */
+.btn-icon {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 11px;
+  line-height: 0;
+}
+
+.ico {
+  width: 24px;
+  height: 24px;
+  display: block;
+}
+
+/* One button, two marks: the bars while it will pause, the triangle while it
+   will resume. Swapped by the class syncPanel sets, so the mark and the label
+   are written in the same breath. */
+#pauseBtn .ico--play,
+#pauseBtn.is-paused .ico--pause { display: none; }
+#pauseBtn.is-paused .ico--play { display: block; }
+
+/* Sound is the one control whose state is the colour: cobalt — this game's own
+   printed ink — while it sounds, red while it does not. The waves give way to
+   a struck cross so the state never rests on colour alone. */
+.btn-sound { color: var(--field); }
+.btn-sound .ico__cross { display: none; }
+.btn-sound.is-muted { color: var(--red); }
+.btn-sound.is-muted .ico__waves { display: none; }
+.btn-sound.is-muted .ico__cross { display: block; }
+
 /* ── the folded instruction sheet ─────────────────────────────────────── */
 
 .help {
@@ -330,8 +364,8 @@ h1 {
   /* the head plate gives up its height on a phone; the playfield needs it */
   .head { padding: 16px 18px 18px; margin-bottom: calc(14px + var(--edge)); }
   h1 { font-size: clamp(30px, 8vw, 40px); }
-  /* three controls, so the odd one out fills its row rather than orphaning */
-  .controls .btn { flex: 1 1 auto; }
+  /* three marks sit on one row at any width, so they keep their own size */
+  .controls { gap: 14px; }
   .help dl > div { flex-direction: column; gap: 2px; }
   .help dt { width: auto; }
 }

@@ -138,6 +138,16 @@ What survives is an afterimage: `flashRows`/`flashLeft` drive a pale band the re
 
 A grounded piece refreshes its lock delay on any successful move or rotation, but only `MAX_LOCK_RESETS` times, so it can't be wiggled along the floor forever. Horizontal auto-repeat is our own DAS (`DAS_DELAY` then `DAS_REPEAT`) and OS key-repeat is explicitly ignored (`if (e.repeat) return`) — don't add a second repeat path. Held keys are cleared on `blur`, since keyups aren't delivered to an unfocused tab.
 
+**The three controls under the well print a mark, not a word** — a replay arrow,
+the pause bars, a speaker — drawn as inline SVG in the house hand, since nothing
+in this project is an emoji or an icon-font glyph. The pause button carries both
+marks and swaps them with the `is-paused` class; the sound button is the one
+whose state is a colour, cobalt (this game's own printed ink) while it sounds and
+red while it does not. Colour is never the only channel, so the waves give way to
+a struck cross as well. `setPauseMark`/`setSoundMark` in `game.js` write the
+`title` and `aria-label` in the same call that swaps the mark, so a button can
+never be showing one thing and announcing another.
+
 Only `tetris_best_v1` (an integer) persists; a game in progress is not saved. Gravity per level is the guideline formula in `dropInterval()`, floored so high levels stay playable.
 
 ### 2048 (`games/2048/`)

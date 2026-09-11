@@ -282,12 +282,30 @@
     overlayEl.hidden = true;
   }
 
+  /* The controls print a mark, not a word, so the word has to be carried by
+     the label — and it is set in the same call that swaps the mark, so a
+     screen reader can never be told one thing while the button shows another. */
+  function setPauseMark(paused) {
+    var label = paused ? 'Resume' : 'Pause';
+    pauseBtn.className = 'btn btn-icon btn-ghost' + (paused ? ' is-paused' : '');
+    pauseBtn.title = label;
+    pauseBtn.setAttribute('aria-label', label);
+  }
+
+  function setSoundMark(muted) {
+    var label = muted ? 'Sound off' : 'Sound on';
+    soundBtn.className = 'btn btn-icon btn-ghost btn-sound' + (muted ? ' is-muted' : '');
+    soundBtn.title = label;
+    soundBtn.setAttribute('aria-label', label);
+    soundBtn.setAttribute('aria-pressed', muted ? 'false' : 'true');
+  }
+
   function syncPanel() {
     scoreEl.textContent = score;
     bestEl.textContent = best;
     linesEl.textContent = lines;
     levelEl.textContent = level;
-    pauseBtn.textContent = state === 'PAUSED' ? 'Resume' : 'Pause';
+    setPauseMark(state === 'PAUSED');
     pauseBtn.disabled = state === 'OVER';
   }
 
@@ -455,8 +473,7 @@
 
   soundBtn.addEventListener('click', function () {
     var muted = Sfx.setMuted(!Sfx.isMuted());
-    soundBtn.textContent = muted ? 'Sound: Off' : 'Sound: On';
-    soundBtn.setAttribute('aria-pressed', muted ? 'false' : 'true');
+    setSoundMark(muted);
     if (!muted) wakeAudio();
   });
 
