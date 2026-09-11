@@ -210,9 +210,14 @@ h1 {
   padding: 0 var(--edge) var(--edge) 0;
 }
 
-.type-card:nth-of-type(1) { grid-column: span 5; }
+/* Widths are set by how much each card has to say, not by position: Make 24
+   has the shortest rule and Number Pyramid the longest, so the widths run the
+   other way to the old 5/4/3. At these three the titles all sit on one line
+   and the rules wrap to three, three and two — which is what makes the white
+   foot start at nearly the same height on all three. */
+.type-card:nth-of-type(1) { grid-column: span 3; }
 .type-card:nth-of-type(2) { grid-column: span 4; }
-.type-card:nth-of-type(3) { grid-column: span 3; }
+.type-card:nth-of-type(3) { grid-column: span 5; }
 
 .type-card {
   appearance: none;
@@ -272,6 +277,15 @@ h1 {
   font-size: 14px;
   line-height: 1.5;
   color: var(--ink-70);
+}
+
+/* Widths get the three rules close to the same depth; this lands them exactly
+   on it. Three lines at the 1.5 line-height, so a rule that wraps to two sits
+   in a three-line box and every card breaks from field to paper on the same
+   line. Only while the cards are side by side — stacked, there is nothing to
+   line up with and the floor would just print blank paper. */
+@media (min-width: 721px) {
+  .type-card p { min-height: 4.5em; }
 }
 
 /* ── settings ─────────────────────────────────────────────────────────── */
