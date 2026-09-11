@@ -38,7 +38,7 @@ Game.Catchphrases = [
   "Huge platform. The best platform. Everybody agrees.",
 ];
 
-Game.MenuOptions = ['Start Game', 'Pick a Level', 'How to Play', 'Sound: On'];
+Game.MenuOptions = ['Start Game', 'Pick a Level', 'How to Play', 'Volume: On'];
 Game.PauseOptions = ['Carry on', 'Restart the level', 'Back to the menu'];
 Game.LEVEL_COUNT = 5;
 Game.LevelNames = {
