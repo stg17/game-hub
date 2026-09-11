@@ -35,5 +35,14 @@ Game.Levels.level1 = {
     { x: 2350, y: 460 }, { x: 2550, y: 460 },
   ],
 
+  // The opening teaches the controls in place: each prompt stands where the
+  // thing it explains is first needed, and fades up as the player reaches it.
+  hints: [
+    { x: 96, y: 352, keys: ['left', 'right'], label: 'Move', range: 110 },
+    { x: 248, y: 318, keys: ['up'], label: 'Jump', range: 130 },
+    { x: 470, y: 330, keys: ['X', 'Ctrl'], label: 'Throw', range: 140 },
+    { x: 1680, y: 352, keys: ['Q'], label: 'Catchphrase' },
+  ],
+
   goal: { x: 2650, y: 380 },
 };

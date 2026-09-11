@@ -78,17 +78,43 @@ A cartoon-shaded side-scrolling platformer built on HTML5 Canvas 2D and vanilla 
 
 **Entity contract**: every entity exposes `update(dt)`, `draw(ctx, cam)`, and AABB fields `x, y, w, h`. `draw` converts world → screen with `x - cam.x`, `y - cam.y` (there is no canvas transform for the camera) and should early-return when off-screen. Removal is by flag, not by splicing during iteration: entities set `dead`/`collected`, and `updatePlaying` in `game.js` filters the arrays after all collision passes.
 
-**Levels are data**: `js/levels/level{1..5}.js` are pure data objects registered into `Game.Levels`. A level object is `{ name, width, height, killY, theme, playerStart, platforms[], enemies[], collectibles[], goal }`; `Game.loadLevel` maps each array through the matching entity factory. Adding a level means: new data file, a `<script>` tag in `index.html`, an entry in `Game.LevelNames` (`constants.js`), and bumping `Game.LEVEL_COUNT` (also in `constants.js`) — `game.js` and `ui.js` both read that constant rather than hardcoding a level count, so nothing else needs to change. `theme` selects a parallax background from `js/background.js` (`lawn`/`downtown`/`rooftop`/`golf`/`sky`) — those are the only valid values, and an unknown theme silently falls back to `lawn`. Progress persists as a single `localStorage` key, `dcromp_unlocked` (an integer level number).
+**Levels are data**: `js/levels/level{1..5}.js` are pure data objects registered into `Game.Levels`. A level object is `{ name, width, height, killY, theme, playerStart, platforms[], enemies[], collectibles[], hints[], goal }` (`hints` optional); `Game.loadLevel` maps each array through the matching entity factory. Adding a level means: new data file, a `<script>` tag in `index.html`, an entry in `Game.LevelNames` (`constants.js`), and bumping `Game.LEVEL_COUNT` (also in `constants.js`) — `game.js` and `ui.js` both read that constant rather than hardcoding a level count, so nothing else needs to change. `theme` selects a parallax background from `js/background.js` (`lawn`/`downtown`/`rooftop`/`golf`/`sky`) — those are the only valid values, and an unknown theme silently falls back to `lawn`. Progress persists as a single `localStorage` key, `dcromp_unlocked` (an integer level number).
 
 When authoring a level, keep single-jump platform height deltas comfortably under the player's max jump height (`JUMP_VELOCITY^2 / (2*GRAVITY)` in `constants.js`, ~144px at current values) — a delta within a few px of the max is a "can't actually reach it" bug in practice, not just in theory, since it demands frame-perfect input.
 
 **The board is sized by CSS; the game is authored at 960x540.** `style.css` grows `#game` to fill the table in 16:9 — capped at 1440px and leaving the back-to-the-box tab its strip — and `main.js`'s `sizeCanvas()` gives the backing store `rect x devicePixelRatio` (capped at 2x) device pixels, then scales the context back to the authored field. So the picture is drawn at the screen's own resolution rather than stretched to it, and a bigger board buys resolution instead of blur. Everything above that stays in field coordinates: **never measure anything off `canvas.width`** — that is device pixels now — `Game.Canvas.WIDTH/HEIGHT` is the field, which is why `Input.attachMouse` maps clicks against it. Assigning `canvas.width` resets the context, so `sizeCanvas` re-applies its transform after every resize, and it runs again on `resize`.
+
+**The controls are taught in the level, not before it.** Level 1 carries a `hints` array — `{x, y, keys, label, range}` — and `Game.Hint` (`js/entities/hint.js`) stands each one where the thing it explains is first needed: Move at the spawn, Jump by the first platform worth jumping to, Throw as the first goon comes on, the catchphrase later on a quiet stretch. Each fades up within `range` of the player and back down past it, so the level teaches itself a beat at a time instead of printing a control list on a screen nobody reads. A hint collides with nothing and is drawn last in `renderWorld`, so the player's own sprite can never stand in front of a prompt. An arrow key prints a drawn arrow and any other key prints its name on an ink cap — no glyph from a font, the same rule as the rest of the box. Space the prompts so only one is up at a time where each one stands. Other levels carry no `hints` key and `loadLevel` treats that as none.
 
 **Rendering style**: all art is procedural Canvas 2D — no image assets. The shared cartoon look comes from `Game.Draw` in `js/utils.js` (`cartoonBox`, `roundRectPath`, `groundShadow`, `highlight`), reused by platforms, UI buttons, speech bubbles, and characters. New visuals should compose those helpers rather than hand-rolling gradients and outlines.
 
 Audio is likewise synthesized — `js/audio.js` builds every sound from WebAudio oscillators. The `AudioContext` can only be created after a user gesture, hence `Game.Audio.init()` called from menu confirm handlers. Every sound checks `Game.muted` itself. There is deliberately no speech synthesis: the Q catchphrase gag is a text-only speech bubble (`player.js`) — a generic browser TTS voice wouldn't sound like the character, and this project doesn't attempt real-voice impersonation, so the sound is skipped rather than faked.
 
 Code conventions: ES5 throughout — `var`, `function`, no arrow functions, no `let`/`const`, no template literals, no optional chaining. Match it; there's no transpiler and the style is uniform across the folder.
+
+### Verifying D.C. Romp
+
+No committed scripts, but the game drives end-to-end against a small fake DOM
+the same way Tetris and 2048 do, and that is worth reaching for after touching
+menus, hit regions or the level-1 prompts. `vm.runInContext` the files **in the
+order `index.html` lists them** (derive the list from the markup rather than
+typing it out — load order is the dependency graph), stub `getElementById` to
+one fake canvas with a `getBoundingClientRect`, a no-op 2D context, and
+`localStorage`; make `requestAnimationFrame` a no-op so nothing runs on its own
+and pump `Game.update(1/60)` + `Game.Input.endFrame()` + `Game.render(ctx)` by
+hand. From there `Game.UI.hitRegions` is the menu, and dispatching the
+listeners the game registered on the fake window/canvas is a keypress or a
+click. A context stub that records `fillRect` with the current `fillStyle` also
+answers "how many options are printed red" — the thing to assert after touching
+selection or hover.
+
+Do **not** reach for headless Chrome to sequence input: driven through an
+iframe, the page's `requestAnimationFrame` runs in a burst at the end of the
+virtual-time budget, so timed clicks land while the game is still on the menu
+and the run passes without testing anything. Headless Chrome is for pixels —
+what a screen looks like, that the board is sharp at `--force-device-scale-factor=1.5`
+— and for those, set `Game.player.x` and call `Game.Camera.follow` to park the
+camera where the shot is wanted.
 
 ### Tic Tac Toe (`games/tic-tac-toe/`)
 

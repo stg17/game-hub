@@ -20,6 +20,7 @@
     Game.entities.enemies = data.enemies.map(function (o) { return Game.Enemy(o); });
     Game.entities.collectibles = data.collectibles.map(function (o) { return Game.Collectible(o); });
     Game.entities.projectiles = [];
+    Game.entities.hints = (data.hints || []).map(function (o) { return Game.Hint(o); });
     Game.entities.goal = Game.Goal(data.goal.x, data.goal.y);
     Game.Camera.reset();
     Game.Camera.follow(Game.player, data.width, data.height);
@@ -141,6 +142,7 @@
     ents.enemies.forEach(function (e) { e.update(dt); });
     ents.collectibles.forEach(function (c) { c.update(dt); });
     ents.projectiles.forEach(function (pr) { pr.update(dt); });
+    ents.hints.forEach(function (hn) { hn.update(dt); });
     ents.goal.update(dt);
 
     Game.Collision.resolvePlayer(Game.player, ents.platforms, dt);
@@ -245,6 +247,8 @@
     Game.entities.enemies.forEach(function (e) { e.draw(ctx, cam); });
     Game.entities.projectiles.forEach(function (pr) { pr.draw(ctx, cam); });
     Game.player.draw(ctx, cam);
+    // last, so the player's own sprite can never stand in front of a prompt
+    Game.entities.hints.forEach(function (hn) { hn.draw(ctx, cam); });
   }
 
   Game.update = function (dt) {
