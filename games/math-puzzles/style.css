@@ -255,12 +255,13 @@ h1 {
   color: var(--paper);
 }
 
-.ti-plate rect { fill: var(--paper); stroke: var(--ink); stroke-width: 2.5; }
-/* Drawn as outlines on the field rather than as paper plates. Ten filled
-   blocks that close together read as a hard chequerboard; hollow, the pyramid
-   reads as one shape. */
-.ti-plate.ti-open rect { fill: none; }
-.ti-num text { font: 700 18px/1 Slab, Georgia, serif; fill: var(--ink); text-anchor: middle; font-variant-numeric: tabular-nums; }
+/* Pieces are drawn on the printed field, not as paper plates laid on it:
+   filled and packed close they read as a hard chequerboard, and as outlines
+   each drawing reads as one shape. currentColor is the icon's own paper, the
+   same colour the grid, frame, cage labels and "= 24" already use — so every
+   mark in these drawings is struck in one ink. */
+.ti-plate rect { fill: none; stroke: currentColor; stroke-width: 2.5; }
+.ti-num text { font: 700 18px/1 Slab, Georgia, serif; fill: currentColor; text-anchor: middle; font-variant-numeric: tabular-nums; }
 .ti-num.sm text { font-size: 13px; }
 .ti-field { fill: rgba(23, 20, 16, .16); }
 .ti-grid  { stroke: currentColor; opacity: .34; fill: none; stroke-width: 1.4; }
