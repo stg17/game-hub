@@ -246,10 +246,12 @@ check(byId.menuBest.textContent === '0', 'a fresh menu shows best streak "' + by
    player who has not asked, and an open drawer would hand over the one thing
    the game wants you to work out. */
 (function () {
-  var tag = (MARKUP.match(/<details class="howto"[^>]*>/) || [])[0];
+  var at = MARKUP.indexOf('<details class="howto');
+  var tag = at < 0 ? '' : MARKUP.slice(at, MARKUP.indexOf('>', at) + 1);
   check(!!tag, 'the menu has no how-to-play drawer');
-  check(tag && tag.indexOf('open') < 0, 'the how-to-play drawer ships open: ' + tag);
-  check(MARKUP.indexOf('class="howto__summary"') > 0 && MARKUP.indexOf('How to play') > 0,
+  /* a leading space, so a class merely containing "open" cannot pass for it */
+  check(tag && tag.indexOf(' open') < 0, 'the how-to-play drawer ships open: ' + tag);
+  check(MARKUP.indexOf('howto__summary') > 0 && MARKUP.indexOf('How to play') > 0,
     'the drawer is not labelled "How to play"');
   var items = (MARKUP.match(/<li>/g) || []).length;
   check(items >= 5, 'the how-to-play drawer explains only ' + items + ' things');
@@ -263,6 +265,7 @@ var barSeen = [];
 byId.startBtn.fire('click');
 
 var answered = 0;
+var seenClauses = [];   /* every clause announced so far, in order */
 var guard = 0;
 while (answered < TARGET && guard++ < 400) {
   if (screen() === 'amendment') {
@@ -275,6 +278,27 @@ while (answered < TARGET && guard++ < 400) {
       'the amendment card did not lift "Except" onto its own line');
     check(byId.amendText.textContent.slice(0, 5) === 'when ',
       'the clause under the lifted word reads "' + byId.amendText.textContent.slice(0, 20) + '"');
+    /* The review of what this clause has to outrank. On the first amendment
+       there is nothing above it, so it is not offered at all; after that it
+       must list every clause already in force, in the order the sheet numbers
+       them, and it must come back shut rather than remembering being opened. */
+    var above = amendments - 1;
+    check(byId.recall.hidden === (above === 0),
+      'the clauses-above drawer is ' + (byId.recall.hidden ? 'hidden' : 'shown') +
+      ' on amendment ' + amendments);
+    check(byId.recall.open !== true, 'the clauses-above drawer came back open');
+    if (above > 0) {
+      var listed = byId.recallList.children.map(function (li) { return li.textContent; });
+      check(listed.length === above,
+        'the drawer lists ' + listed.length + ' clauses above, expected ' + above);
+      check(listed.join(' | ') === seenClauses.join(' | '),
+        'the drawer lists the wrong clauses above: ' + listed.join(' | '));
+    }
+    /* leave it open, so the next amendment has to have shut it again — without
+       this the check above can never fail and proves nothing */
+    byId.recall.open = true;
+    seenClauses.push(amendmentText());
+
     check(lastFocused === byId.amendBtn, 'focus did not land on the amendment button');
     byId.amendBtn.fire('click');
     continue;

@@ -263,7 +263,9 @@ kbd {
   box-shadow: 4px 4px 0 0 var(--ink);
 }
 
-.howto__summary {
+/* Shared by both drawers on this game: the how-to on the menu and the review
+   of the clauses already in force on the amendment card. */
+.drawer__summary {
   display: flex;
   align-items: center;
   gap: 10px;
@@ -276,19 +278,20 @@ kbd {
      drawn, so it goes and the plus below takes over */
   list-style: none;
 }
-.howto__summary::-webkit-details-marker { display: none; }
-.howto__summary::marker { content: ''; }
-.howto__summary:hover { background: var(--paper-dim); }
-.howto__summary:focus-visible { outline: 3px solid var(--red-lit); outline-offset: -6px; }
+.drawer__summary::-webkit-details-marker { display: none; }
+.drawer__summary::marker { content: ''; }
+.drawer__summary:focus-visible { outline: 3px solid var(--red-lit); outline-offset: -6px; }
 
-.howto__mark { width: 16px; height: 16px; flex: none; }
+.drawer__mark { width: 16px; height: 16px; flex: none; }
 /* the plus loses its upright and becomes a minus once the drawer is open */
-.howto[open] .howto__mark-v { display: none; }
+.drawer[open] .drawer__mark-v { display: none; }
 
-.howto__body {
+.drawer__body {
   padding: 12px 14px 14px;
   border-top: 2px solid var(--ink-15);
 }
+
+.howto__summary:hover { background: var(--paper-dim); }
 
 .howto__list {
   margin: 0;
@@ -300,6 +303,27 @@ kbd {
 }
 .howto__list li + li { margin-top: 10px; }
 .howto__list b { color: var(--ink); }
+
+/* ── the clauses already on the page ──────────────────────────────────── */
+
+/* On the gold card, so it is drawn as a keyline rather than laid on as a
+   second plate — the card is already the printed surface. */
+.recall {
+  margin: 0 0 18px;
+  border: 3px solid var(--ink);
+}
+.recall[hidden] { display: none; }
+.recall__summary:hover { background: rgba(23, 20, 16, .08); }
+
+.recall__list {
+  margin: 0;
+  padding: 12px 14px 14px 34px;
+  border-top: 2px solid var(--ink-30);
+  font-size: 14px;
+  line-height: 1.45;
+}
+.recall__list li + li { margin-top: 6px; }
+.recall__list li::marker { font-weight: 700; }
 
 /* ── an amendment ─────────────────────────────────────────────────────── */
 

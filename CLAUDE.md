@@ -219,6 +219,15 @@ to say different things. On the sheet itself the clause stays inline, where it
 has to read as one line of small print in a numbered list. A clause that ever
 opened differently falls back to printing whole, with the lifted word hidden.
 
+The card also carries a **Clauses above** drawer listing the small print the
+new clause has to outrank, numbered as the sheet numbers it. It is hidden
+outright on the first amendment, when there is nothing above it, and it is
+forced shut on every one after — a `<details>` remembers being opened, so
+without that reset the card would come back already talking. It shares the
+`drawer__*` classes with the menu's How to play; both use a drawn plus that
+loses its upright when open, because the UA disclosure triangle is a font
+glyph and every mark in this box is drawn.
+
 **The loss screen prints the round back.** Saying "the answer was shape 2" in
 words asks the player to take the verdict on trust, which is a poor way to end
 a game whose whole promise is that the answer was there to be read. `drawRecap`

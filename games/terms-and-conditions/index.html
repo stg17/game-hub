@@ -50,17 +50,17 @@
          here for the player who has been voided three times and wants to be
          told why. A real <details>, so it needs no script and answers the
          keyboard on its own. -->
-    <details class="howto">
-      <summary class="howto__summary">
-        <svg class="howto__mark" viewBox="0 0 20 20" aria-hidden="true" focusable="false">
+    <details class="howto drawer">
+      <summary class="howto__summary drawer__summary">
+        <svg class="drawer__mark" viewBox="0 0 20 20" aria-hidden="true" focusable="false">
           <g stroke="currentColor" stroke-width="2.6" stroke-linecap="square">
-            <path class="howto__mark-v" d="M10 4v12"/>
+            <path class="drawer__mark-v" d="M10 4v12"/>
             <path d="M4 10h12"/>
           </g>
         </svg>
         How to play
       </summary>
-      <div class="howto__body">
+      <div class="howto__body drawer__body">
         <ul class="howto__list">
           <li><b>The big line names the shape to click.</b> It is the instruction,
             and on a sheet with no small print it is the whole of the answer.</li>
@@ -88,6 +88,21 @@
            clause has to read as one line of small print. -->
       <p class="amend-card__except" id="amendExcept">Except</p>
       <p class="amend-card__text" id="amendText"></p>
+      <!-- What this clause has to outrank. Shut by default and hidden
+           altogether on the first amendment, when there is nothing above it. -->
+      <details class="recall drawer" id="recall" hidden>
+        <summary class="recall__summary drawer__summary">
+          <svg class="drawer__mark" viewBox="0 0 20 20" aria-hidden="true" focusable="false">
+            <g stroke="currentColor" stroke-width="2.6" stroke-linecap="square">
+              <path class="drawer__mark-v" d="M10 4v12"/>
+              <path d="M4 10h12"/>
+            </g>
+          </svg>
+          Clauses above
+        </summary>
+        <ol class="recall__list drawer__body" id="recallList"></ol>
+      </details>
+
       <p class="amend-card__note">Added to the bottom of the page, so it outranks every clause above it.</p>
       <div class="btn-row">
         <button class="btn btn-primary" id="amendBtn">Read and continue</button>

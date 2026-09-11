@@ -70,6 +70,8 @@
     el.amendNo = document.getElementById('amendNo');
     el.amendText = document.getElementById('amendText');
     el.amendExcept = document.getElementById('amendExcept');
+    el.recall = document.getElementById('recall');
+    el.recallList = document.getElementById('recallList');
     el.amendBtn = document.getElementById('amendBtn');
 
     el.sheet = document.getElementById('sheet');
@@ -226,6 +228,21 @@
         el.amendExcept.hidden = true;
         el.amendText.textContent = added.text;
       }
+
+      /* What the new clause has to outrank, for a player who has lost track of
+         the page. Numbered as they are numbered on the sheet, and always shut
+         to begin with — a details element remembers being opened otherwise, and
+         the card would come back already talking. */
+      var earlier = state.active.slice(0, -1);
+      el.recallList.innerHTML = '';
+      earlier.forEach(function (c) {
+        var li = document.createElement('li');
+        li.setAttribute('data-clause', c.id);
+        li.textContent = c.text;
+        el.recallList.appendChild(li);
+      });
+      el.recall.open = false;
+      el.recall.hidden = !earlier.length;
       syncHud();
       show('amendment');
       el.amendBtn.focus();
