@@ -217,14 +217,29 @@ kbd {
   padding: 3px 6px 2px;
 }
 
+/* The one number the menu carries, so it is set as a numeral rather than as
+   part of the sentence around it. */
 .menu-best {
-  margin: 0 0 22px;
-  font-size: 13px;
+  margin: 0 0 26px;
+  display: flex;
+  align-items: baseline;
+  gap: 10px;
+  font-size: 16px;
   letter-spacing: .02em;
   color: rgba(230, 220, 196, .78);
+}
+.menu-best b {
+  color: var(--paper);
+  font: 700 26px/1 Slab, Georgia, serif;
   font-variant-numeric: tabular-nums;
 }
-.menu-best b { color: var(--paper); font-size: 16px; }
+
+/* The way in. It is the only thing on the menu you have to press, so it is
+   printed at a size that says so. */
+.btn-lead {
+  font-size: 16px;
+  padding: 18px 34px;
+}
 
 /* Not an instruction about the game — just how to reach the shapes without a
    mouse. Kept quiet, but above the contrast floor: it is the only route in for
