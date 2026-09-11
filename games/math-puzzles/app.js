@@ -150,6 +150,10 @@
     setTimeout(function () {
       state.puzzleState = getModule().generate(state.difficulty);
       updateHud();
+      /* Make 24 has nothing to check. render() calls onSolved the instant the
+         last tile reads 24, so the button could never report a win — only
+         ever "not solved yet", which the player can already see. */
+      el.playCheckBtn.hidden = (state.type === 'make24');
       showScreen('play');
       startTimerIfNeeded();
       getModule().render(el.puzzleContainer, state.puzzleState, { onSolved: handleSolved });
