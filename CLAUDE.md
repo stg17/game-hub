@@ -138,21 +138,17 @@ What survives is an afterimage: `flashRows`/`flashLeft` drive a pale band the re
 
 A grounded piece refreshes its lock delay on any successful move or rotation, but only `MAX_LOCK_RESETS` times, so it can't be wiggled along the floor forever. Horizontal auto-repeat is our own DAS (`DAS_DELAY` then `DAS_REPEAT`) and OS key-repeat is explicitly ignored (`if (e.repeat) return`) — don't add a second repeat path. Held keys are cleared on `blur`, since keyups aren't delivered to an unfocused tab.
 
-**The well is sized by height, not by width.** `#board` is
-`clamp(425px, calc(88vh - 184px), 600px)` with `width: auto`, so the canvas —
-authored 300x600 and scaled by CSS, the same trick the phone layout already
-used — takes whatever the window has left once the head plate and the controls
-are placed, and stops at its authored 600 from roughly a 990px window up.
-Everything above it (`.wrap`'s top padding, the head plate's bottom margin) is
-in `vh` for the same reason. The old fixed drop put the floor of the well, and
-the controls under it, below the fold on an ordinary laptop, which is the one
-thing this page cannot do — you cannot play a well you have to scroll to.
-
-The floor of 425px is the taller component tray's height: shrink the well past
-that and the tray sets the row height instead, so the page gets no shorter. A
-`min-width: 701px and max-height: 760px` block narrows both trays to 104px on a
-768px-tall laptop, which buys that height back and lets the floor drop to 336.
-Change one of those numbers and re-measure the other — they are a pair.
+**The page opens scrolled to the well, and the well is never shrunk to fit.**
+The board is authored 300x600 with the head plate above it, so on an ordinary
+laptop its floor starts below the fold. Sizing it off the viewport was tried and
+reverted: a 600px well at full size is the better game, and the fix is to scroll
+to it. `scrollToWell()` in `game.js` runs at startup and again on `load` — at
+script time a scrollbar or a late stylesheet can still change the viewport
+height it measures against — and it is capped at the well's own ceiling, so it
+never scrolls the top of the well off to chase the bottom. The controls
+underneath are allowed to open below the fold; the well is not. It also sets
+`history.scrollRestoration = 'manual'`, or a reload is put back where it was and
+undoes this.
 
 **The three controls under the well print a mark, not a word** — a replay arrow,
 the pause bars, a speaker — drawn as inline SVG in the house hand, since nothing

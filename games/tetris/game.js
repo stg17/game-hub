@@ -13,9 +13,11 @@
   var DAS_DELAY = 0.16;        // hold-to-repeat: initial pause
   var DAS_REPEAT = 0.04;       // hold-to-repeat: cadence after that
   var NEXT_COUNT = 3;
+  var WELL_MARGIN = 12;        // px of air left above/below the well when opening to it
   var LINE_SCORE = [0, 100, 300, 500, 800];
 
-  var boardCtx = document.getElementById('board').getContext('2d');
+  var boardEl = document.getElementById('board');
+  var boardCtx = boardEl.getContext('2d');
   var nextCtx = document.getElementById('next').getContext('2d');
   var holdCtx = document.getElementById('hold').getContext('2d');
   var scoreEl = document.getElementById('score');
@@ -477,7 +479,28 @@
     if (!muted) wakeAudio();
   });
 
+  /* The well is authored 600px tall with the head plate above it, so on an
+     ordinary laptop its floor opens below the fold. The board is not shrunk to
+     fit — a smaller well is a worse game — so the page scrolls to it instead.
+     The controls underneath may stay off screen; the well may not, which is why
+     the scroll is capped at the well's own ceiling rather than at whatever it
+     would take to bring the floor up. Scroll restoration is turned off or the
+     browser puts a reload back where it was and undoes this. */
+  function scrollToWell() {
+    var r = boardEl.getBoundingClientRect();
+    var top = r.top + window.pageYOffset;
+    var wanted = r.bottom + window.pageYOffset + WELL_MARGIN - document.documentElement.clientHeight;
+    if (wanted <= 0) return;
+    window.scrollTo(0, Math.max(0, Math.round(Math.min(wanted, top - WELL_MARGIN))));
+  }
+
+  if ('scrollRestoration' in history) history.scrollRestoration = 'manual';
+
   startGame();
+  scrollToWell();
+  /* Again once everything has settled: at script time a scrollbar or a late
+     stylesheet can still change the viewport height this measures against. */
+  window.addEventListener('load', scrollToWell);
   requestAnimationFrame(function (t) {
     lastTime = t;
     requestAnimationFrame(frame);
