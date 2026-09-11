@@ -408,7 +408,7 @@ viewport to a 485px minimum, so a true 390px capture needs the iframe), play it
 synchronously in one tick so no virtual time passes mid-run, then fire a `blur`
 at the iframe's window to freeze the clock before capturing.
 
-### Nonogram (`games/nonogram/`)
+### Nonograms (`games/nonogram/`)
 
 The numbers beside each row and column are the run lengths of ink
 in that line, in order, and reconstructing them turns a blank grid into a
@@ -500,7 +500,7 @@ right arrows on a roving tabindex. Every square carries
 `aria-describedby="rc<y> cc<x>"`, so a screen reader reads the two clue lines
 that govern it rather than making the player go and find them.
 
-### Verifying Nonogram
+### Verifying Nonograms
 
 Two committed Node scripts, both plain `node`, no dependencies:
 
