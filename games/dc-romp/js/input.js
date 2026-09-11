@@ -4,6 +4,10 @@ Game.Input = (function () {
   var justReleased = {};
   var mouse = { x: -1, y: -1 };
   var mouseClickedFlag = false;
+  // Which device is currently driving. Keyboard selection and a mouse hover are
+  // both printed the same way — red — so only the live one may light anything,
+  // or a menu shows two chosen options at once.
+  var pointerActive = false;
 
   function normalize(key) {
     if (key === ' ') return 'Space';
@@ -12,6 +16,7 @@ Game.Input = (function () {
 
   window.addEventListener('keydown', function (e) {
     var key = normalize(e.key);
+    pointerActive = false;
     if (!down[key]) {
       justPressed[key] = true;
     }
@@ -53,20 +58,28 @@ Game.Input = (function () {
         var p = toCanvasCoords(e);
         mouse.x = p.x;
         mouse.y = p.y;
+        pointerActive = true;
       });
       canvas.addEventListener('click', function (e) {
         var p = toCanvasCoords(e);
         mouse.x = p.x;
         mouse.y = p.y;
         mouseClickedFlag = true;
+        pointerActive = true;
       });
       canvas.addEventListener('mouseleave', function () {
         mouse.x = -1;
         mouse.y = -1;
+        pointerActive = false;
       });
     },
     getMousePos: function () {
       return mouse;
+    },
+    // True while the mouse is the device being used: it moved more recently
+    // than any key was pressed, and it has not left the board.
+    pointerActive: function () {
+      return pointerActive;
     },
     mouseClicked: function () {
       return mouseClickedFlag;

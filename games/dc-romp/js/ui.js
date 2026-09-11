@@ -34,7 +34,10 @@ Game.UI = (function () {
     hitRegions.push({ x: x, y: y, w: w, h: h, id: id });
   }
 
+  // Nothing is hovered while the keyboard is the device in use, so a keyboard
+  // selection and a stale pointer resting elsewhere cannot both print red.
   function isHovered(x, y, w, h) {
+    if (!Game.Input.pointerActive()) return false;
     var m = Game.Input.getMousePos();
     return m.x >= x && m.x <= x + w && m.y >= y && m.y <= y + h;
   }

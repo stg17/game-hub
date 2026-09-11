@@ -43,10 +43,9 @@
     p.invulnTimer = Game.Physics.INVULN_DURATION;
   }
 
-  // Returns the id of whatever UI hit-region the mouse just clicked (if any),
+  // Returns the id of whatever UI hit-region the mouse is over (if any),
   // testing against the rects Game.UI registered on the previous render pass.
-  function getClickedId() {
-    if (!Input.mouseClicked()) return null;
+  function getHoveredId() {
     var m = Input.getMousePos();
     var regions = Game.UI.hitRegions;
     for (var i = regions.length - 1; i >= 0; i--) {
@@ -54,6 +53,21 @@
       if (m.x >= r.x && m.x <= r.x + r.w && m.y >= r.y && m.y <= r.y + r.h) return r.id;
     }
     return null;
+  }
+
+  function getClickedId() {
+    return Input.mouseClicked() ? getHoveredId() : null;
+  }
+
+  // While the mouse is the live device, the keyboard selection follows it, so
+  // the lit option and the one Enter would activate are always the same one.
+  // ui.js prints no hover at all once a key is pressed, which is the other half
+  // of the same rule.
+  function selectionUnderPointer(prefix) {
+    if (!Input.pointerActive()) return -1;
+    var id = getHoveredId();
+    if (!id || id.indexOf(prefix) !== 0) return -1;
+    return parseInt(id.slice(prefix.length), 10);
   }
 
   function activateMenuOption(i) {
@@ -68,6 +82,8 @@
 
   function updateMenu(clickedId) {
     var n = Game.MenuOptions.length;
+    var under = selectionUnderPointer('menu-');
+    if (under >= 0) Game.menuIndex = under;
     if (Input.wasPressed('ArrowUp')) Game.menuIndex = (Game.menuIndex - 1 + n) % n;
     if (Input.wasPressed('ArrowDown')) Game.menuIndex = (Game.menuIndex + 1) % n;
     if (Input.wasPressed('Enter') || Input.wasPressed('Space')) {
@@ -92,6 +108,8 @@
   }
 
   function updateLevelSelect(clickedId) {
+    var under = selectionUnderPointer('level-');
+    if (under >= 0) Game.levelSelectIndex = under;
     if (Input.wasPressed('ArrowLeft')) Game.levelSelectIndex = Math.max(1, Game.levelSelectIndex - 1);
     if (Input.wasPressed('ArrowRight')) Game.levelSelectIndex = Math.min(Game.LEVEL_COUNT, Game.levelSelectIndex + 1);
     if (Input.wasPressed('Escape') || Input.wasPressed('Backspace') || clickedId === 'levelselect-back') {
@@ -178,6 +196,8 @@
 
   function updatePaused(clickedId) {
     var n = Game.PauseOptions.length;
+    var under = selectionUnderPointer('pause-');
+    if (under >= 0) Game.pauseIndex = under;
     if (Input.wasPressed('ArrowUp')) Game.pauseIndex = (Game.pauseIndex - 1 + n) % n;
     if (Input.wasPressed('ArrowDown')) Game.pauseIndex = (Game.pauseIndex + 1) % n;
     if (Input.wasPressed('Escape') || Input.wasPressed('p') || Input.wasPressed('P')) {
