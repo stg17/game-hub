@@ -206,16 +206,6 @@ Game.UI = (function () {
     return w;
   }
 
-  function caption(ctx, text, y, color, size) {
-    ctx.save();
-    ctx.font = slab(size || 12, true);
-    ctx.fillStyle = color || 'rgba(23,20,16,0.62)';
-    ctx.textAlign = 'center';
-    ctx.textBaseline = 'alphabetic';
-    tracked(ctx, text.toUpperCase(), W / 2, y, (size || 12) * 0.14);
-    ctx.restore();
-  }
-
   function drawMenu(ctx, selectedIndex) {
     backdrop(ctx);
     sheet(ctx, 150, 42, W - 300, H - 104);
@@ -399,7 +389,7 @@ Game.UI = (function () {
 
   function drawPauseOverlay(ctx, selectedIndex) {
     var w = 330;
-    var h = 66 + Game.PauseOptions.length * 55 + 56;
+    var h = 66 + Game.PauseOptions.length * 55 + 46;
     var x = W / 2 - w / 2;
     var y = H / 2 - h / 2;
     overlaySheet(ctx, x, y, w, h);
@@ -411,8 +401,6 @@ Game.UI = (function () {
     for (var i = 0; i < Game.PauseOptions.length; i++) {
       button(ctx, W / 2 - bw / 2, startY + i * (bh + gap), bw, bh, Game.PauseOptions[i], i === selectedIndex, 'pause-' + i);
     }
-
-    caption(ctx, 'Escape or P to continue', y + h - 26, 'rgba(23,20,16,0.55)', 11);
   }
 
   function resultSheet(ctx, heading, headingColor, statLabel, statValue, btnLabel, btnId) {
