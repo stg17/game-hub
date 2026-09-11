@@ -123,6 +123,37 @@ h1 {
   color: var(--paper);
 }
 
+/* ── out of a puzzle ──────────────────────────────────────────────────────
+   Sits under the title, where a back arrow is looked for. It used to be the
+   first chip in the row with Hint, Check and Deal another, which made leaving
+   look like a fourth thing to do to the puzzle rather than a way out of it.
+
+   Plain text on the baize rather than a plate: the fixed "Back to the box" tab
+   is already a plate in the corner above it, and two stacked tabs would read as
+   one control repeated. Hover goes to full-strength paper, not red — the house
+   hover colour for a back tab is red, but that tab is on paper, and red on the
+   green table is 2:1. */
+.puzzle-back {
+  appearance: none;
+  -webkit-appearance: none;
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  margin: 0 0 18px;
+  padding: 0;
+  border: 0;
+  background: none;
+  cursor: pointer;
+  font: 700 11.5px/1 Slab, Georgia, serif;
+  letter-spacing: .16em;
+  text-transform: uppercase;
+  color: rgba(230, 220, 196, .78);
+}
+/* display is inline-flex, which would otherwise beat the default [hidden] */
+.puzzle-back[hidden] { display: none; }
+.puzzle-back:hover, .puzzle-back:focus-visible { color: var(--paper); }
+.puzzle-back__arrow { width: 13px; height: 13px; flex: none; }
+
 /* ── the running head, once a puzzle is out ───────────────────────────── */
 
 .hud {

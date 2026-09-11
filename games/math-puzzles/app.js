@@ -44,7 +44,7 @@
     el.settingsStartBtn = document.getElementById('settingsStartBtn');
     el.puzzleContainer = document.getElementById('puzzleContainer');
     el.playMessage = document.getElementById('playMessage');
-    el.playBackBtn = document.getElementById('playBackBtn');
+    el.puzzleBackBtn = document.getElementById('puzzleBackBtn');
     el.playHintBtn = document.getElementById('playHintBtn');
     el.playCheckBtn = document.getElementById('playCheckBtn');
     el.playNewBtn = document.getElementById('playNewBtn');
@@ -57,6 +57,9 @@
     state.screen = name;
     Object.keys(el.screens).forEach(function (key) { el.screens[key].hidden = key !== name; });
     el.hud.hidden = (name === 'menu');
+    /* Only while a puzzle is out: on settings and the solved card the screen
+       already offers its own way back, in a row with the action beside it. */
+    el.puzzleBackBtn.hidden = (name !== 'play');
   }
 
   function getModule() { return window.MathPuzzles[state.type]; }
@@ -186,7 +189,7 @@
     el.settingsBackBtn.addEventListener('click', function () { showScreen('menu'); });
     el.settingsStartBtn.addEventListener('click', startPuzzle);
 
-    el.playBackBtn.addEventListener('click', function () {
+    el.puzzleBackBtn.addEventListener('click', function () {
       Storage.recordAbandon(state.type, state.difficulty);
       backToMenu();
     });

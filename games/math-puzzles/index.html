@@ -19,6 +19,14 @@
     <h1>Math&nbsp;Puzzles</h1>
   </header>
 
+  <!-- Leaving a puzzle is navigation, not one of the puzzle's own actions, so
+       it sits under the title where a back arrow is looked for, rather than in
+       the row with Hint and Check where it read as a fourth thing to do. -->
+  <button class="puzzle-back" type="button" id="puzzleBackBtn" hidden>
+    <svg class="puzzle-back__arrow" viewBox="0 0 16 16" aria-hidden="true" focusable="false"><path d="M10 2 4 8l6 6" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="square"/></svg>
+    All puzzles
+  </button>
+
   <div class="hud" id="hud" hidden>
     <span id="hudType"></span>
     <span id="hudDifficulty" class="badge"></span>
@@ -89,7 +97,6 @@
 
   <section id="screen-play" class="screen" hidden>
     <div class="play-controls">
-      <button class="btn btn-ghost" id="playBackBtn">Back to the puzzles</button>
       <button class="btn btn-ghost" id="playHintBtn">Hint</button>
       <button class="btn btn-ghost" id="playCheckBtn">Check</button>
       <button class="btn btn-primary" id="playNewBtn">Deal another</button>
