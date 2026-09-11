@@ -40,7 +40,6 @@
     el.difficultyToggle = document.getElementById('difficultyToggle');
     el.timedToggle = document.getElementById('timedToggle');
     el.settingsStats = document.getElementById('settingsStats');
-    el.settingsBackBtn = document.getElementById('settingsBackBtn');
     el.settingsStartBtn = document.getElementById('settingsStartBtn');
     el.puzzleContainer = document.getElementById('puzzleContainer');
     el.playMessage = document.getElementById('playMessage');
@@ -56,10 +55,12 @@
   function showScreen(name) {
     state.screen = name;
     Object.keys(el.screens).forEach(function (key) { el.screens[key].hidden = key !== name; });
-    el.hud.hidden = (name === 'menu');
-    /* Only while a puzzle is out: on settings and the solved card the screen
-       already offers its own way back, in a row with the action beside it. */
-    el.puzzleBackBtn.hidden = (name !== 'play');
+    /* The running head reports a puzzle in progress. There is not one yet on
+       settings, where it drew an empty badge and a rule under the title. */
+    el.hud.hidden = (name === 'menu' || name === 'settings');
+    /* Once you have picked a puzzle there is always somewhere to go back to,
+       and it is always in the same place. */
+    el.puzzleBackBtn.hidden = (name === 'menu');
   }
 
   function getModule() { return window.MathPuzzles[state.type]; }
@@ -186,7 +187,6 @@
       });
     });
 
-    el.settingsBackBtn.addEventListener('click', function () { showScreen('menu'); });
     el.settingsStartBtn.addEventListener('click', startPuzzle);
 
     el.puzzleBackBtn.addEventListener('click', function () {
