@@ -152,11 +152,6 @@ window.MathPuzzles.pyramid = (function () {
       var wrap = document.createElement('div');
       wrap.className = 'pyr-wrap';
 
-      var instructions = document.createElement('p');
-      instructions.className = 'puzzle-instructions';
-      instructions.textContent = 'Each block equals the sum of the two blocks directly below it. Fill in the missing blocks.';
-      wrap.appendChild(instructions);
-
       var pyramid = document.createElement('div');
       pyramid.className = 'pyr-pyramid';
       for (var r = 0; r < N; r++) {

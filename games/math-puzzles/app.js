@@ -150,10 +150,12 @@
     setTimeout(function () {
       state.puzzleState = getModule().generate(state.difficulty);
       updateHud();
-      /* Make 24 has nothing to check. render() calls onSolved the instant the
-         last tile reads 24, so the button could never report a win — only
-         ever "not solved yet", which the player can already see. */
-      el.playCheckBtn.hidden = (state.type === 'make24');
+      /* Nothing to check in these two: each render calls onSolved itself the
+         moment the puzzle comes out right — the last tile reading 24, or the
+         last block filled correctly — so the button could never report a win,
+         only ever "not solved yet". Calcudoku keeps its Check, where a part
+         filled grid makes the answer genuinely worth asking for. */
+      el.playCheckBtn.hidden = (state.type === 'make24' || state.type === 'pyramid');
       showScreen('play');
       startTimerIfNeeded();
       getModule().render(el.puzzleContainer, state.puzzleState, { onSolved: handleSolved });
