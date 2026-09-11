@@ -172,6 +172,16 @@ the one explanation this game must not give, because working out that the small
 print overrides the headline *is* the game. The clauses arrive one at a time on
 their own screen, which is teaching enough.
 
+**The amendment card lifts the override word.** Every clause in the catalogue
+opens `Except `, and on the card announcing a new one that word is the whole
+point, so `nextRound` splits it off and sets it large in Lid over the
+condition beneath — EXCEPT / *when the backdrop is yellow, click the smallest
+shape.* The split is a plain `slice` on the literal `'Except '`, not a regex,
+and the two halves are printed verbatim, so the card and the sheet cannot come
+to say different things. On the sheet itself the clause stays inline, where it
+has to read as one line of small print in a numbered list. A clause that ever
+opened differently falls back to printing whole, with the lifted word hidden.
+
 **The loss screen prints the round back.** Saying "the answer was shape 2" in
 words asks the player to take the verdict on trust, which is a poor way to end
 a game whose whole promise is that the answer was there to be read. `drawRecap`

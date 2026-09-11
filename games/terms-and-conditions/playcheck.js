@@ -255,7 +255,12 @@ while (answered < TARGET && guard++ < 400) {
     amendments++;
     check(/^Amendment \d+$/.test(byId.amendNo.textContent),
       'amendment heading reads "' + byId.amendNo.textContent + '"');
-    check(byId.amendText.textContent.length > 10, 'the amendment printed no clause text');
+    check(amendmentText().length > 10, 'the amendment printed no clause text');
+    /* the override word is lifted out and set on its own, not left inline */
+    check(byId.amendExcept.hidden === false && byId.amendExcept.textContent === 'Except',
+      'the amendment card did not lift "Except" onto its own line');
+    check(byId.amendText.textContent.slice(0, 5) === 'when ',
+      'the clause under the lifted word reads "' + byId.amendText.textContent.slice(0, 20) + '"');
     check(lastFocused === byId.amendBtn, 'focus did not land on the amendment button');
     byId.amendBtn.fire('click');
     continue;
@@ -345,6 +350,14 @@ check(byId.hud.hidden === false, 'the HUD is hidden mid-run');
   clickShape(solved.answer);
   check(screen() !== 'over', 'the round after the stall was judged wrong');
 })();
+
+/* The amendment card sets the leading "Except" on its own line, so the clause
+   a player reads is the two halves together. Reading only one of them is how a
+   split that silently stopped working would still pass. */
+function amendmentText() {
+  var lead = byId.amendExcept.hidden ? '' : byId.amendExcept.textContent + ' ';
+  return lead + byId.amendText.textContent;
+}
 
 /* ── losing, and what the loss screen says ─────────────────────────────── */
 
@@ -500,7 +513,7 @@ check(byId.hud.hidden === false, 'the HUD is hidden mid-run');
     var seen = [];
     for (var step = 0; step < 60 && seen.length < OPENERS; step++) {
       if (screen() === 'amendment') {
-        var text = byId.amendText.textContent;
+        var text = amendmentText();
         check(/^Except when /.test(text),
           'an amendment does not read as an override: "' + text + '"');
         seen.push(text);

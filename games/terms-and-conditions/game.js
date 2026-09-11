@@ -69,6 +69,7 @@
 
     el.amendNo = document.getElementById('amendNo');
     el.amendText = document.getElementById('amendText');
+    el.amendExcept = document.getElementById('amendExcept');
     el.amendBtn = document.getElementById('amendBtn');
 
     el.sheet = document.getElementById('sheet');
@@ -213,7 +214,18 @@
       var added = state.clauseOrder[state.active.length];
       state.active = state.active.concat([added]);
       el.amendNo.textContent = 'Amendment ' + state.active.length;
-      el.amendText.textContent = added.text;
+      /* Lift the leading "Except" onto its own line. The two halves together
+         are still exactly the clause as written — nothing is reworded, so the
+         card and the sheet cannot say different things. */
+      var LEAD = 'Except ';
+      if (added.text.slice(0, LEAD.length) === LEAD) {
+        el.amendExcept.textContent = 'Except';
+        el.amendExcept.hidden = false;
+        el.amendText.textContent = added.text.slice(LEAD.length);
+      } else {
+        el.amendExcept.hidden = true;
+        el.amendText.textContent = added.text;
+      }
       syncHud();
       show('amendment');
       el.amendBtn.focus();
