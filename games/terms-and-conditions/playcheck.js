@@ -284,9 +284,9 @@ while (answered < TARGET && guard++ < 400) {
        them, and it must come back shut rather than remembering being opened. */
     var above = amendments - 1;
     check(byId.recall.hidden === (above === 0),
-      'the clauses-above drawer is ' + (byId.recall.hidden ? 'hidden' : 'shown') +
+      'the clause-review drawer is ' + (byId.recall.hidden ? 'hidden' : 'shown') +
       ' on amendment ' + amendments);
-    check(byId.recall.open !== true, 'the clauses-above drawer came back open');
+    check(byId.recall.open !== true, 'the clause-review drawer came back open');
     if (above > 0) {
       var listed = byId.recallList.children.map(function (li) { return li.textContent; });
       check(listed.length === above,

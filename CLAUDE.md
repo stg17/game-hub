@@ -215,7 +215,7 @@ to say different things. On the sheet itself the clause stays inline, where it
 has to read as one line of small print in a numbered list. A clause that ever
 opened differently falls back to printing whole, with the lifted word hidden.
 
-The card also carries a **Clauses above** drawer listing the small print the
+The card also carries a **Clause review** drawer listing the small print the
 new clause has to outrank, numbered as the sheet numbers it. It is hidden
 outright on the first amendment, when there is nothing above it, and it is
 forced shut on every one after — a `<details>` remembers being opened, so
