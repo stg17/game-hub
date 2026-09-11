@@ -383,8 +383,11 @@ h1 {
   .panel .stat { flex: 1 1 0; padding: 7px 9px 8px; }
   .panel .stat-value { font-size: 21px; }
   #board { height: min(46vh, 400px); width: auto; }
-  /* the head plate gives up its height on a phone; the playfield needs it */
-  .head { padding: 16px 18px 18px; margin-bottom: calc(14px + var(--edge)); }
+  /* The head plate gives up its height on a phone; the playfield needs it. The
+     right padding is not decoration — it is the room the No. 01 stamp sits in,
+     and a three-value shorthand here once dropped it to 18px and printed the
+     stamp over the end of the title. */
+  .head { padding: 16px 84px 18px 18px; margin-bottom: calc(14px + var(--edge)); }
   h1 { font-size: clamp(30px, 8vw, 40px); }
   /* three marks sit on one row at any width, so they keep their own size */
   .controls { gap: 14px; }
