@@ -208,7 +208,6 @@ h1 {
 .grid-options__buttons span { display: block; margin-top: 6px; font-size: 11px; }
 .grid-options__buttons [aria-pressed="true"] { background: var(--red); color: var(--paper); }
 .grid-options__rule { margin: 16px 0 0; font-size: 14px; }
-.grid-options__note { margin: 4px 0 0; font-size: 14px; color: var(--paper-dim); }
 
 .controls {
   display: flex;
@@ -397,24 +396,38 @@ h1 {
 
 .overlay-actions { display: flex; flex-wrap: wrap; gap: 10px; justify-content: center; }
 
-/* ── the printed instructions along the bottom ────────────────────────── */
+/* ── the printed instructions along the bottom, in a drawer ──────────── */
 
 .legend {
   margin-top: 26px;
   border-top: 2px solid rgba(230, 220, 196, .22);
-  padding-top: 16px;
+  padding-top: 10px;
 }
 
+/* The head is the drawer’s own handle. The UA disclosure triangle is a font
+   glyph, so it goes and the drawn plus takes over — losing its upright to
+   become a minus once the drawer is open, the same mark the other games use. */
 .legend__head {
-  margin: 0 0 12px;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  cursor: pointer;
+  padding: 6px 0;
   font-size: 11px;
   font-weight: 700;
   letter-spacing: .18em;
   text-transform: uppercase;
   color: #d9b46a;
+  list-style: none;
 }
+.legend__head::-webkit-details-marker { display: none; }
+.legend__head::marker { content: ''; }
+.legend__head:focus-visible { outline: 3px solid var(--red-lit); outline-offset: 3px; }
 
-.legend__list { margin: 0; display: grid; gap: 9px; }
+.drawer__mark { width: 14px; height: 14px; flex: none; }
+.drawer[open] .drawer__mark-v { display: none; }
+
+.legend__list { margin: 12px 0 0; display: grid; gap: 9px; }
 .legend__list > div { display: flex; gap: 14px; align-items: baseline; }
 
 .legend__list dt {

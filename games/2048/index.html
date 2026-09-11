@@ -41,7 +41,6 @@
       <button type="button" class="btn btn-ghost" data-size="5" aria-pressed="false">5 × 5 <span>Bonus</span></button>
     </div>
     <p class="grid-options__rule" id="modeRule" aria-live="polite">4 × 4 classic: one new tile per move.</p>
-    <p class="grid-options__note">Each grid keeps its own game and best score.</p>
   </fieldset>
 
   <div class="controls">
@@ -62,14 +61,22 @@
     </div>
   </div>
 
-  <div class="legend">
-    <p class="legend__head">How it is played</p>
+  <details class="legend drawer">
+    <summary class="legend__head">
+      <svg class="drawer__mark" viewBox="0 0 20 20" aria-hidden="true" focusable="false">
+        <g stroke="currentColor" stroke-width="2.6" stroke-linecap="square">
+          <path class="drawer__mark-v" d="M10 4v12"/>
+          <path d="M4 10h12"/>
+        </g>
+      </svg>
+      How to play
+    </summary>
     <dl class="legend__list">
       <div><dt>Arrow keys<span>/</span>WASD</dt><dd>Slide every tile that way</dd></div>
       <div><dt>Swipe</dt><dd>Same thing, on a touch screen</dd></div>
       <div><dt>U</dt><dd>Take the move back &mdash; 25 deep, and it survives a reload</dd></div>
     </dl>
-  </div>
+  </details>
 </main>
 
 <script src="board.js"></script>

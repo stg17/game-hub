@@ -206,6 +206,16 @@ Positions are set as `--r`/`--c` custom properties, never as pixel offsets: `.ti
 
 Reaching 2048 sets `won` and shows the win overlay once; "Keep going" sets `keepPlaying` so it never reappears and only game-over is checked from then on.
 
+**The controls list is a shut drawer.** The foot of the page is a plain `<details>`
+headed **How to play** — no script, and it answers the keyboard itself. Anyone who
+has played a sliding-tile game already knows the arrow keys, so three printed lines
+of them under every board was apparatus nobody read; the drawer keeps them for
+whoever wants them. Its summary marker is drawn, not a UA disclosure triangle: the
+plus loses its upright and becomes a minus when the drawer opens, the same mark
+Terms & Conditions uses. The grid picker’s second line — "Each grid keeps its own
+game and best score" — went with it; each grid still does, and finding your game
+where you left it says so better than a sentence does.
+
 ### Terms & Conditions (`games/terms-and-conditions/`)
 
 A reaction game about small print. One instruction is printed large —
