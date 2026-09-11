@@ -138,6 +138,22 @@ What survives is an afterimage: `flashRows`/`flashLeft` drive a pale band the re
 
 A grounded piece refreshes its lock delay on any successful move or rotation, but only `MAX_LOCK_RESETS` times, so it can't be wiggled along the floor forever. Horizontal auto-repeat is our own DAS (`DAS_DELAY` then `DAS_REPEAT`) and OS key-repeat is explicitly ignored (`if (e.repeat) return`) — don't add a second repeat path. Held keys are cleared on `blur`, since keyups aren't delivered to an unfocused tab.
 
+**The well is sized by height, not by width.** `#board` is
+`clamp(425px, calc(88vh - 184px), 600px)` with `width: auto`, so the canvas —
+authored 300x600 and scaled by CSS, the same trick the phone layout already
+used — takes whatever the window has left once the head plate and the controls
+are placed, and stops at its authored 600 from roughly a 990px window up.
+Everything above it (`.wrap`'s top padding, the head plate's bottom margin) is
+in `vh` for the same reason. The old fixed drop put the floor of the well, and
+the controls under it, below the fold on an ordinary laptop, which is the one
+thing this page cannot do — you cannot play a well you have to scroll to.
+
+The floor of 425px is the taller component tray's height: shrink the well past
+that and the tray sets the row height instead, so the page gets no shorter. A
+`min-width: 701px and max-height: 760px` block narrows both trays to 104px on a
+768px-tall laptop, which buys that height back and lets the floor drop to 336.
+Change one of those numbers and re-measure the other — they are a pair.
+
 **The three controls under the well print a mark, not a word** — a replay arrow,
 the pause bars, a speaker — drawn as inline SVG in the house hand, since nothing
 in this project is an emoji or an icon-font glyph. The pause button carries both
