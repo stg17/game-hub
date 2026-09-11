@@ -256,6 +256,10 @@ h1 {
 }
 
 .ti-plate rect { fill: var(--paper); stroke: var(--ink); stroke-width: 2.5; }
+/* Drawn as outlines on the field rather than as paper plates. Ten filled
+   blocks that close together read as a hard chequerboard; hollow, the pyramid
+   reads as one shape. */
+.ti-plate.ti-open rect { fill: none; }
 .ti-num text { font: 700 18px/1 Slab, Georgia, serif; fill: var(--ink); text-anchor: middle; font-variant-numeric: tabular-nums; }
 .ti-num.sm text { font-size: 13px; }
 .ti-field { fill: rgba(23, 20, 16, .16); }
