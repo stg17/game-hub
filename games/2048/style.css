@@ -241,6 +241,25 @@ h1 {
 .btn-primary { background: var(--red); color: var(--paper); }
 .btn-ghost   { background: var(--paper); color: var(--ink); }
 
+/* The two controls under the tray print their mark rather than their name — a
+   replay loop and an arrow turning back. Each keeps its word in the title and
+   aria-label, so nothing is named only by a shape, and both are drawn as inline
+   SVG in the house hand: no glyphs, no icon font. The overlay keeps its words,
+   where the buttons answer a sentence rather than sit under the board. */
+.btn-icon {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 11px;
+  line-height: 0;
+}
+
+.ico {
+  width: 24px;
+  height: 24px;
+  display: block;
+}
+
 /* ── the tray ─────────────────────────────────────────────────────────── */
 
 /* Every grid fits the same tray. Reserve its border, gaps and outer edge

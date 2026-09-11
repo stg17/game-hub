@@ -206,6 +206,13 @@ Positions are set as `--r`/`--c` custom properties, never as pixel offsets: `.ti
 
 Reaching 2048 sets `won` and shows the win overlay once; "Keep going" sets `keepPlaying` so it never reappears and only game-over is checked from then on.
 
+**The two controls under the tray print a mark, not a word** — a replay loop and
+an arrow turning back — drawn as inline SVG in the house hand, the same rule as
+Tetris’s three. Each keeps its own wording ("Empty the tray", "Take the move
+back") in `title` and `aria-label`, so nothing is named only by a shape. The
+overlay’s buttons stay words: there they answer a sentence the sheet has just
+printed, and a bare mark beside "Try again" would be the odd one out.
+
 **The controls list is a shut drawer.** The foot of the page is a plain `<details>`
 headed **How to play** — no script, and it answers the keyboard itself. Anyone who
 has played a sliding-tile game already knows the arrow keys, so three printed lines
