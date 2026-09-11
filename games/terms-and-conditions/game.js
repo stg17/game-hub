@@ -17,7 +17,8 @@
 
   /* One clause per difficulty tier, so the cap is the catalogue's tier count
      rather than a number typed here twice. */
-  var CLAUSE_CAP = R.RUN_CLAUSES;
+  /* No ceiling: the ramp keeps asking for another clause, and the only thing
+     that ever stops it is the catalogue running dry. */
   var EASE_IN_ROUNDS = 2;   /* rounds of headline-only, to learn the base */
   var PER_CLAUSE = 3;       /* correct answers between amendments */
   var TIME_START = 6000;
@@ -26,7 +27,7 @@
 
   function clausesFor(streak) {
     if (streak < EASE_IN_ROUNDS) return 0;
-    return Math.min(CLAUSE_CAP, 1 + Math.floor((streak - EASE_IN_ROUNDS) / PER_CLAUSE));
+    return 1 + Math.floor((streak - EASE_IN_ROUNDS) / PER_CLAUSE);
   }
   function timeFor(streak) {
     return Math.max(TIME_FLOOR, TIME_START - streak * TIME_STEP);
@@ -104,10 +105,10 @@
   function syncHud() {
     var stats = Store.get();
     el.hudStreak.textContent = String(state.streak);
-    var clauseCount = state.active.length + ' of ' + CLAUSE_CAP;
-    el.hudClauses.textContent = clauseCount;
-    /* the printed badge is legible as a fraction; said aloud it needs a noun */
-    el.hudClauses.setAttribute('aria-label', clauseCount + ' clauses in force');
+    /* A count, not a fraction: there is no total to be out of. */
+    var n = state.active.length;
+    el.hudClauses.textContent = n + (n === 1 ? ' clause' : ' clauses');
+    el.hudClauses.setAttribute('aria-label', n + (n === 1 ? ' clause' : ' clauses') + ' in force');
     el.hudBest.textContent = 'Best streak ' + stats.bestStreak;
   }
 
@@ -197,6 +198,11 @@
         el.clauseList.appendChild(li);
       });
     }
+    /* Set the page in columns once there is enough of it to push the shapes
+       off the screen. */
+    el.clauseList.className = 'fine' +
+      (state.active.length >= 8 ? ' fine--dense' : '') +
+      (state.active.length >= 14 ? ' fine--denser' : '');
   }
 
   /* ── the run ────────────────────────────────────────────────────────── */
@@ -212,7 +218,7 @@
 
   function nextRound() {
     var want = clausesFor(state.streak);
-    if (want > state.active.length) {
+    if (want > state.active.length && state.active.length < state.clauseOrder.length) {
       /* A new clause must be read before it can end a run. */
       var added = state.clauseOrder[state.active.length];
       state.active = state.active.concat([added]);

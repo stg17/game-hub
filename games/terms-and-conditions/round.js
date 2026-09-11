@@ -24,9 +24,10 @@ window.TC.Round = (function () {
   var FIRE_RATE = 0.5;    /* share of rounds where a clause changes the answer */
   var ATTEMPTS = 120;     /* per round, before settling for what we have */
 
-  // How many clauses one run deals: one from each difficulty tier. See
-  // runOrder below for why that is the number.
-  var RUN_CLAUSES = C.TIERS;
+  // How many clauses a run can deal before the catalogue is spent: all of
+  // them. There is no finish line — the sheet keeps growing until the player
+  // drops a round. See runOrder for the order they arrive in.
+  var RUN_CLAUSES = C.CLAUSES.length;
 
   /* A small seeded generator, so the self-check can reproduce a failure. */
   function lcg(seed) {
@@ -38,6 +39,15 @@ window.TC.Round = (function () {
   }
 
   function pick(rng, arr) { return arr[Math.floor(rng() * arr.length)]; }
+
+  function shuffle(rng, arr) {
+    var out = arr.slice();
+    for (var i = out.length - 1; i > 0; i--) {
+      var j = Math.floor(rng() * (i + 1));
+      var swap = out[i]; out[i] = out[j]; out[j] = swap;
+    }
+    return out;
+  }
 
   function sampleDistinct(rng, arr, n) {
     var pool = arr.slice();
@@ -204,13 +214,26 @@ window.TC.Round = (function () {
   //
   // Tiers should stay evenly stocked. A tier holding one clause is a slot that
   // prints the same line every run.
+  /* The whole catalogue, dealt in waves: one clause from each difficulty tier,
+     easiest first, then round again for the next one from each. The first six
+     a player meets are therefore exactly what they always were — one per tier,
+     climbing — and the run simply keeps going instead of stopping there. A
+     wave is shuffled within each tier, so two runs of the same length are not
+     the same run. */
   function runOrder(rng) {
     rng = rng || Math.random;
-    var out = [];
+    var byTier = [];
     for (var tier = 1; tier <= C.TIERS; tier++) {
       var inTier = C.CLAUSES.filter(function (c) { return c.rank === tier; });
-      if (!inTier.length) continue;
-      out.push(pick(rng, inTier));
+      byTier.push(shuffle(rng, inTier));
+    }
+    var out = [];
+    for (var wave = 0; ; wave++) {
+      var addedAny = false;
+      for (var t = 0; t < byTier.length; t++) {
+        if (wave < byTier[t].length) { out.push(byTier[t][wave]); addedAny = true; }
+      }
+      if (!addedAny) break;
     }
     return out;
   }

@@ -336,7 +336,18 @@ while (answered < TARGET && guard++ < 400) {
 
 check(answered === TARGET, 'only got through ' + answered + ' of ' + TARGET + ' rounds');
 check(amendments >= 5, 'only ' + amendments + ' amendments arrived in ' + TARGET + ' rounds');
-check(maxClauses >= 5, 'the clause list only ever reached ' + maxClauses);
+/* The ramp has no ceiling. Six used to be the whole run, so passing it is the
+   thing worth proving; the badge must be a count, not a fraction out of a
+   total that no longer exists. */
+check(maxClauses > 6, 'the clause list stopped growing at ' + maxClauses +
+  ' — the ramp still has a ceiling');
+check(byId.hudClauses.textContent.indexOf(' of ') < 0,
+  'the clause badge still reads as a fraction: "' + byId.hudClauses.textContent + '"');
+(function () {
+  var t = byId.hudClauses.textContent, n = parseInt(t, 10);
+  check(t === n + (n === 1 ? ' clause' : ' clauses'),
+    'the clause badge reads "' + t + '"');
+})();
 check(byId.hud.hidden === false, 'the HUD is hidden mid-run');
 
 /* the bar must actually drain */

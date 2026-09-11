@@ -515,6 +515,23 @@ kbd {
 .fine li + li { margin-top: 4px; }
 .fine li::marker { font-weight: 700; }
 
+/* A long page of small print sets in columns, the way a long page of small
+   print actually does. Without it the list pushes the shapes and the clock
+   off the bottom of the screen, and the run becomes a scrolling exercise
+   against a shrinking clock. game.js adds the class from the clause count. */
+.fine--dense {
+  columns: 2;
+  column-gap: 30px;
+  max-width: none;
+  font-size: 12.5px;
+}
+.fine--denser {
+  columns: 3;
+  font-size: 12px;
+}
+/* a clause must not be split down the middle by a column break */
+.fine--dense li { break-inside: avoid; }
+
 /* Before the first amendment. Says the sheet is complete as printed, rather
    than leaving a gap that looks like something failed to load. */
 /* --ink-70, not the --ink-45 this used to be: at 45% on the palest backdrop

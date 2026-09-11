@@ -261,8 +261,13 @@ check(50 - C.GLYPH.star.r >= 0 && 50 + C.GLYPH.star.r <= 100,
       'runOrder dealt ' + order.length + ' clauses, expected ' + R.RUN_CLAUSES);
     for (var i = 0; i < order.length; i++) {
       seenClause[order[i].id] = true;
-      check(order[i].rank === i + 1,
-        'runOrder slot ' + (i + 1) + ' holds a tier-' + order[i].rank + ' clause — the ramp is broken');
+      /* The ramp is now a repeating wave: each run of TIERS slots climbs the
+         tiers easiest-first, then starts the next wave. The first wave is what
+         a player used to get as their whole run, so the early game is
+         unchanged. */
+      check(order[i].rank === (i % C.TIERS) + 1,
+        'runOrder slot ' + (i + 1) + ' holds a tier-' + order[i].rank +
+        ' clause, expected tier ' + ((i % C.TIERS) + 1) + ' — the ramp is broken');
     }
     sets[order.map(function (c) { return c.id; }).join('|')] = true;
   }
@@ -279,7 +284,7 @@ check(50 - C.GLYPH.star.r >= 0 && 50 + C.GLYPH.star.r <= 100,
 
 var ROUNDS = 4000;
 var rng = R.lcg(20260909);
-var DEPTHS = R.RUN_CLAUSES;   /* the deepest a real run ever gets */
+var DEPTHS = R.RUN_CLAUSES;   /* the whole catalogue: a long run reaches it */
 
 var fired = 0;
 var decidedTally = {};

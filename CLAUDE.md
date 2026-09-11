@@ -215,6 +215,24 @@ smallest shape"). A new clause arrives every third correct answer and the clock
 shortens; one wrong answer or one timeout ends the run, and best streak is the
 score.
 
+**There is no ceiling and no finish line.** The ramp keeps asking for another
+clause and only stops when the catalogue runs dry, so `runOrder` deals the
+whole of it — all 18 — in waves: one clause from each difficulty tier,
+easiest first, then round again for the next from each, shuffled within a tier.
+A player's first six are therefore exactly the six they always got, one per
+tier and climbing; the run simply carries on instead of stopping there. The
+last clause lands at a streak of 53, and the clock reaches its 2400ms floor at
+28, so in practice the sheet is still growing long after the game has become
+unsurvivable — which is the point. The HUD badge is a count (`13 clauses`), not
+a fraction, because there is no total to be out of.
+
+Two things this cost. The engine was measured at every depth before the change:
+`deal` still returns a valid round 100% of the time and holds its ~50% fire
+rate with all 18 clauses in force, so nothing degrades into the fallback. And
+the sheet grows — `.fine--dense` sets it in two columns from eight clauses and
+three from fourteen, which takes an 18-clause list from 465px to 298px. Even so
+the page scrolls on a laptop, as it already did at six.
+
 **The menu explains nothing on purpose.** It prints one line — "Follow the
 instructions carefully" — plus the best streak and a keyboard note. An earlier
 build printed the whole agreement there: precedence, the ramp, the lot. That is
