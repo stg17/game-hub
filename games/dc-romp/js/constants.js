@@ -39,7 +39,7 @@ Game.Catchphrases = [
 ];
 
 Game.MenuOptions = ['Start Game', 'Pick a Level', 'How to Play', 'Sound: On'];
-Game.PauseOptions = ['Carry on', 'Restart the level', 'Back to the menu'];
+Game.PauseOptions = ['Continue', 'Restart', 'Menu'];
 Game.LEVEL_COUNT = 5;
 Game.LevelNames = {
   1: 'White House Lawn',

@@ -412,7 +412,7 @@ Game.UI = (function () {
       button(ctx, W / 2 - bw / 2, startY + i * (bh + gap), bw, bh, Game.PauseOptions[i], i === selectedIndex, 'pause-' + i);
     }
 
-    caption(ctx, 'Escape or P to carry on', y + h - 26, 'rgba(23,20,16,0.55)', 11);
+    caption(ctx, 'Escape or P to continue', y + h - 26, 'rgba(23,20,16,0.55)', 11);
   }
 
   function resultSheet(ctx, heading, headingColor, statLabel, statValue, btnLabel, btnId) {
