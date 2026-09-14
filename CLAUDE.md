@@ -197,7 +197,8 @@ The default is classic 4×4, with 3×3 and 5×5 bonus grids. Every new game star
 **The 4 × 4 button is printed larger than the other two, on purpose.** It is
 the game; 3 × 3 and 5 × 5 are bonus grids kept in the box beside it. It takes a
 wider share of the row, larger type and a deeper drawn shadow, while the other
-two sit on `--paper-dim` rather than full paper — dimmer stock for the extras.
+two are tinted `--tile-8` — the same gold as the game's own 8 tile — rather than
+full paper, marking them as the lighter, bonus fare.
 That is deliberately a different channel from the red `aria-pressed` fill,
 which already means "this is the grid in play" and stays available to whichever
 of the three is selected; the 4 × 4 keeps reading as the main board even while

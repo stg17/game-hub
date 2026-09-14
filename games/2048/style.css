@@ -25,6 +25,7 @@
 
   --field:      #d8912a;   /* this game's printed colour */
   --tray:       #8a5a18;   /* the chipboard the tiles sit in */
+  --tile-8:     #ddb96f;   /* shared with the 8 tile, so the bonus grids print its colour */
 
   --edge:       6px;
 }
@@ -215,10 +216,10 @@ h1 {
 
 /* The 4 × 4 is the game; the other two are extras kept in the box beside it. It
    is printed wider and larger and stands on a deeper shadow, and the bonus pair
-   sit back a shade on dimmer stock — so which one is the main board reads before
-   anything has been chosen, and goes on reading whichever is. Deliberately not
-   the red fill: that channel already means "this is the grid you are playing",
-   and one mark cannot say two things. */
+   are tinted the 8 tile's gold rather than plain paper — so which one is the
+   main board reads before anything has been chosen, and goes on reading
+   whichever is. Deliberately not the red fill: that channel already means
+   "this is the grid you are playing", and one mark cannot say two things. */
 .grid-options__buttons [data-size="4"] {
   flex: 1.55;
   padding: 16px 8px;
@@ -232,7 +233,7 @@ h1 {
 .grid-options__buttons [data-size="4"]:active:not(:disabled) { box-shadow: 3px 3px 0 0 var(--ink); }
 
 .grid-options__buttons [data-size="3"],
-.grid-options__buttons [data-size="5"] { background: var(--paper-dim); }
+.grid-options__buttons [data-size="5"] { background: var(--tile-8); }
 
 /* Last, so the lit grid is red whichever of the three it is. */
 .grid-options__buttons [aria-pressed="true"] { background: var(--red); color: var(--paper); }
@@ -388,7 +389,7 @@ h1 {
    colours of the other games in the box for anything past 128 */
 .tile-2    { background: #f0e6d0; }
 .tile-4    { background: #e8d6ac; }
-.tile-8    { background: #ddb96f; }
+.tile-8    { background: var(--tile-8); }
 .tile-16   { background: #d09a3f; }
 .tile-32   { background: #c2652a; }
 .tile-64   { background: #b13f1f; color: var(--paper); }
