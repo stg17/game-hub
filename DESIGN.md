@@ -299,7 +299,7 @@ The cover and the tag are one object throughout — the flying element is a clon
 Square corners, everywhere, with no exceptions in the build: `border-radius` is not set on a single element across the eight stylesheets. The form language is the die-cut rectangle — a hard 3px `var(--ink)` keyline around a flat fill, with an ink plate offset beneath it.
 
 Recurring silhouettes:
-- **The tab**: a plate with `border-top: 0`, hung from the top edge of the viewport and pushed *down* on hover. Used once per game page for the back link.
+- **The tab**: a plate with a complete 3px ink border, inset 12px from the top of the viewport and pushed *down* on hover. Used once per game page for the back link.
 - **The corner stamp**: a solid ink rectangle flush into a plate's top-right corner (`top: 0; right: 0`), carrying tracked caps in paper. Every board and every head plate has one.
 - **The registration mark**: a circle of r7 crossed by 22px rules, drawn in 28–30% ink at the corners of canvas sheets (`Game.UI.regMark`).
 - **The die-cut outline**: 3px dashed pulpboard at 34% over a 135° 9px hatch — the empty slot, and the dashed cage strokes in Calcudoku and the Tetris ghost piece.
@@ -333,7 +333,7 @@ All iconography is inline SVG drawn from these same primitives with `currentColo
 - **Error:** red text on a 16% red wash (`.conflict`). No icon, no message chrome.
 
 ### Navigation
-The only navigation between surfaces is the back tab: `position: fixed; top: 0`, pulpboard, 3px ink, `border-top: 0`, slip edge, an inline SVG chevron at 13px, label "Back to the box" in Slab 700 11.5px/`0.16em` caps. Hover pushes it *down* 3px and turns the label red. It appears identically on all seven game pages.
+The only navigation between surfaces is the back tab: `position: fixed; top: 12px`, pulpboard, a complete 3px ink border, slip edge, an inline SVG chevron at 13px, label "Back to the box" in Slab 700 11.5px/`0.16em` caps. Hover pushes it *down* 3px and turns the label red. All seven games use the same styling. D.C. Romp reserves a 48px top strip before centering its canvas; at narrow widths, its existing notice carries the back link instead.
 
 ### The Record Strip
 Every hub board prints what the box remembers about that game — best score, tally, puzzles solved, level unlocked — read live from that game's own `localStorage` key by `hub.js`. Set 12px Slab 700 tabular caps at `0.09em` above a 2px `{colors.ink-15}` rule. The unplayed state is a real state: it drops to 400 weight at 70% ink and reads as an invitation ("No score set yet"), never as a zero or a broken value.

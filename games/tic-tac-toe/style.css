@@ -59,7 +59,7 @@ html { scrollbar-color: #6d5a41 var(--table-deep); }
 
 .hub-link {
   position: fixed;
-  top: 0;
+  top: 12px;
   left: clamp(14px, 4vw, 40px);
   z-index: 10;
   display: inline-flex;
@@ -68,7 +68,6 @@ html { scrollbar-color: #6d5a41 var(--table-deep); }
   background: var(--paper);
   color: var(--ink);
   border: 3px solid var(--ink);
-  border-top: 0;
   padding: 9px 16px 10px;
   font-size: 11.5px;
   font-weight: 700;
