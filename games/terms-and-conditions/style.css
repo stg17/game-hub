@@ -241,15 +241,6 @@ kbd {
   padding: 18px 34px;
 }
 
-/* Not an instruction about the game — just how to reach the shapes without a
-   mouse. Kept quiet, but above the contrast floor: it is the only route in for
-   a keyboard player and must not read as decoration. */
-.menu-keys {
-  margin: 18px 0 0;
-  font-size: 13.5px;
-  color: rgba(230, 220, 196, .88);
-}
-
 /* ── how to play ──────────────────────────────────────────────────────── */
 
 /* A printed tab that opens into a slip. Closed it is one line, so the menu
