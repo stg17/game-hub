@@ -134,6 +134,14 @@ h1 {
   color: var(--paper);
 }
 
+/* While a round is running the sheet is the whole screen. The head plate is
+   identity, and identity is not what you need with two seconds on the clock —
+   the back tab carries navigation and the HUD carries state. Reclaiming it
+   keeps the shapes and the draining clock above the fold as the page of small
+   print grows, which is the whole point of the game being readable at all.
+   A browser without :has() simply keeps the plate, and scrolls as before. */
+body:has(#screen-play:not([hidden])) .head { display: none; }
+
 /* ── the running head ─────────────────────────────────────────────────── */
 
 .hud {
@@ -521,6 +529,13 @@ kbd {
 }
 /* a clause must not be split down the middle by a column break */
 .fine--dense li { break-inside: avoid; }
+
+/* At the deepest stacks, tighten the space around the small print rather than
+   shrink the headline — the instruction has to stay readable exactly when
+   there is least time to read it. Buys back the last few pixels so the shapes
+   and the draining clock stay on screen. */
+.sheet:has(.fine--denser) .sheet__headline { margin-bottom: 8px; }
+.sheet:has(.fine--denser) .fine { margin-bottom: 12px; }
 
 /* Before the first amendment. Says the sheet is complete as printed, rather
    than leaving a gap that looks like something failed to load. */

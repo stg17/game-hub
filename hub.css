@@ -404,15 +404,6 @@ html { scrollbar-color: var(--tray) var(--table-deep); }
   color: #d9b46a;
 }
 
-.colophon__note {
-  margin: 0;
-  flex: 1 1 380px;
-  max-width: 72ch;
-  font-size: 14px;
-  line-height: 1.6;
-  color: rgba(230, 220, 196, .78);
-}
-
 /* ── opening the box ──────────────────────────────────────────────────── */
 
 /* The intro is built by hub.js, never by the markup, so a browser with no
