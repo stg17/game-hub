@@ -202,9 +202,39 @@ h1 {
   text-transform: uppercase;
   color: #d9b46a;
 }
-.grid-options__buttons { display: flex; gap: 10px; padding-right: 5px; }
-.grid-options__buttons .btn { flex: 1; padding: 12px 8px; }
+.grid-options__buttons { display: flex; align-items: stretch; gap: 10px; padding-right: 5px; }
+.grid-options__buttons .btn {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 12px 8px;
+}
 .grid-options__buttons span { display: block; margin-top: 6px; font-size: 11px; }
+
+/* The 4 × 4 is the game; the other two are extras kept in the box beside it. It
+   is printed wider and larger and stands on a deeper shadow, and the bonus pair
+   sit back a shade on dimmer stock — so which one is the main board reads before
+   anything has been chosen, and goes on reading whichever is. Deliberately not
+   the red fill: that channel already means "this is the grid you are playing",
+   and one mark cannot say two things. */
+.grid-options__buttons [data-size="4"] {
+  flex: 1.55;
+  padding: 16px 8px;
+  font-size: 15px;
+  letter-spacing: .18em;
+  box-shadow: 7px 7px 0 0 var(--ink);
+}
+.grid-options__buttons [data-size="4"] span { margin-top: 8px; font-size: 12px; }
+.grid-options__buttons [data-size="4"]:hover:not(:disabled),
+.grid-options__buttons [data-size="4"]:focus-visible { box-shadow: 9px 9px 0 0 var(--ink); }
+.grid-options__buttons [data-size="4"]:active:not(:disabled) { box-shadow: 3px 3px 0 0 var(--ink); }
+
+.grid-options__buttons [data-size="3"],
+.grid-options__buttons [data-size="5"] { background: var(--paper-dim); }
+
+/* Last, so the lit grid is red whichever of the three it is. */
 .grid-options__buttons [aria-pressed="true"] { background: var(--red); color: var(--paper); }
 .grid-options__rule { margin: 16px 0 0; font-size: 14px; }
 

@@ -194,6 +194,16 @@ DOM tiles rather than canvas, because sliding/merging is much easier to animate 
 
 The default is classic 4×4, with 3×3 and 5×5 bonus grids. Every new game starts with two tiles. A successful move spawns one tile in 3×3/4×4 and two in 5×5 (only one if that is all the space left); a no-op spawns nothing. Each grid has its own saved game, best and undo history, and switching resumes that grid.
 
+**The 4 × 4 button is printed larger than the other two, on purpose.** It is
+the game; 3 × 3 and 5 × 5 are bonus grids kept in the box beside it. It takes a
+wider share of the row, larger type and a deeper drawn shadow, while the other
+two sit on `--paper-dim` rather than full paper — dimmer stock for the extras.
+That is deliberately a different channel from the red `aria-pressed` fill,
+which already means "this is the grid in play" and stays available to whichever
+of the three is selected; the 4 × 4 keeps reading as the main board even while
+looking at it selected would say otherwise, because size and colour are saying
+two different things.
+
 **Tile ids are the whole design.** A board is a 3×3, 4×4 or 5×5 matrix of `null` or `{id, value}`, and `Board.move` returns a *brand-new* board plus `moves` (per tile id, the cell it lands in), `merges`, `gained` and `moved`. `Board.create(size)` defaults to 4; other operations derive the size from their matrix. Ids survive a move, which is what lets `game.js` animate by moving the *same* DOM node (kept in `nodes`, keyed by id) instead of redrawing the grid. `move()` never touches the board passed in, so the caller can keep the old one.
 
 **Both halves of a merge slide onto the same cell** and get a `moves` entry each; the absorbed one is pushed to a lower `z-index` and removed by the single `setTimeout(..., MOVE_MS)` that also relabels the survivor and drops in the new tiles. `MOVE_MS` must stay in sync with the `.tile` transform transition in `style.css`. The `pop`/`appear` keyframes drive `transform` themselves and outlast `MOVE_MS`, so `doMove` strips those classes and forces a reflow before setting any new position — otherwise a tile still mid-animation jumps instead of gliding. A `busy` flag blocks input, restarting and grid switching during the slide.
