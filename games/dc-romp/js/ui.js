@@ -211,10 +211,10 @@ Game.UI = (function () {
     sheet(ctx, 150, 42, W - 300, H - 104);
 
     // the title sits on this game's own printed field, the same sky the hub
-    // prints board No. 05 on — full strength, not a tinted-up word
+    // prints board No. 02 on — full strength, not a tinted-up word
     plate(ctx, 150, 42, W - 300, 152, FIELD, 8);
     regMark(ctx, 172, 64, "rgba(23,20,16,0.30)");
-    setStamp(ctx, 810 - 84, 42, "No. 05");
+    setStamp(ctx, 810 - 84, 42, "No. 02");
     title(ctx, 'D.C. ROMP', 128, 54);
 
     ctx.save();
@@ -236,7 +236,7 @@ Game.UI = (function () {
   function drawHowTo(ctx) {
     backdrop(ctx);
     sheet(ctx, 60, 26, W - 120, H - 52);
-    setStamp(ctx, 92, 56, 'No. 05 · Rules');
+    setStamp(ctx, 92, 56, 'No. 02 · Rules');
     title(ctx, 'HOW TO PLAY', 100, 34);
 
     var lines = [
@@ -284,7 +284,7 @@ Game.UI = (function () {
   function drawLevelSelect(ctx, unlockedLevel, selectedLevel, levelCount) {
     backdrop(ctx);
     sheet(ctx, 40, 104, W - 80, 264);
-    setStamp(ctx, 92, 134, 'No. 05 · Levels');
+    setStamp(ctx, 92, 134, 'No. 02 · Levels');
     title(ctx, 'PICK A LEVEL', 174, 32);
 
     var bw = 158, bh = 96, gap = 14;
@@ -369,7 +369,7 @@ Game.UI = (function () {
     ctx.textAlign = 'center';
     ctx.textBaseline = 'middle';
     ctx.font = slab(11, true);
-    tracked(ctx, 'No. 05 · LEVEL ' + Game.levelIndex + ' OF ' + levelCount, W - lw / 2 - 14, 26, 1.2);
+    tracked(ctx, 'No. 02 · LEVEL ' + Game.levelIndex + ' OF ' + levelCount, W - lw / 2 - 14, 26, 1.2);
     ctx.font = slab(12, true);
     ctx.fillStyle = INK;
     tracked(ctx, label, W - lw / 2 - 14, 43, 1.6);
@@ -438,7 +438,7 @@ Game.UI = (function () {
   function drawWin(ctx) {
     backdrop(ctx);
     sheet(ctx, 150, 56, W - 300, 340);
-    setStamp(ctx, 182, 86, 'No. 05 · Complete');
+    setStamp(ctx, 182, 86, 'No. 02 · Complete');
 
     ctx.save();
     ctx.textAlign = 'center';
