@@ -427,13 +427,14 @@ kbd {
 .board {
   display: grid;
   width: fit-content;
+  --ink-gap: 1px;
 }
 
 /* The square size, and the only place it is set. A big plate gets smaller
    squares so that it and its gutters still fit without scrolling. */
-.board--small  { --cell: 42px; }
-.board--medium { --cell: 32px; }
-.board--large  { --cell: 26px; }
+.board--small  { --cell: 42px; --ink-gap: 2px; }
+.board--medium { --cell: 32px; --ink-gap: 2px; }
+.board--large  { --cell: 26px; --ink-gap: 1px; }
 
 .gut {
   display: flex;
@@ -468,7 +469,11 @@ kbd {
 .sq {
   appearance: none;
   -webkit-appearance: none;
-  padding: 0;
+  /* The hairline of pulpboard an inked square leaves round itself. It is
+     padding rather than an inset on the ink, so it is the same on all four
+     sides whether or not that side carries a rule, and it is set on every
+     square so nothing moves when one is marked. */
+  padding: var(--ink-gap);
   margin: 0;
   cursor: pointer;
   background: transparent;
@@ -489,7 +494,19 @@ kbd {
 /* No hover state: a square cannot lift without tearing the ruling, and a tonal
    wash is out of world. The affordance is the cursor — pointerdown focuses the
    square, so the lit ring follows the mouse too. */
-.sq--ink { background: var(--ink); }
+
+/* The ink is clipped to the content box, so an inked square prints as a block
+   standing inside its own ruling rather than as a flood that swallows it. A
+   flood is what a run of nine looks like when it comes out as one unbroken
+   bar: the rules between the squares are ink on ink, and the player is left
+   measuring a length instead of counting squares. With the hairline of board
+   showing, the light rules read as pale lines between the blocks and the
+   heavy fifth rule as a black band between two of them, which is what makes a
+   long run countable at a glance. */
+.sq--ink {
+  background: var(--ink);
+  background-clip: content-box;
+}
 
 /* The cursor, and the one lit thing on the plate. Deliberately :focus and not
    :focus-visible — browsers suppress :focus-visible on a pointer-focused
@@ -521,6 +538,10 @@ kbd {
    card would hand back a copy of the reward instead of the reward. Border
    widths are untouched, so nothing reflows at the moment of completion. */
 .board--done { pointer-events: none; }
+/* The counting aid is apparatus, and a finished plate has nothing left to
+   count: the ink floods back over its rules and the blocks close up into one
+   picture. Paint only — no width or padding changes, so nothing reflows. */
+.board--done .sq--ink { background-clip: border-box; }
 .board--done .sq--out::before,
 .board--done .sq--out::after { display: none; }
 .board--done .sq:focus { box-shadow: none; }
