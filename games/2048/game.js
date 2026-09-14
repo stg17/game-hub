@@ -146,11 +146,13 @@
   function syncUi() {
     scoreEl.textContent = score;
     bestEl.textContent = best;
-    undoBtn.disabled = busy || history.length === 0;
-    overlayUndoBtn.disabled = busy || history.length === 0;
-    newGameBtn.disabled = busy;
+    // Disabled means "there is nothing here to press", never "a tile is still
+    // sliding". Every handler guards on `busy` itself, so painting the whole row
+    // grey for the 130ms of a slide protected nothing and made each arrow press
+    // flash the controls off and on again.
+    undoBtn.disabled = history.length === 0;
+    overlayUndoBtn.disabled = history.length === 0;
     for (var i = 0; i < sizeButtons.length; i++) {
-      sizeButtons[i].disabled = busy;
       sizeButtons[i].setAttribute('aria-pressed', String(Number(sizeButtons[i].dataset.size) === size));
     }
     var modeRule = size === 5

@@ -206,12 +206,22 @@ Positions are set as `--r`/`--c` custom properties, never as pixel offsets: `.ti
 
 Reaching 2048 sets `won` and shows the win overlay once; "Keep going" sets `keepPlaying` so it never reappears and only game-over is checked from then on.
 
-**The two controls under the tray print a mark, not a word** — a replay loop and
-an arrow turning back — drawn as inline SVG in the house hand, the same rule as
-Tetris’s three. Each keeps its own wording ("Empty the tray", "Take the move
-back") in `title` and `aria-label`, so nothing is named only by a shape. The
-overlay’s buttons stay words: there they answer a sentence the sheet has just
-printed, and a bare mark beside "Try again" would be the odd one out.
+**Emptying the tray prints a mark; undo prints its word.** The replay loop is
+inline SVG in the house hand, the same rule as Tetris’s three controls, and it
+keeps "Empty the tray" in `title` and `aria-label` so it is never named only by a
+shape. Undo was drawn too and went back to the word: a U-turn arrow beside a loop
+is two curved arrows asking to be told apart, and the word costs one button’s
+width. `.btn-icon`’s padding is set so the chip stands exactly as tall as that
+word button rather than stretching the row to the taller of the two.
+
+**Disabled means "nothing here to press", never "a tile is still sliding".**
+`doMove` holds `busy` for `MOVE_MS`, and `syncUi` used to hand that straight to
+`disabled` on the new-game button, both undos and all three size buttons — so
+every arrow press flashed the whole page grey and back for 130ms, which at speed
+is dizzying. Every handler already guards on `busy` itself (`doMove`, `undo`,
+`newGame` and `changeSize` all return early), so the attribute was protecting
+nothing and only painting. It now tracks the one honest condition, an empty undo
+history. Don’t route animation state back into `disabled`.
 
 **The controls list is a shut drawer.** The foot of the page is a plain `<details>`
 headed **How to play** — no script, and it answers the keyboard itself. Anyone who

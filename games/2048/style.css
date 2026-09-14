@@ -241,16 +241,17 @@ h1 {
 .btn-primary { background: var(--red); color: var(--paper); }
 .btn-ghost   { background: var(--paper); color: var(--ink); }
 
-/* The two controls under the tray print their mark rather than their name — a
-   replay loop and an arrow turning back. Each keeps its word in the title and
-   aria-label, so nothing is named only by a shape, and both are drawn as inline
-   SVG in the house hand: no glyphs, no icon font. The overlay keeps its words,
-   where the buttons answer a sentence rather than sit under the board. */
+/* Emptying the tray prints its mark rather than its name — a replay loop, drawn
+   as inline SVG in the house hand: no glyph, no icon font. It keeps its word in
+   the title and aria-label, so it is never named only by a shape. Undo stays a
+   word beside it. The padding is set so the chip stands exactly as tall as that
+   word button (24px mark + 6px either side + the 3px rules), and the row sits
+   level rather than stretching one button to the other. */
 .btn-icon {
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  padding: 11px;
+  padding: 6px;
   line-height: 0;
 }
 

@@ -52,14 +52,7 @@
         <path d="M12.5 4.8 9.7 9.1 7.5 3.3Z" fill="currentColor"/>
       </svg>
     </button>
-    <button class="btn btn-icon btn-ghost" id="undoBtn" type="button" title="Take the move back" aria-label="Take the move back">
-      <svg class="ico" viewBox="0 0 24 24" aria-hidden="true" focusable="false">
-        <g fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="butt">
-          <path d="M19 18V11.4a5.4 5.4 0 0 0-10.8 0"/>
-        </g>
-        <path d="M8.2 16.2 5 10.7h6.4Z" fill="currentColor"/>
-      </svg>
-    </button>
+    <button class="btn btn-ghost" id="undoBtn" type="button">Undo</button>
   </div>
 
   <div class="board" id="board" role="group" aria-label="2048, 4 by 4 grid" aria-describedby="modeRule">
@@ -70,7 +63,7 @@
       <p id="overlayText"></p>
       <div class="overlay-actions">
         <button class="btn btn-primary" id="overlayPrimary"></button>
-        <button class="btn btn-ghost" id="overlayUndo">Take the move back</button>
+        <button class="btn btn-ghost" id="overlayUndo">Undo</button>
       </div>
     </div>
   </div>
