@@ -323,7 +323,7 @@ kbd {
   flex-wrap: wrap;
   align-items: flex-start;
   gap: 18px;
-  margin-bottom: 18px;
+  margin-bottom: 8px;
 }
 
 .apparatus {
@@ -567,7 +567,7 @@ kbd {
 /* The hint, on the system's measure and in ink rather than gold — gold marks
    state in this box, it does not carry sentences. */
 .note {
-  margin: 0 0 18px;
+  margin: 0 0 8px;
   min-height: 1.55em;
   max-width: 46ch;
   font-size: 14.5px;
