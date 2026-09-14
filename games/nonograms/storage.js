@@ -1,4 +1,4 @@
-// Nonogram — what the box remembers.
+// Nonograms — what the box remembers.
 //
 // Same try/catch + in-memory-fallback shape as the other games (see
 // games/math-puzzles/storage.js): blocked or full storage degrades to a

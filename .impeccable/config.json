@@ -83,6 +83,15 @@
         ],
         "createdAt": "2026-09-08T19:25:25.773Z",
         "reason": "Impeccable: measured false positive on .lid__plate - the render shows 25-46px clearance on all four sides; the rule reads the decorative inset gold ring (an inset box-shadow) as the container boundary. Confirmed by the finish reviewer."
+      },
+      {
+        "rule": "side-tab",
+        "value": "*",
+        "files": [
+          "games/nonograms/style.css"
+        ],
+        "createdAt": "2026-09-14T19:19:40.862Z",
+        "reason": "false positive: these are nonogram grid-cell ruling borders (.sq--rule-l/t, .sq--edge-l/t/r/b) per CLAUDE.md's documented grid design (heavy every-5th rule, outer grid border) — not a card side-tab accent"
       }
     ]
   }

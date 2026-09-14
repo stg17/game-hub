@@ -1,4 +1,4 @@
-// Nonogram — the plates.
+// Nonograms — the plates.
 //
 // Every picture is drawn by hand, not generated. A random nonogram of the right
 // density is still solvable, but it resolves into noise, and the whole payoff of
@@ -7,7 +7,7 @@
 // is finished — the reveal is the reward.
 //
 // EVERY PICTURE HERE IS SOLVABLE BY PURE DEDUCTION. `selfcheck.js` runs the
-// line solver in nonogram.js over all of them from a blank sheet and refuses
+// line solver in nonograms.js over all of them from a blank sheet and refuses
 // any that need a guess, which also proves the solution is the only one. A
 // picture that stalls the solver does not get to be "hard" — it gets fixed or
 // dropped. Symmetric hollow shapes are the usual offender; breaking the

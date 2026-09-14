@@ -341,7 +341,7 @@ html { scrollbar-color: var(--tray) var(--table-deep); }
 /* ── the open space in the tray ──────────────────────────────────────── */
 
 /* The slot closes the last row. The plan is composed by hand now, so its
-   width is stated rather than derived: Nonogram takes 7 of the last row and
+   width is stated rather than derived: Nonograms takes 7 of the last row and
    the slot takes the 5 that are left. Move a board and this is the other
    number to re-check. */
 .slot {

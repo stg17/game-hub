@@ -1,4 +1,4 @@
-// Nonogram — the logic, with no DOM and no timers in sight.
+// Nonograms — the logic, with no DOM and no timers in sight.
 //
 // A nonogram is a printed picture described only by how much ink each row and
 // column carries. The numbers along the top and side are the run lengths of
@@ -12,7 +12,7 @@
 // decides whether a picture is allowed in the game at all, and selfcheck.js
 // runs it over every picture in pictures.js.
 window.INK = window.INK || {};
-window.INK.Nonogram = (function () {
+window.INK.Nonograms = (function () {
   'use strict';
 
   /* A cell in a player's grid, or in the solver's working grid. */

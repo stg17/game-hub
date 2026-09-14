@@ -22,7 +22,7 @@ games/
   tetris/          Canvas Tetris with SRS rotation, hold, and a ghost piece
   2048/            DOM sliding-tile puzzle with a multi-step undo
   terms-and-conditions/  Reaction game about small print that overrides a big instruction
-  nonogram/        Reconstruct a printed picture from run-length clues
+  nonograms/       Reconstruct a printed picture from run-length clues
 ```
 
 Each subfolder under `games/` is a fully independent game: its own `index.html`, its own styles, its own scripts, nothing shared or imported across game folders. This is deliberate — games can use completely different code styles/conventions from each other, and none of them can break another by being edited.
@@ -464,7 +464,7 @@ viewport to a 485px minimum, so a true 390px capture needs the iframe), play it
 synchronously in one tick so no virtual time passes mid-run, then fire a `blur`
 at the iframe's window to freeze the clock before capturing.
 
-### Nonograms (`games/nonogram/`)
+### Nonograms (`games/nonograms/`)
 
 The numbers beside each row and column are the run lengths of ink
 in that line, in order, and reconstructing them turns a blank grid into a
@@ -493,13 +493,13 @@ pattern 2048 uses, would cover the one thing worth looking at. Because the
 finish is a state of the play screen and not a screen, `state.done` guards the
 clock, the pointer handlers, the hint and `Esc`.
 
-Script order in `index.html` is the dependency graph: `nonogram.js` →
+Script order in `index.html` is the dependency graph: `nonograms.js` →
 `pictures.js` → `storage.js` → `game.js`. The first two are **pure** — no DOM,
 no timers — which is what makes the guarantee below checkable.
 
 **THE GUARANTEE: every plate is finishable by deduction alone.** Never a guess,
 never a 50/50 you discover was wrong twenty moves later. This is enforced, not
-intended: `nonogram.js`'s `solveLine` finds *every* deduction available from a
+intended: `nonograms.js`'s `solveLine` finds *every* deduction available from a
 single line (it walks all arrangements of the runs consistent with what is
 known and keeps what they agree on), `solve` runs rows and columns to a fixed
 point, and `isFair` requires that to finish a plate from blank. Because every

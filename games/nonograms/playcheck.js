@@ -1,4 +1,4 @@
-// Nonogram — end-to-end check.  Run it with:  node playcheck.js
+// Nonograms — end-to-end check.  Run it with:  node playcheck.js
 //
 // selfcheck.js proves the plates and the solver. This drives the whole game —
 // game.js included — against a small fake DOM and a clock we own, which is the
@@ -202,7 +202,7 @@ function boot() {
 }
 
 var sb = boot();
-var N = sb.INK.Nonogram;
+var N = sb.INK.Nonograms;
 var P = sb.INK.Pictures;
 
 /* ── helpers over the fake DOM ─────────────────────────────────────────── */
@@ -639,7 +639,7 @@ var solvedMs;
 
   /* now reload the whole game against the same storage */
   sb = boot();
-  N = sb.INK.Nonogram;
+  N = sb.INK.Nonograms;
   P = sb.INK.Pictures;
 
   check(screen() === 'index', 'the reloaded game did not open on the index');

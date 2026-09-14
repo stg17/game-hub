@@ -113,7 +113,7 @@
       return runs > 0 ? plural(runs, 'game played', 'games played') : null;
     },
 
-    /* Nonogram (No. 07). The slug and the storage key predate the rename and
+    /* Nonograms (No. 07). The slug and the storage key predate the rename and
        are deliberately frozen: players' recorded times live under the old key. */
     ink: function () {
       var s = json('inkbynumbers_stats_v1');

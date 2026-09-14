@@ -1,6 +1,6 @@
-// Nonogram — screens, the board, input, the clock.
+// Nonograms — screens, the board, input, the clock.
 //
-// All the reasoning lives in nonogram.js, which is pure and self-checked. This
+// All the reasoning lives in nonograms.js, which is pure and self-checked. This
 // file draws a plate and takes marks. Conventions kept from the rest of the
 // box: screens toggled by the `hidden` property, one function that pushes state
 // into the DOM, and elapsed time always computed from a wall-clock base rather
@@ -12,7 +12,7 @@
 (function () {
   'use strict';
 
-  var N = window.INK.Nonogram;
+  var N = window.INK.Nonograms;
   var P = window.INK.Pictures;
   var Store = window.INK.Storage;
 

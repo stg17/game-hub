@@ -1,4 +1,4 @@
-// Nonogram — headless self-check.  Run it with:  node selfcheck.js
+// Nonograms — headless self-check.  Run it with:  node selfcheck.js
 //
 // The throwaway-Node-script pattern CLAUDE.md documents for the other
 // generators, kept in the folder because this game makes a promise that has to
@@ -21,11 +21,11 @@ var vm = require('vm');
 var sandbox = {};
 sandbox.window = sandbox;
 var ctx = vm.createContext(sandbox);
-['nonogram.js', 'pictures.js'].forEach(function (f) {
+['nonograms.js', 'pictures.js'].forEach(function (f) {
   vm.runInContext(fs.readFileSync(path.join(__dirname, f), 'utf8'), ctx, { filename: f });
 });
 
-var N = sandbox.INK.Nonogram;
+var N = sandbox.INK.Nonograms;
 var P = sandbox.INK.Pictures;
 
 var failures = [];
