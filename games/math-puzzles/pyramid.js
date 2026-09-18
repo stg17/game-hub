@@ -219,7 +219,7 @@ window.MathPuzzles.pyramid = (function () {
             " don't add up — check the highlighted ones.";
           msg.className = 'pyr-message error';
         }
-      }, 600);
+      }, 1500);
     }
 
     activeRerender = redraw;
