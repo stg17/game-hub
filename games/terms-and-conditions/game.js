@@ -38,6 +38,7 @@
   var state = {
     screen: 'menu',
     running: false,
+    timed: true,          /* menu toggle; No clock skips the deadline entirely */
     streak: 0,
     clauseOrder: [],     /* this run's clauses, in the order they arrive */
     active: [],          /* the ones printed so far */
@@ -66,6 +67,7 @@
     el.hudBest = document.getElementById('hudBest');
 
     el.menuBest = document.getElementById('menuBest');
+    el.clockToggle = document.getElementById('clockToggle');
     el.startBtn = document.getElementById('startBtn');
 
     el.amendNo = document.getElementById('amendNo');
@@ -81,6 +83,7 @@
     el.headline = document.getElementById('headline');
     el.shapes = document.getElementById('shapes');
     el.clauseList = document.getElementById('clauseList');
+    el.clockBar = document.getElementById('clockBar');
     el.barFill = document.getElementById('barFill');
 
     el.overTitle = document.getElementById('overTitle');
@@ -278,6 +281,9 @@
     drawRound();
     syncHud();
     show('play');
+    /* No clock: nothing drains and a timeout can never end the round, so the
+       bar that exists to show that draining is hidden rather than frozen full. */
+    el.clockBar.hidden = !state.timed;
     el.barFill.style.width = '100%';
     /* keyboard stays on the sheet, so 1-6 works without a click first */
     el.sheet.focus();
@@ -415,7 +421,7 @@
     var gap = lastFrameAt ? now - lastFrameAt : 0;
     lastFrameAt = now;
 
-    if (state.screen === 'play' && state.running && !state.paused) {
+    if (state.screen === 'play' && state.running && !state.paused && state.timed) {
       if (gap > STALL_MS) state.deadline += gap;
       var left = state.deadline - now;
       if (left <= 0) {
@@ -448,10 +454,26 @@
 
   /* ── input ──────────────────────────────────────────────────────────── */
 
+  function syncClockToggle() {
+    Array.prototype.forEach.call(el.clockToggle.children, function (btn) {
+      var isTimed = btn.getAttribute('data-value') === 'timed';
+      var active = isTimed === state.timed;
+      btn.className = 'toggle-btn' + (active ? ' active' : '');
+      btn.setAttribute('aria-pressed', String(active));
+    });
+  }
+
   function wire() {
     el.startBtn.addEventListener('click', startRun);
     el.againBtn.addEventListener('click', startRun);
     el.amendBtn.addEventListener('click', dealRound);
+
+    Array.prototype.forEach.call(el.clockToggle.children, function (btn) {
+      btn.addEventListener('click', function () {
+        state.timed = btn.getAttribute('data-value') === 'timed';
+        syncClockToggle();
+      });
+    });
 
     el.shapes.addEventListener('click', function (e) {
       var btn = e.target.closest ? e.target.closest('.tc-shape') : null;
@@ -486,6 +508,7 @@
   cache();
   wire();
   el.menuBest.textContent = String(Store.get().bestStreak);
+  syncClockToggle();
   syncHud();
   show('menu');
   requestAnimationFrame(frame);

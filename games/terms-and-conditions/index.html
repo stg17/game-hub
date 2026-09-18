@@ -38,6 +38,14 @@
 
     <p class="menu-best">Best streak so far: <b id="menuBest">0</b></p>
 
+    <div class="clock-group">
+      <p class="clock-group__label">Clock</p>
+      <div class="toggle-row" id="clockToggle" role="group" aria-label="Clock">
+        <button type="button" class="toggle-btn active" data-value="timed" aria-pressed="true">Timed</button>
+        <button type="button" class="toggle-btn" data-value="untimed" aria-pressed="false">No clock</button>
+      </div>
+    </div>
+
     <div class="btn-row">
       <button class="btn btn-primary btn-lead" id="startBtn">Start</button>
     </div>
@@ -62,10 +70,10 @@
       <div class="howto__body drawer__body">
         <ul class="howto__list">
           <li>Always click the biggest shape.</li>
+          <li>Every 3 correct answers, a new rule is added to the list.</li>
           <li>But read the numbered rules under it first. A rule can
             change the answer.</li>
           <li>If more than one rule applies, use the last one in the list.</li>
-          <li>Every 3 correct answers, a new rule is added to the list.</li>
           <li>You get less time to answer as the game goes on.</li>
           <li>One wrong click, or running out of time, ends the game.</li>
           <li>Your score is the most correct answers you got in a row.</li>
@@ -126,7 +134,7 @@
            gets the grouping, from here. -->
       <ol class="fine" id="clauseList" aria-label="Terms and conditions"></ol>
       <div class="shapes" id="shapes"></div>
-      <div class="bar" aria-hidden="true"><span class="bar__fill" id="barFill"></span></div>
+      <div class="bar" id="clockBar" aria-hidden="true"><span class="bar__fill" id="barFill"></span></div>
     </div>
   </section>
 

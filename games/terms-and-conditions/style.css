@@ -241,6 +241,35 @@ kbd {
   font-variant-numeric: tabular-nums;
 }
 
+/* Timed is the game as designed; No clock is the option for reading it at
+   your own pace. Same toggle-row pattern as math-puzzles' Timed/No clock. */
+.clock-group { margin: 0 0 26px; }
+.clock-group__label {
+  margin: 0 0 9px;
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: .18em;
+  text-transform: uppercase;
+  color: rgba(230, 220, 196, .55);
+}
+.toggle-row { display: flex; flex-wrap: wrap; gap: 0; }
+.toggle-btn {
+  appearance: none;
+  -webkit-appearance: none;
+  cursor: pointer;
+  font: 700 12px/1 Slab, Georgia, serif;
+  letter-spacing: .13em;
+  text-transform: uppercase;
+  padding: 11px 18px;
+  background: var(--paper);
+  color: var(--ink);
+  border: 3px solid var(--ink);
+  margin-left: -3px;
+}
+.toggle-btn:first-child { margin-left: 0; }
+.toggle-btn:hover { background: var(--paper-dim); }
+.toggle-btn.active { background: var(--field); color: var(--paper); position: relative; z-index: 1; }
+
 /* The way in. It is the only thing on the menu you have to press, so it is
    printed at a size that says so. */
 .btn-lead {
