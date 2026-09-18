@@ -196,21 +196,30 @@ window.MathPuzzles.pyramid = (function () {
       container.appendChild(wrap);
     }
 
+    var checkTimer = null;
+
     function onGridChanged() {
-      var result = checkSolution(puzzleState);
-      if (!result.allFilled) return; // don't redraw mid-typing — avoids losing input focus
-      lastMismatches = {};
-      result.mismatches.forEach(function (m) { lastMismatches[m.r + ',' + m.i] = true; });
-      redraw();
-      var msg = container.querySelector('.pyr-message');
-      if (result.solved) {
-        if (msg) { msg.textContent = 'Solved!'; msg.className = 'pyr-message success'; }
-        callbacks.onSolved();
-      } else if (msg) {
-        msg.textContent = result.mismatches.length + ' block' + (result.mismatches.length === 1 ? '' : 's') +
-          " don't add up — check the highlighted ones.";
-        msg.className = 'pyr-message error';
-      }
+      // A cell reads as "filled" the instant one digit of a two-digit answer lands,
+      // so redrawing right away would yank focus out of the box before the second
+      // digit is typed. Wait for a pause in typing before redrawing.
+      if (checkTimer) clearTimeout(checkTimer);
+      checkTimer = setTimeout(function () {
+        checkTimer = null;
+        var result = checkSolution(puzzleState);
+        if (!result.allFilled) return;
+        lastMismatches = {};
+        result.mismatches.forEach(function (m) { lastMismatches[m.r + ',' + m.i] = true; });
+        redraw();
+        var msg = container.querySelector('.pyr-message');
+        if (result.solved) {
+          if (msg) { msg.textContent = 'Solved!'; msg.className = 'pyr-message success'; }
+          callbacks.onSolved();
+        } else if (msg) {
+          msg.textContent = result.mismatches.length + ' block' + (result.mismatches.length === 1 ? '' : 's') +
+            " don't add up — check the highlighted ones.";
+          msg.className = 'pyr-message error';
+        }
+      }, 600);
     }
 
     activeRerender = redraw;
